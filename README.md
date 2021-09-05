@@ -17,10 +17,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
      </tr>
     <tr>
       <td>HANOIS.PAS</td>
-      <td>Ce fichier permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
+      <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>    
     <tr>
       <td>TETRIS.PAS</td>
-      <td>Ce fichier permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
+      <td>Ce fichier de jeu permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
      </tr>
 </table>
