@@ -1,3 +1,9 @@
+{ @author: Sylvain Maltais (support@gladir.com)
+  @created: 2021
+  @website(https://www.gladir.com/7iles)
+  @abstract(Target: Free Pascal)
+}
+
 Program PacMan;
 
 Uses CRT;
