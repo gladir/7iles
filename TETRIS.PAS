@@ -1,12 +1,12 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @created: 2011
   @website(https://www.gladir.com/7iles)
-  @abstract(Target: Free Pascal)
+  @abstract(Target: Turbo Pascal, Free Pascal)
 }
 
 Program Tetris;
 
-Uses Crt;
+Uses Crt,DOS;
 
 Const
  {Code de touche clavier renvoyee par ReadKey}
@@ -31,6 +31,27 @@ Type
   FBar:Word;
   UpDate:Boolean;
  End;
+
+{$IFNDEF FPC}
+ Procedure CursorOff;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AH:=1;
+  Regs.CH:=32;
+  Regs.CL:=0;
+  Intr($10,Regs);
+ End;
+
+ Procedure CursorOn;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX:=$0100;
+  Regs.CX:=(7 shl 8)+9;
+  Intr($10,Regs);
+ End;
+{$ENDIF}
 
 Function  TetrisInit(Var Q:TetrisGame):Boolean;Forward;
 Procedure TetrisStart(Var Q:TetrisGame);Forward;
@@ -180,7 +201,8 @@ Var
   End
    Else
   Begin
-   _Chr:='O' ;Attr:=$71+Q.Form;
+   _Chr:={$IFDEF FPC}'O'{$ELSE}Chr(254){$ENDIF};
+   Attr:=$71+Q.Form;
   End;
   For I:=0to 3do Begin
    GotoXY(HomeX+Q.X+BlkFormat[Q.Form,Q._Move,I].X,
