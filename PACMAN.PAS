@@ -252,7 +252,7 @@ Begin
      Write({$IFDEF FPC}'.'{$ELSE}Chr(250){$ENDIF});
     End;
     2:Begin
-     TextColor(13+BLINK);
+     TextColor(13{$IFNDEF FPC}+BLINK{$ENDIF});
      Write({$IFDEF FPC}'O'{$ELSE}Chr(249){$ENDIF});
     End;
     3:Begin
