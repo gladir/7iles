@@ -1,12 +1,12 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @created: 2021
   @website(https://www.gladir.com/7iles)
-  @abstract(Target: Free Pascal)
+  @abstract(Target: Turbo Pascal, Free Pascal)
 }
 
 Program PacMan;
 
-Uses CRT;
+Uses CRT,DOS;
 
 Const
  {Code de touche clavier renvoyee par ReadKey}
@@ -70,6 +70,27 @@ Var
   DotCount:Boolean;
   Speed:Byte;
  End;
+
+{$IFNDEF FPC}
+ Procedure CursorOff;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AH:=1;
+  Regs.CH:=32;
+  Regs.CL:=0;
+  Intr($10,Regs);
+ End;
+
+ Procedure CursorOn;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX:=$0100;
+  Regs.CX:=(7 shl 8)+9;
+  Intr($10,Regs);
+ End;
+{$ENDIF}
 
 Procedure InitData;
 Var
@@ -208,8 +229,13 @@ Begin
  GotoXY(1,25);
  TextColor(15);
  Write('Niveau : ',Level,' Pointage : ',Score,' Vie : ',Live);
- If ChaseTimer>0Then Write('Temps : ',ChaseTimer,' Attraper : ',ChaseGhost);
  ClrEol;
+ GotoXY(30,1);
+ If ChaseTimer>0Then Write('Temps : ',ChaseTimer)
+                Else ClrEol;
+ GotoXY(30,2);
+ If ChaseTimer>0Then Write('Attr. : ',ChaseGhost)
+                Else ClrEol;
 End;
 
 Procedure DisplayNewBoard;
@@ -223,23 +249,67 @@ Begin
    Case Screen[Y,X]of
     1:Begin
      TextColor(12);
-     Write('.');
+     Write({$IFDEF FPC}'.'{$ELSE}Chr(250){$ENDIF});
     End;
     2:Begin
-     TextColor(13);
-     Write('O');
+     TextColor(13+BLINK);
+     Write({$IFDEF FPC}'O'{$ELSE}Chr(249){$ENDIF});
     End;
     3:Begin
      TextColor((8+Level)and $F);
-     Write('=');
+     Write({$IFDEF FPC}'='{$ELSE}Chr(205){$ENDIF});
     End;
     4:Begin
      TextColor((8+Level)and $F);
-     Write('I');
+     Write({$IFDEF FPC}'I'{$ELSE}Chr(186){$ENDIF});
     End;
-    5..16:Begin
+    5:Begin
      TextColor((8+Level)and $F);
-     Write('+');
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(200){$ENDIF});
+    End;
+    6:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(188){$ENDIF});
+    End;
+    7:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(201){$ENDIF});
+    End;
+    8:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(187){$ENDIF});
+    End;
+    9:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(222){$ENDIF});
+    End;
+    10:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(221){$ENDIF});
+    End;
+    11:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(220){$ENDIF});
+    End;
+    12:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(223){$ENDIF});
+    End;
+    13:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(185){$ENDIF});
+    End;
+    14:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(204){$ENDIF});
+    End;
+    15:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(202){$ENDIF});
+    End;
+    16:Begin
+     TextColor((8+Level)and $F);
+     Write({$IFDEF FPC}'+'{$ELSE}Chr(203){$ENDIF});
     End;
     17:Begin
      TextColor(15);
@@ -301,7 +371,7 @@ Begin
                     Else TextBackground(0);
      TextColor(14);
      MouthOpen:=Not MouthOpen;
-     If(MouthOpen)Then Write('A')
+     If(MouthOpen)Then Write({$IFDEF FPC}'A'{$ELSE}Chr(239){$ENDIF})
                   Else Write('o');
      TextBackground(0);
     End;
@@ -358,7 +428,7 @@ Begin
       {CheckCellGhost;}
       GotoXY(1+Ghosts[I].X,1+Ghosts[I].Y);
       TextColor(10+I);
-      Write('f');
+      Write({$IFDEF FPC}'f'{$ELSE}Chr(234){$ENDIF});
      End
       Else
      FindDirection(I);
@@ -368,7 +438,7 @@ Begin
       {CheckCellGhost;}
       GotoXY(1+Ghosts[I].X,1+Ghosts[I].Y);
       TextColor(10+I);
-      Write('f');
+      Write({$IFDEF FPC}'f'{$ELSE}Chr(234){$ENDIF});
      End
       Else
      FindDirection(I);
@@ -378,7 +448,7 @@ Begin
       {CheckCellGhost;}
       GotoXY(1+Ghosts[I].X,1+Ghosts[I].Y);
       TextColor(10+I);
-      Write('f');
+      Write({$IFDEF FPC}'f'{$ELSE}Chr(234){$ENDIF});
      End
       Else
      FindDirection(I);
@@ -388,12 +458,16 @@ Begin
       {CheckCellGhost;}
       GotoXY(1+Ghosts[I].X,1+Ghosts[I].Y);
       TextColor(10+I);
-      Write('f');
+      Write({$IFDEF FPC}'f'{$ELSE}Chr(234){$ENDIF});
      End
       Else
      FindDirection(I);
     End;
-    If(Ghosts[I].X=PlayerX)and(Ghosts[I].Y=PlayerY)Then Begin
+    If((Ghosts[I].X-1=PlayerX)and(Ghosts[I].Y=PlayerY))or
+      ((Ghosts[I].X+1=PlayerX)and(Ghosts[I].Y=PlayerY))or
+      ((Ghosts[I].X=PlayerX)and(Ghosts[I].Y-1=PlayerY))or
+      ((Ghosts[I].X=PlayerX)and(Ghosts[I].Y+1=PlayerY))or
+      ((Ghosts[I].X=PlayerX)and(Ghosts[I].Y=PlayerY))Then Begin
      If ChaseTimer>0 Then Begin
       Inc(ChaseGhost);
       Inc(Score,200*ChaseGhost);
@@ -433,7 +507,9 @@ Begin
 End;
 
 BEGIN
+ TextMode(CO40);
  ClrScr;
+ CursorOff;
  Screen:=InitialScreen;
  HiScore:=0;
  Live:=4;
@@ -442,4 +518,7 @@ BEGIN
  InitData;
  DisplayNewBoard;
  Play;
+ TextMode(CO80);
+ ClrScr;
+ CursorOn;
 END.
