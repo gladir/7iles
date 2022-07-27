@@ -10,9 +10,11 @@ Aperçu de Tours d'Hanois (sous Free Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/132130773-31b4704d-974c-48d3-a9d9-49b31ae1698d.png)
 
-Aperçu de Pac-Man (sous Free Pascal)
+Aperçu de Pac-Man
 
-![image](https://user-images.githubusercontent.com/11842176/132139074-12bba7cb-1823-4c84-bbdd-bf528ffc99cf.png)
+![image](https://user-images.githubusercontent.com/11842176/181350205-9c10b332-533e-42f3-a578-82db24c9a400.png)
+![image](https://user-images.githubusercontent.com/11842176/181349771-4c04f0cd-79e1-444a-929b-5703242b5aeb.png)
+
 
 Aperçu de Bowling (sous Turbo Pascal)
 
