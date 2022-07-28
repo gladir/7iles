@@ -24,7 +24,9 @@ Aperçu de Peg Leap (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181311079-9a050acd-a403-4812-ad54-30a7b416db63.png)
 
+Aperçu de Tic-Tac-Toe (sous Free Pascal)
 
+![image](https://user-images.githubusercontent.com/11842176/181402919-b1cc137a-1c02-4770-bc6d-4104d9712fff.png)
 
 # Liste des fichiers
 
@@ -54,5 +56,9 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     <tr>
       <td>TETRIS.PAS</td>
       <td>Ce fichier de jeu permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
+     </tr>
+     <tr>
+        <td>TTT.PAS</td>
+        <td>Ce fichier de jeu permet de lancer le jeu Tic-Tac-Toe contre l'ordinateur.</td>
      </tr>
 </table>
