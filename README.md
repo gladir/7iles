@@ -2,10 +2,26 @@
 
 Les jeux contenu dans 7iles sont une séries de programmes autonomes écrit en Pascal et n'ayant pas de dépendances avec d'autres fichiers Pascal mais uniquement d'un compilateur, comme par exemple Free Pascal.
 
+Aperçu de Tetris (sous Free Pascal)
+
 ![image](https://user-images.githubusercontent.com/11842176/132130638-57b5e8d3-50df-4696-834e-1790eb6e7645.png)
+
+Aperçu de Tours d'Hanois (sous Free Pascal)
+
 ![image](https://user-images.githubusercontent.com/11842176/132130773-31b4704d-974c-48d3-a9d9-49b31ae1698d.png)
-![image](https://user-images.githubusercontent.com/11842176/132139074-12bba7cb-1823-4c84-bbdd-bf528ffc99cf.png)
+
+Aperçu de Pac-Man
+
+![image](https://user-images.githubusercontent.com/11842176/181350205-9c10b332-533e-42f3-a578-82db24c9a400.png)
+![image](https://user-images.githubusercontent.com/11842176/181349771-4c04f0cd-79e1-444a-929b-5703242b5aeb.png)
+
+
+Aperçu de Bowling (sous Turbo Pascal)
+
 ![image](https://user-images.githubusercontent.com/11842176/181278768-d61424df-c033-45d7-ae1f-402a9a0b9a79.png)
+
+Aperçu de Peg Leap (sous Turbo Pascal)
+
 ![image](https://user-images.githubusercontent.com/11842176/181311079-9a050acd-a403-4812-ad54-30a7b416db63.png)
 
 
