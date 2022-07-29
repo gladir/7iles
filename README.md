@@ -15,6 +15,9 @@ Aperçu de Pac-Man
 ![image](https://user-images.githubusercontent.com/11842176/181350205-9c10b332-533e-42f3-a578-82db24c9a400.png)
 ![image](https://user-images.githubusercontent.com/11842176/181349771-4c04f0cd-79e1-444a-929b-5703242b5aeb.png)
 
+Apercu de Breakout (sous Turbo Pascal)
+
+![image](https://user-images.githubusercontent.com/11842176/181775528-e7932f33-f995-4eb9-b465-6a38cbc9411f.png)
 
 Aperçu de Bowling (sous Turbo Pascal)
 
@@ -38,8 +41,12 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <th>Description</th>
      </tr>
     <tr> 
+      <td>BREAKOUT.PAS</td>
+      <td>Ce fichier contient le jeu BREAKOUT de style Atari 2600.</td>
+     </tr>
+    <tr> 
       <td>BOWLING.PAS</td>
-      <td>Ce fichier de jeu contient le jeu de BOWLING de style Atari 2600.</td>
+      <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
     </tr>
     <tr>
       <td>HANOIS.PAS</td>
