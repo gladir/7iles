@@ -306,7 +306,7 @@ BEGIN
    (ParamStr(1)='/h')or(ParamStr(1)='/H')Then Begin
   WriteLn('BREAKOUT : Cette commande permet de lancer le jeu BREAKOUT.');
   WriteLn;
-  WriteLn('Syntaxe : BREAKOUT [/FULLBALLS]');
+  WriteLn('Syntaxe : BREAKOUT [/FULLBALLS] [SHOWBRICKS]');
   WriteLn;
   WriteLn(' /FULLBALLS        Nombre de balles illimit‚s');
   WriteLn(' /SHOWBRICKS       Affiche les briques restantes');
