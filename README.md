@@ -45,19 +45,19 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <th>Description</th>
      </tr>
     <tr> 
-      <td>BREAKOUT.PAS</td>
+      <td><b>BREAKOUT.PAS</b></td>
       <td>Ce fichier contient le jeu BREAKOUT de style Atari 2600.</td>
      </tr>
     <tr> 
-      <td>BOWLING.PAS</td>
+      <td><b>BOWLING.PAS</b></td>
       <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
     </tr>
     <tr>
-      <td>HANOIS.PAS</td>
+      <td><b>HANOIS.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>    
      <tr>
-      <td>PACMAN.PAS</td>
+      <td><b>PACMAN.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Pac-Man. Ce jeux consiste a manger les pastilles sans vous faire attraper par les fantomes.</td>
      </tr>        
      <tr>
@@ -65,15 +65,15 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient un autre jeu de carte de patience.</td>
       </tr>
      <tr>
-        <td>PEGLEAP.PAS</b></td>
+        <td><b>PEGLEAP.PAS</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
     <tr>
-      <td>TETRIS.PAS</td>
+      <td><b>TETRIS.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
      </tr>
      <tr>
-        <td>TTT.PAS</td>
+        <td><b>TTT.PAS</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Tic-Tac-Toe contre l'ordinateur.</td>
      </tr>
 </table>
