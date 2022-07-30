@@ -10,7 +10,18 @@ Uses Crt;
 
 Procedure Main;
 Const
- C:Array[1..7]of Char='=======';
+ C:Array[1..7]of Char=
+ {$IFDEF FPC}
+  '======='
+ {$ELSE}
+  Char(177)+Char(177)+Char(177)+Char(177)+Char(177)+Char(177)+Char(177)
+ {$ENDIF};
+ C2:Array[1..7]of Char=
+ {$IFDEF FPC}
+  '======='
+ {$ELSE}
+  Char(178)+Char(178)+Char(178)+Char(178)+Char(178)+Char(178)+Char(178)
+ {$ENDIF};
  XD:Array[1..3]of Byte=(9,25,41);
 Var
  A:Array[1..3,0..8]of Byte;
@@ -28,12 +39,13 @@ Begin
   For X:=1to 3do Begin
    Z:=A[X,I];
    If Z=0Then Begin
-    GotoXY(XD[X]-7,Y); Write(' ':7,'I',' ':7);
+    GotoXY(XD[X]-7,Y); Write(' ':7,{$IFDEF FPC}'I'{$ELSE}Chr(219){$ENDIF},' ':7);
    End
     Else
    For J:=XD[X]-Z to XD[X]+Z do Begin
     GotoXY(J,Y);
-    Write(C[Z]);
+    If Odd(Z)Then Write(C[Z])
+             Else Write(C2[Z]);
    End;
   End;
  End;
