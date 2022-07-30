@@ -31,6 +31,10 @@ Aperçu de Tic-Tac-Toe (sous Free Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181402919-b1cc137a-1c02-4770-bc6d-4104d9712fff.png)
 
+Aperçu d'un jeu de Patience (sous Turbo Pascal)
+
+![image](https://user-images.githubusercontent.com/11842176/181925570-d5e4692e-dada-4d95-acc1-68f542c69291.png)
+
 # Liste des fichiers
 
 Voici la liste des différents fichiers de jeux proposés dans 7iles :
@@ -56,6 +60,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td>PACMAN.PAS</td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Pac-Man. Ce jeux consiste a manger les pastilles sans vous faire attraper par les fantomes.</td>
      </tr>        
+     <tr>
+        <td><b>PATIENCE.PAS</b></b>
+        <td>Ce fichier contient un autre jeu de carte de patience.</td>
+      </tr>
      <tr>
         <td>PEGLEAP.PAS</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
