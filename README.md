@@ -41,7 +41,7 @@ Aperçu du jeu Soko-Ban (sous Turbo Pascal)
 
 Aperçu du jeu Space Jockey (sous Turbo Pascal)
 
-![image](https://user-images.githubusercontent.com/11842176/182052296-77ba26bd-f396-4202-8ff4-3991f7155810.png)
+![image](https://user-images.githubusercontent.com/11842176/182154290-2a0c0138-ed21-42cb-8a6e-2d3ed05720d8.png)
 
 # Liste des fichiers
 
