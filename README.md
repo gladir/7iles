@@ -35,6 +35,10 @@ Aperçu d'un jeu de Patience (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181925570-d5e4692e-dada-4d95-acc1-68f542c69291.png)
 
+Aperçu du jeu Soko-Ban (sous Turbo Pascal)
+
+![image](https://user-images.githubusercontent.com/11842176/182032881-cd2cd40f-3105-4afe-bcbf-28d318f85cdf.png)
+
 # Liste des fichiers
 
 Voici la liste des différents fichiers de jeux proposés dans 7iles :
@@ -68,6 +72,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>PEGLEAP.PAS</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
+     <tr>
+        <td><b>SOKOBAN.PAS</b></td>
+        <td>Ce fichier de jeu contient le jeu Soko-Ban.</td>
+    </tr>
     <tr>
       <td><b>TETRIS.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
