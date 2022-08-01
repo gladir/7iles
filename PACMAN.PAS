@@ -90,6 +90,42 @@ Var
   Regs.CX:=(7 shl 8)+9;
   Intr($10,Regs);
  End;
+
+ Procedure LoadFont(AscII:Word;Table,Matrice,Nombre:Byte;Buffer:Pointer);
+ Var
+  Registre:Registers;
+ Begin
+  With Registre do Begin
+   AX:=$1100;
+   BH:=Matrice;
+   BL:=Table;
+   CX:=Nombre;
+   DX:=AscII;
+   BP:=Ofs(Buffer^);
+   ES:=Seg(Buffer^);
+   Intr($10,Registre);
+  End;
+ End;
+
+ Procedure Font234;Assembler;ASM
+   { 234 }
+  DB 00011100b
+  DB 01111110b
+  DB 11111111b
+  DB 10011001b
+  DB 10011001b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 10111011b
+  DB 10011001b
+  DB 10011001b
+ END;
 {$ENDIF}
 
 Procedure InitData;
@@ -510,6 +546,9 @@ BEGIN
  TextMode(CO40);
  ClrScr;
  CursorOff;
+ {$IFNDEF FPC}
+  LoadFont(234,0,16,1,@Font234);
+ {$ENDIF}
  Screen:=InitialScreen;
  HiScore:=0;
  Live:=4;
