@@ -628,7 +628,7 @@ Procedure ShowAlien(N:Byte);Begin
            '--+--'
           {$ELSE}
            Chr(196)+Chr(196)+Chr(194)+Chr(196)+Chr(196)
-          {$ENDIF}); { HÇlicoptäre }
+          {$ENDIF}); { Helicoptere }
   5:Write({$IFDEF FPC}
            ' --+ '
           {$ELSE}
@@ -656,7 +656,7 @@ Procedure ShowAlien(N:Byte);Begin
            '<-+-+'
           {$ELSE}
            Chr(230)+Chr(231)+Chr(232)+Chr(233)+Chr(234)
-          {$ENDIF}); { HÇlicoptäre }
+          {$ENDIF}); { Helicoptere }
   5:Write({$IFDEF FPC} { Tank }
      '---- '
      {$ELSE}
@@ -681,7 +681,7 @@ Procedure ShowAlien(N:Byte);Begin
      '  T  '
     {$ELSE}
      '  '+Chr(235)+'  '
-    {$ENDIF}); { HÇlicoptäre }
+    {$ENDIF}); { Helicoptere }
   5:Write({$IFDEF FPC}
      '-ooo '
     {$ELSE}
