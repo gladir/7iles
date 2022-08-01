@@ -4,7 +4,7 @@
   @abstract(Target: Turbo Pascal, Free Pascal)
 }
 
-Program SpaceJocker;
+Program SpaceJockey;
 
 Uses Crt,DOS;
 
