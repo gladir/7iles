@@ -33,6 +33,511 @@ Var
   Regs.CX:=(7 shl 8)+9;
   Intr($10,Regs);
  End;
+
+ Procedure LoadFont(AscII:Word;Table,Matrice,Nombre:Byte;Buffer:Pointer);
+ Var
+  Registre:Registers;
+ Begin
+  With Registre do Begin
+   AX:=$1100;
+   BH:=Matrice;
+   BL:=Table;
+   CX:=Nombre;
+   DX:=AscII;
+   BP:=Ofs(Buffer^);
+   ES:=Seg(Buffer^);
+   Intr($10,Registre);
+  End;
+ End;
+
+ Procedure Font224;Assembler;ASM
+   { 224 }
+  DB 00000001b
+  DB 00000001b
+  DB 00000011b
+  DB 00000011b
+  DB 00000111b
+  DB 00000111b
+  DB 00001111b
+  DB 00001111b
+  DB 00011111b
+  DB 00011111b
+  DB 00111111b
+  DB 00111111b
+  DB 01111111b
+  DB 01111111b
+  DB 11111111b
+  DB 11111111b
+
+   {225 }
+  DB 10000000b
+  DB 10000000b
+  DB 11000000b
+  DB 11000000b
+  DB 11100000b
+  DB 11100000b
+  DB 11110000b
+  DB 11110000b
+  DB 11111000b
+  DB 11111000b
+  DB 11111100b
+  DB 11111100b
+  DB 11111110b
+  DB 11111110b
+  DB 11111111b
+  DB 11111111b
+
+   { 226 }
+  DB 00000011b
+  DB 00001111b
+  DB 00011111b
+  DB 00111111b
+  DB 00111111b
+  DB 01111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 01111111b
+  DB 00111111b
+  DB 00111111b
+  DB 00011111b
+  DB 00001111b
+  DB 00000011b
+
+   { 227 }
+  DB 11000000b
+  DB 11110000b
+  DB 11111000b
+  DB 11111100b
+  DB 11111100b
+  DB 11111110b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111110b
+  DB 11111100b
+  DB 11111100b
+  DB 11111000b
+  DB 11110000b
+  DB 11000000b
+
+   { 228 }
+  DB 10101010b
+  DB 10101010b
+  DB 10101010b
+  DB 10101010b
+  DB 10101010b
+  DB 10101010b
+  DB 10101010b
+  DB 10101010b
+  DB 10010010b
+  DB 01010100b
+  DB 01010100b
+  DB 01010100b
+  DB 01010100b
+  DB 01010100b
+  DB 01010110b
+  DB 01010100b
+
+   { 229 }
+  DB 11111111b
+  DB 10000001b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 01111110b
+  DB 00111100b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 230 }
+  DB 00111111b
+  DB 01000001b
+  DB 10000001b
+  DB 10000001b
+  DB 10000001b
+  DB 10000001b
+  DB 10000001b
+  DB 10000001b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 01111111b
+  DB 00111110b
+
+   { 231 }
+  DB 11111110b
+  DB 11111110b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111110b
+  DB 11111110b
+
+   { 232 }
+  DB 00011000b
+  DB 00111100b
+  DB 00111100b
+  DB 00111100b
+  DB 00111100b
+  DB 00111100b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 01111110b
+  DB 01111110b
+  DB 00111100b
+  DB 00111100b
+  DB 00011000b
+  DB 00011000b
+
+   { 233 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 234 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000011b
+  DB 00000111b
+  DB 00001111b
+  DB 00011111b
+  DB 11111111b
+  DB 11111110b
+  DB 11111100b
+  DB 11111100b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 235 }
+  DB 00011000b
+  DB 01111110b
+  DB 01000010b
+  DB 01000010b
+  DB 10000001b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 236 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00111000b
+  DB 00111111b
+  DB 00111000b
+  DB 00111000b
+  DB 00111111b
+  DB 00111000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 237 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 11111111b
+  DB 00000000b
+  DB 00000000b
+  DB 11111111b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 238 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 11111111b
+  DB 00000111b
+  DB 00000111b
+  DB 11111111b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 239 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 01111111b
+  DB 01111111b
+  DB 01111111b
+  DB 00011111b
+  DB 00011111b
+  DB 00111111b
+  DB 01111111b
+  DB 11111111b
+
+   { 240 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 11111100b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111110b
+  DB 11111110b
+  DB 11111110b
+  DB 11111000b
+  DB 11111000b
+  DB 11111100b
+  DB 11111110b
+  DB 11111111b
+
+   { 241 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000011b
+  DB 00001111b
+  DB 00111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 00000111b
+
+   { 242 }
+  DB 00000000b
+  DB 00000011b
+  DB 00000011b
+  DB 00001111b
+  DB 00111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+
+   { 243 }
+  DB 11111111b
+  DB 11111111b
+  DB 01111111b
+  DB 01111111b
+  DB 00111111b
+  DB 00111111b
+  DB 00011111b
+  DB 00011111b
+  DB 00001111b
+  DB 00001111b
+  DB 00001111b
+  DB 00001111b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 244 }
+  DB 11111111b
+  DB 11111111b
+  DB 11111110b
+  DB 11111110b
+  DB 11111110b
+  DB 11111110b
+  DB 11111100b
+  DB 11111100b
+  DB 11111100b
+  DB 11111100b
+  DB 11111000b
+  DB 11110000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+
+   { 245 }
+  DB 00000000b
+  DB 00000011b
+  DB 00000111b
+  DB 00011111b
+  DB 00111000b
+  DB 01111000b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 00111111b
+  DB 00011111b
+  DB 00000111b
+  DB 00000000b
+
+   { 246 }
+  DB 00000000b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 00000000b
+
+   { 247 }
+  DB 00111100b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 00111100b
+
+   { 248 }
+  DB 00000000b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 11111111b
+  DB 00000000b
+
+   { 249 }
+  DB 01111110b
+  DB 11111110b
+  DB 11111110b
+  DB 11111100b
+  DB 11111100b
+  DB 11111000b
+  DB 11111000b
+  DB 11110000b
+  DB 11110000b
+  DB 11100000b
+  DB 11100000b
+  DB 11000000b
+  DB 11000000b
+  DB 10000000b
+  DB 10000000b
+  DB 00000000b
+
+   { 250 }
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000000b
+  DB 00000111b
+  DB 00001111b
+  DB 00011111b
+  DB 00111110b
+ END;
+
 {$ENDIF}
 
 Procedure ShowLive;Begin
@@ -51,6 +556,9 @@ Begin
  TextBackground(Black);
  ClrScr;
  CursorOff;
+ {$IFNDEF FPC}
+  LoadFont(224,0,16,27,@Font224);
+ {$ENDIF}
  Live:=3;
  BK:=0;
  XShip:=4;
@@ -93,13 +601,29 @@ Procedure ShowAlien(N:Byte);Begin
  GotoXY(XAlien[N],YAlien[N]);
  TextColor(Cyan);
  Case AlienType[N]of
-  1:Write({$IFDEF FPC}
+  1:Begin
+   TextColor(Blue);
+   Write({$IFDEF FPC}
            ' ( ) '
           {$ELSE}
-           ' ('+Chr(219)+') '
+           ' '+Chr(226)+Chr(219)+Chr(227)+' '
           {$ENDIF}); { Ballon }
-  2:Write('  /  '); { Avion }
-  3:Write('/---\'); { Maison }
+   TextColor(Cyan);
+  End;
+  2:Write({$IFDEF FPC}
+           '  /  '
+          {$ELSE}
+           '  / '+Chr(250)
+          {$ENDIF});{ Avion }
+  3:Begin
+   TextColor(7);
+   Write({$IFDEF FPC}
+          '/---\'
+         {$ELSE}
+          Chr(224)+Chr(219)+Chr(219)+Chr(219)+Chr(225)
+         {$ENDIF}); { Maison }
+   TextColor(Cyan);
+  End;
   4:Write({$IFDEF FPC}
            '--+--'
           {$ELSE}
@@ -108,24 +632,44 @@ Procedure ShowAlien(N:Byte);Begin
   5:Write({$IFDEF FPC}
            ' --+ '
           {$ELSE}
-           ' '+Chr(205)+Chr(205)+Chr(184)+' '
+           Chr(236)+Chr(237)+Chr(238)+Chr(239)+Chr(240)
           {$ENDIF}); { Tank }
  End;
  GotoXY(XAlien[N],YAlien[N]+1);
  Case AlienType[N]of
-  1:Write(' \|/ ');
-  2:Write('-<--/');
+  1:Write({$IFDEF FPC} { Ballon }
+     ' \|/ '
+    {$ELSE}
+     '  '+Chr(228)+'  '
+    {$ENDIF});
+  2:Write({$IFDEF FPC}
+     '-<--/'
+    {$ELSE}
+     Chr(245)+Chr(246)+Chr(247)+Chr(248)+Chr(249)
+    {$ENDIF}); { Avion }
   3:Write({$IFDEF FPC}
            '+-+-+'
           {$ELSE}
            Chr(218)+Chr(196)+Chr(194)+Chr(196)+Chr(191)
           {$ENDIF});
-  4:Write('<-+-+');
-  5:Write('---- ');
+  4:Write({$IFDEF FPC}
+           '<-+-+'
+          {$ELSE}
+           Chr(230)+Chr(231)+Chr(232)+Chr(233)+Chr(234)
+          {$ENDIF}); { H‚licoptŠre }
+  5:Write({$IFDEF FPC} { Tank }
+     '---- '
+     {$ELSE}
+      Chr(241)+Chr(242)+Chr(219)+Chr(219)+Chr(219)
+     {$ENDIF});
  End;
  GotoXY(XAlien[N],YAlien[N]+2);
  Case AlienType[N]of
-  1:Write('  U');
+  1:Write({$IFDEF FPC}
+     '  U  '
+    {$ELSE}
+     '  '+Chr(229)+'  '
+    {$ENDIF});
   2:Write('  \  ');
   3:Write(
     {$IFDEF FPC}
@@ -133,8 +677,16 @@ Procedure ShowAlien(N:Byte);Begin
     {$ELSE}
      Chr(212)+Chr(205)+Chr(207)+Chr(205)+Chr(190)
     {$ENDIF});
-  4:Write('  T  ');
-  5:Write('-ooo ');
+  4:Write({$IFDEF FPC}
+     '  T  '
+    {$ELSE}
+     '  '+Chr(235)+'  '
+    {$ENDIF}); { H‚licoptŠre }
+  5:Write({$IFDEF FPC}
+     '-ooo '
+    {$ELSE}
+     Chr(243)+'ooo'+Chr(244)
+    {$ENDIF});
  End;
 End;
 
