@@ -3176,7 +3176,7 @@ Const
 Var
  Score:LongInt;
  Life,Level,Gold:Byte;
- XMan,YMan,XManRun,YManRun:Integer;
+ XMan,YMan,XManRun,YManRun,WaitYManRun:Integer;
  CurrEnnemi:Byte;
  XEnnemi,YEnnemi:Array[0..10]of Byte;
  CurrTab:Array[0..15,0..27] of Char;
@@ -3210,11 +3210,13 @@ Procedure InitGame;Begin
  TextBackground(0);
  TextColor(7);
  ClrScr;
+ CursorOff;
  Life:=3;
  Score:=0;
  Level:=1;
  XManRun:=0;
  YManRun:=0;
+ WaitYManRun:=0;
  LoadCurrLevel;
 End;
 
@@ -3324,7 +3326,7 @@ Begin
  End;
  TextColor(15);
  TextBackground(0);
- GotoXY(30,18);
+ GotoXY(29,18);
  Write('Niveau : ',Level);
 End;
 
@@ -3396,6 +3398,39 @@ Procedure RightMan;Begin
  End;
 End;
 
+Function UpMan:Boolean;Begin
+ UpMan:=False;
+ If YMan>0Then Begin { Up }
+  If CurrTab[YMan,XMan]in['H','S']Then Begin
+   XManRun:=0;
+   HideMan;
+   Dec(YMan);
+   ShowMan;
+   UpMan:=True;
+  End;
+ End;
+End;
+
+Function DownMan:Boolean;Begin
+ DownMan:=False;
+ If CurrTab[YMan+1,XMan]in['H','S']Then Begin
+  XManRun:=0;
+  HideMan;
+  Inc(YMan);
+  ShowMan;
+  DownMan:=True;
+ End
+  Else
+ If CurrTab[YMan+1,XMan]in[' ']Then Begin
+  XManRun:=0;
+  HideMan;
+  Inc(YMan);
+  ShowMan;
+  DownMan:=True;
+  YManRun:=1;
+ End;
+End;
+
 Procedure RunGame;
 Var
  I,Skip:Byte;
@@ -3463,38 +3498,42 @@ Begin
    Skip:=(Skip+1)and 3;
   Until Keypressed;
   K:=ReadKey;
+  If(WaitYManRun=-1)and(UpMan)Then Begin
+   WaitYManRun:=0;
+  End
+   Else
+  If(WaitYManRun=1)and(DownMan)Then Begin
+   WaitYManRun:=0;
+  End
+   Else
   Case K of
    ' ':XManRun:=0;
    #0:Case ReadKey of
     #72:Begin
-     If YMan>0Then Begin { Up }
-      XManRun:=0;
-      If CurrTab[YMan,XMan]in['H','S']Then Begin
-       HideMan;
-       Dec(YMan);
-       ShowMan;
-      End;
+     If(UpMan)Then Begin
+      WaitYManRun:=0;
      End
       Else
-     If Gold<=0Then Begin
+     If(Gold<=0)and(YMan=0)Then Begin
       Inc(Level);
       XManRun:=0;
       YManRun:=0;
       LoadCurrLevel;
       ShowLevel;
       ShowLife;
-     End;
+     End
+      Else
+     WaitYManRun:=-1;
     End;
     #75:LeftMan; { Left }
     #77:RightMan; { Right }
     #80:Begin { Down }
-     XManRun:=0;
-     If CurrTab[YMan+1,XMan]in['H','S']Then Begin
-      HideMan;
-      Inc(YMan);
-      ShowMan;
-     End;
-    End;
+     If(DownMan)Then Begin
+      WaitYManRun:=0;
+     End
+      Else
+     WaitYManRun:=1;
+    End
    End;
   End;
  Until K=#27;
@@ -3504,4 +3543,5 @@ BEGIN
  InitGame;
  ShowLevel;
  RunGame;
+ CursorOn;
 END.
