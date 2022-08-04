@@ -77,7 +77,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier de jeu permet de lancer le jeu Lode Runner.</td>
      </tr>
      <tr>
-        <td>MISSILE.PAS</b></td>
+        <td><b>MISSILE.PAS</b></td>
         <td>Ce fichier contient le jeu Missile Command uniquement compatible qu'avec le Turbo Pascal 7.</td>
      </tr>
      <tr>
