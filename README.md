@@ -43,6 +43,10 @@ Aperçu du jeu Space Jockey (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/182154290-2a0c0138-ed21-42cb-8a6e-2d3ed05720d8.png)
 
+Aperçu du jeu Lode Runner (sous Turbo Pascal)
+
+![image](https://user-images.githubusercontent.com/11842176/182494992-0f869c14-5ecf-4315-8697-901c3ee5c84a.png)
+
 # Liste des fichiers
 
 Voici la liste des différents fichiers de jeux proposés dans 7iles :
@@ -63,7 +67,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     <tr>
       <td><b>HANOIS.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
-     </tr>    
+     </tr>
+     <tr>
+        <td><b>LODERUNN.PAS</b></td>
+        <td>Ce fichier de jeu permet de lancer le jeu Lode Runner.</td>
+     </tr>
      <tr>
       <td><b>PACMAN.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Pac-Man. Ce jeux consiste a manger les pastilles sans vous faire attraper par les fantomes.</td>
