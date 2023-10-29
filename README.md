@@ -60,6 +60,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <th>Nom</th>
       <th>Description</th>
      </tr>
+    <tr>
+        <td><b>ANAGRAM.PAS</b></td>
+        <td>Ce fichier contient le jeu ANAGRAM. Trouver un mot ayant les mettres lettres que l'originale.</td>
+    </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
       <td>Ce fichier contient le jeu BREAKOUT de style Atari 2600.</td>
