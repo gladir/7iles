@@ -62,7 +62,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
      </tr>
     <tr>
         <td><b>ANAGRAM.PAS</b></td>
-        <td>Ce fichier contient le jeu ANAGRAM. Trouver un mot ayant les mettres lettres que l'originale.</td>
+        <td>Ce fichier contient le jeu ANAGRAM. Trouver un mot ayant les mêmes lettres que l'originale.</td>
     </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
