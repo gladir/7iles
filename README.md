@@ -1,6 +1,6 @@
 # 7iles
 
-Les jeux contenu dans 7iles sont une séries de programmes autonomes écrit en Pascal et n'ayant pas de dépendances avec d'autres fichiers Pascal mais uniquement d'un compilateur, comme par exemple Free Pascal.
+Les jeux contenu dans 7iles sont une séries de programmes autonomes écrit en Pascal et n'ayant pas de dépendances avec d'autres fichiers Pascal mais uniquement d'un compilateur, comme par exemple Free Pascal ou Turbo Pascal.
 
 Aperçu de Tetris (sous Free Pascal)
 
