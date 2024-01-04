@@ -96,6 +96,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>PEGLEAP.PAS</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
+    <tr>
+        <td><b>SODOKU.PAS</b></td>
+        <td>Ce fichier de jeu contient le jeu Sodoku.</td>
+    </tr>
      <tr>
         <td><b>SOKOBAN.PAS</b></td>
         <td>Ce fichier de jeu contient le jeu Soko-Ban.</td>
