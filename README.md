@@ -73,6 +73,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
     </tr>
     <tr>
+        <td><b>GOMOKU.PAS<b/></td>
+        <td>Ce fichier contient le jeu japonais GOMOKU.</td>
+    </tr>
+    <tr>
       <td><b>HANOIS.PAS</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>
@@ -96,6 +100,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>PEGLEAP.PAS</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
+    <tr>
+        <td><b>RENJU.PAS<b/></td>
+        <td>Ce fichier contient le jeu japonais RENJU.</td>
+    </tr>            
     <tr>
         <td><b>SODOKU.PAS</b></td>
         <td>Ce fichier de jeu contient le jeu Sodoku.</td>
