@@ -34,7 +34,6 @@ Const
  PieceColor:Array[ColorType] of Byte=(White,LightGreen);
 
 Var
- I:Integer;
  Board:Array[IndexType,IndexType]of BoardType;
  Player:ColorType;
  TotalLines:Integer;
@@ -378,6 +377,10 @@ Begin
  Player:=Cross;
  TotalLines:=2*2*(N*(N-4)+(N-4)*(N-4));
  GameWon:=False;
+ For I:=1 to 3 do Begin
+  FindMove(X,Y);
+  MakeMove(X,Y);
+ End;
 End;
 
 Function OpponentColor(Player:ColorType):ColorType;Begin
@@ -666,10 +669,6 @@ BEGIN
  ResetGame(True);
  X:=(N+1) shr 1;
  Y:=X;
- For I:=1 to 3 do Begin
-  FindMove(X,Y);
-  MakeMove(X,Y);
- End;
  Repeat
   ReadCommand(X,Y,Command);
   If(GameOver)Then Begin
