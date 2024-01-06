@@ -340,49 +340,6 @@ Procedure WriteCommand(S:String);Begin
  Write(Copy(S,2,Length(s)-1));
 End;
 
-Procedure ResetGame(FirstGame:Boolean);
-Var
- I,J:IndexType;
- D:0..3;
- C:ColorType;
-Begin
- SetUpScreen;
- If FirstGame Then Begin
-  TextColor(HeadingColor);
-  GotoXY(49, 1);
-  Write('R E N J U');
-  GotoXY(49,3);
-  WriteCommand('Nouvelle partie ');
-  WriteCommand('Quitte ');
-  GotoXY(49,4);
-  WriteCommand('Auto ');
-  WriteCommand('Jouer ');
-  WriteCommand('Indice');
-  GotoXY(49,5);
-  WriteHelp('?-pour Aide   ', 1);
-  FirstGame := false;
- End
-  Else
- Begin
-  ClearMsg;
-  ClearMove;
- End;
- For I:=1 to N do For J:=1 to N do Begin
-  Board[I,J]:=Empty;
-  For C:=Cross to Nought do Begin
-   Value[I,J,C]:=0;
-   For D:=0 to 3 do Line[D,I,J,C]:=0;
-  End;
- End;
- Player:=Cross;
- TotalLines:=2*2*(N*(N-4)+(N-4)*(N-4));
- GameWon:=False;
- For I:=1 to 3 do Begin
-  FindMove(X,Y);
-  MakeMove(X,Y);
- End;
-End;
-
 Function OpponentColor(Player:ColorType):ColorType;Begin
  If Player=Cross Then OpponentColor:=Nought
                  Else OpponentColor:=Cross;
@@ -529,6 +486,49 @@ Begin
    Y:=J;
    Max:=Valu;
   End;
+ End;
+End;
+
+Procedure ResetGame(FirstGame:Boolean);
+Var
+ I,J:IndexType;
+ D:0..3;
+ C:ColorType;
+Begin
+ SetUpScreen;
+ If FirstGame Then Begin
+  TextColor(HeadingColor);
+  GotoXY(49, 1);
+  Write('R E N J U');
+  GotoXY(49,3);
+  WriteCommand('Nouvelle partie ');
+  WriteCommand('Quitte ');
+  GotoXY(49,4);
+  WriteCommand('Auto ');
+  WriteCommand('Jouer ');
+  WriteCommand('Indice');
+  GotoXY(49,5);
+  WriteHelp('?-pour Aide   ', 1);
+  FirstGame := false;
+ End
+  Else
+ Begin
+  ClearMsg;
+  ClearMove;
+ End;
+ For I:=1 to N do For J:=1 to N do Begin
+  Board[I,J]:=Empty;
+  For C:=Cross to Nought do Begin
+   Value[I,J,C]:=0;
+   For D:=0 to 3 do Line[D,I,J,C]:=0;
+  End;
+ End;
+ Player:=Cross;
+ TotalLines:=2*2*(N*(N-4)+(N-4)*(N-4));
+ GameWon:=False;
+ For I:=1 to 3 do Begin
+  FindMove(X,Y);
+  MakeMove(X,Y);
  End;
 End;
 
