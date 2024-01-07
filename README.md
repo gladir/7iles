@@ -57,71 +57,88 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
 
 <table>
     <tr>
+      <th>Fichier</th>
       <th>Nom</th>
       <th>Description</th>
      </tr>
     <tr>
         <td><b>ANAGRAM.PAS</b></td>
+        <td><b>Anagram</b></td>
         <td>Ce fichier contient le jeu ANAGRAM. Trouver un mot ayant les mêmes lettres que l'originale.</td>
     </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
+      <td><b>BREAKOUT</b></td>
       <td>Ce fichier contient le jeu BREAKOUT de style Atari 2600.</td>
      </tr>
     <tr> 
       <td><b>BOWLING.PAS</b></td>
+      <td><b>BOWLING</b></td>
       <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
     </tr>
     <tr>
         <td><b>GOMOKU.PAS<b/></td>
+        <td><b>GOMOKO</b></td>
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
     </tr>
     <tr>
       <td><b>HANOIS.PAS</b></td>
+      <td><b>Tours d'Hanois</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>
      <tr>
         <td><b>LODERUNN.PAS</b></td>
+        <td><b>Lode Runner</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Lode Runner.</td>
      </tr>
      <tr>
         <td><b>MISSILE.PAS</b></td>
+        <td><b>Missile Command</b></td>
         <td>Ce fichier contient le jeu Missile Command uniquement compatible qu'avec le Turbo Pascal 7.</td>
      </tr>
      <tr>
       <td><b>PACMAN.PAS</b></td>
+       <td><b>Pac-Man</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Pac-Man. Ce jeux consiste a manger les pastilles sans vous faire attraper par les fantomes.</td>
      </tr>        
      <tr>
         <td><b>PATIENCE.PAS</b></b>
+        <td><b>Patience</b></td>
         <td>Ce fichier contient un autre jeu de carte de patience.</td>
       </tr>
      <tr>
         <td><b>PEGLEAP.PAS</b></td>
+         <td><b>Peg Leap</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
     <tr>
         <td><b>RENJU.PAS<b/></td>
+        <td><b>Renju</b></td>
         <td>Ce fichier contient le jeu japonais RENJU.</td>
     </tr>            
     <tr>
         <td><b>SODOKU.PAS</b></td>
+        <td><b>Sodoku</b></td>
         <td>Ce fichier de jeu contient le jeu Sodoku.</td>
     </tr>
      <tr>
         <td><b>SOKOBAN.PAS</b></td>
+        <td><b>Soko-Ban</b></td>
         <td>Ce fichier de jeu contient le jeu Soko-Ban.</td>
     </tr>
     <tr>
        <td><b>SPACEJOC.PAS</b></td>
+       <td><b>Space Jockey</b></td>
        <td>Ce fichier de jeu permet de lancer le jeu Space Jockey originaire du Atari 2600.</td>
     </tr>
     <tr>
       <td><b>TETRIS.PAS</b></td>
+       <td><b>Tetris</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
      </tr>
      <tr>
         <td><b>TTT.PAS</b></td>
+         <td><b>Tic-Tac-Toe</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Tic-Tac-Toe contre l'ordinateur.</td>
      </tr>
 </table>
