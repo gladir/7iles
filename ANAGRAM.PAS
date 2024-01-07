@@ -101,6 +101,22 @@ Begin
 End;
 
 BEGIN
+ WriteLn('                                                        ');
+ WriteLn('                                                        ');
+ WriteLn('   ##                                                   ');
+ WriteLn('   ##                                                   ');
+ WriteLn('  # ##                                                  ');
+ WriteLn('  # ##  ## ####  #####   #### #### ###   #####  # ## ## ');
+ WriteLn(' #   ##  ##   ##     ## ##   ##  ##  ##      ## ## ## ##');
+ WriteLn(' ######  ##   ## ###### ##   ##  ##      ###### ## ## ##');
+ WriteLn('#     ## ##   ####   ##  #####   ##     ##   ## ## ## ##');
+ WriteLn('#     ## ##   ####   ## ##       ##     ##   ## ## ## ##');
+ WriteLn('##   #######  ## #### ## ###### ####     #### #### ## ##');
+ WriteLn('                        ##    ##                        ');
+ WriteLn('                         ######                         ');
+ WriteLn('                                                        ');
+ WriteLn('                                                        ');
+ WriteLn;
  WriteLn('JEU - ANAGRAM');
  WriteLn;
  WriteLn('Le but du jeu est trouv‚ un mot connu ayant le mˆme que le ');
