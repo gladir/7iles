@@ -68,12 +68,12 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
-      <td><b>BREAKOUT</b></td>
+      <td><b>BreakOut</b></td>
       <td>Ce fichier contient le jeu BREAKOUT de style Atari 2600.</td>
      </tr>
     <tr> 
       <td><b>BOWLING.PAS</b></td>
-      <td><b>BOWLING</b></td>
+      <td><b>Bowling</b></td>
       <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
     </tr>
     <tr>
