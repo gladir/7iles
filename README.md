@@ -83,7 +83,8 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     </tr>
     <tr>
         <td><b>HANGMAN.PAS</b></td>
-        <td>Ce fichier contient le jeu HANGMAN, aussi connu sous le nom de bonhomme pendu.</td>
+        <td><b>Hangman</b></td>
+        <td>Ce fichier contient le jeu Hangman, aussi connu sous le nom de bonhomme pendu.</td>
     </tr>
     <tr>
       <td><b>HANOIS.PAS</b></td>
