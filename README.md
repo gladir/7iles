@@ -82,6 +82,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
     </tr>
     <tr>
+        <td><b>HANGMAN.PAS</b></td>
+        <td>Ce fichier contient le jeu HANGMAN, aussi connu sous le nom de bonhomme pendu.</td>
+    </tr>
+    <tr>
       <td><b>HANOIS.PAS</b></td>
       <td><b>Tours d'Hanois</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
