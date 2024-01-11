@@ -146,4 +146,9 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>Tic-Tac-Toe</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Tic-Tac-Toe contre l'ordinateur.</td>
      </tr>
+    <tr>
+        <td><b>YATHZEE.PAS</b></td>
+        <td><b>Yathzee</b></td>
+        <td>Ce fichier de jeu permet de lancer le jeu de dés Yathzee.</td>
+    </tr>
 </table>
