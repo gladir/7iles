@@ -107,7 +107,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
      <tr>
          <td><b>LUNAR.PAS</b></td>
          <td><b>Lunar Lander</b></td>
-         <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrisage lunaire.</td>
+         <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrissage lunaire.</td>
      </tr>
      <tr>
         <td><b>LODERUNN.PAS</b></td>
