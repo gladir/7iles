@@ -403,51 +403,62 @@ BEGIN
    SetUseACP(False);
   {$ENDIF}
  {$ENDIF}
- Finish:=False;
- PlayNow:=False;
- If(StrToUpper(ParamStr(1))='/PLAY')Then PlayNow:=True;
- Repeat
-  If(PlayNow)Then Begin
-   K:='2';
-  End
-   Else
-  Begin
-   TextMode(C80);
-   ClrScr;
-   TextColor(LightBlue);
-   WriteLn('  ת     ת      תתתת    ת  תתתתת תתתתתת  ');
-   WriteLn('  ת     ת      תת  ת   ת  ת   תתת    תת ');
-   WriteLn('  ת     ת      תת   ת  ת  ת    תת     ת ');
-   WriteLn('  ת     ת      תת    ת ת  ת    תת     ת ');
-   WriteLn(' תת     ת     תתת     תת תת    תתת    תת');
-   WriteLn('תתת     ת    תתתת      תתתתתתתתתתתתתתתתת');
-   WriteLn('תתת     ת    תתתת      תתתת    תתתת   תת');
-   WriteLn('תתת     ת    תתתת  תת  תתתת    תתתת   תת');
-   WriteLn('תתת     תת   תתתת  תת  תתתת    תתתת   תת');
-   WriteLn('תתתתתתתת תתתתתתתת  תת  תתתת    תתתת   תת');
-   TextColor(White);
-   WriteLn(' ':12,'  ת       תתתתת תתת    תתתתתתתת תתתתתתתתתתתתתת  ');
-   WriteLn(' ':12,'  ת       ת   תתת  ת   תתתת   תתת       ת    תת ');
-   WriteLn(' ':12,'  ת       ת    תת   ת  תתתת    תת       ת     ת ');
-   WriteLn(' ':12,'  ת       ת    תת    ת תתתת    תת       ת     ת ');
-   WriteLn(' ':12,' תת      תת    תת     תתתתת    תתת      תת    תת');
-   WriteLn(' ':12,'תתת     תתתתתתתתת      תתתת    תתתתתתת  תתתתתתתת');
-   WriteLn(' ':12,'תתת     תתת    תת      תתתת    תתתת     תתת   תת');
-   WriteLn(' ':12,'תתת     תתת    תת  תת  תתתת    תתתת     תתת   תת');
-   WriteLn(' ':12,'תתתתתתתתתתת    תת  תת  תתתתתתתתתתתתתתתתתתתת   תת');
-   TextColor(7);
-   WriteLn(' ':30,Dupl(#254,24));
-   WriteLn(' ':30,'1 - Instructions');
-   WriteLn(' ':30,'2 - Jouer … Lunar Lander');
-   WriteLn(' ':30,'3 - Quitter');
-   WriteLn(' ':30,Dupl(#254,24));
-   Write('Entrez votre choix : ');
-   K:=UpCase(ReadKey);
-   If K=#0 Then ReadKey;
-   WriteLn(K);
-  End;
-  Case K of
-   '1':Begin
+ If(ParamStr(1)='/?')or(ParamStr(1)='--help')or(ParamStr(1)='-h')or
+   (ParamStr(1)='/h')or(ParamStr(1)='/H')Then Begin
+  WriteLn('LUNAR : Cette commande permet de lancer le jeu ',
+                     'Lunar Lander (jeu d''att‚rissage lunaire).');
+  WriteLn;
+  WriteLn('Syntaxe : LUNAR [/PLAY]');
+  WriteLn;
+  WriteLn(' /PLAY   Permet de jouer imm‚diatement');
+ End
+  Else
+ Begin
+  Finish:=False;
+  PlayNow:=False;
+  If(StrToUpper(ParamStr(1))='/PLAY')Then PlayNow:=True;
+  Repeat
+   If(PlayNow)Then Begin
+    K:='2';
+   End
+    Else
+   Begin
+    TextMode(C80);
+    ClrScr;
+    TextColor(LightBlue);
+    WriteLn('  ת     ת      תתתת    ת  תתתתת תתתתתת  ');
+    WriteLn('  ת     ת      תת  ת   ת  ת   תתת    תת ');
+    WriteLn('  ת     ת      תת   ת  ת  ת    תת     ת ');
+    WriteLn('  ת     ת      תת    ת ת  ת    תת     ת ');
+    WriteLn(' תת     ת     תתת     תת תת    תתת    תת');
+    WriteLn('תתת     ת    תתתת      תתתתתתתתתתתתתתתתת');
+    WriteLn('תתת     ת    תתתת      תתתת    תתתת   תת');
+    WriteLn('תתת     ת    תתתת  תת  תתתת    תתתת   תת');
+    WriteLn('תתת     תת   תתתת  תת  תתתת    תתתת   תת');
+    WriteLn('תתתתתתתת תתתתתתתת  תת  תתתת    תתתת   תת');
+    TextColor(White);
+    WriteLn(' ':12,'  ת       תתתתת תתת    תתתתתתתת תתתתתתתתתתתתתת  ');
+    WriteLn(' ':12,'  ת       ת   תתת  ת   תתתת   תתת       ת    תת ');
+    WriteLn(' ':12,'  ת       ת    תת   ת  תתתת    תת       ת     ת ');
+    WriteLn(' ':12,'  ת       ת    תת    ת תתתת    תת       ת     ת ');
+    WriteLn(' ':12,' תת      תת    תת     תתתתת    תתת      תת    תת');
+    WriteLn(' ':12,'תתת     תתתתתתתתת      תתתת    תתתתתתת  תתתתתתתת');
+    WriteLn(' ':12,'תתת     תתת    תת      תתתת    תתתת     תתת   תת');
+    WriteLn(' ':12,'תתת     תתת    תת  תת  תתתת    תתתת     תתת   תת');
+    WriteLn(' ':12,'תתתתתתתתתתת    תת  תת  תתתתתתתתתתתתתתתתתתתת   תת');
+    TextColor(7);
+    WriteLn(' ':30,Dupl(#254,24));
+    WriteLn(' ':30,'1 - Instructions');
+    WriteLn(' ':30,'2 - Jouer … Lunar Lander');
+    WriteLn(' ':30,'3 - Quitter');
+    WriteLn(' ':30,Dupl(#254,24));
+    Write('Entrez votre choix : ');
+    K:=UpCase(ReadKey);
+    If K=#0 Then ReadKey;
+    WriteLn(K);
+   End;
+   Case K of
+    '1':Begin
       { Instruction }
      ClrScr;
      TextColor(White);
@@ -487,20 +498,21 @@ BEGIN
      WriteLn;
      Write('Presse une touche pour continuer...');
      If ReadKey=#0 Then ReadKey;
+    End;
+    '2','P':Begin
+     Randomize;
+     InitVideo;
+     Repeat
+      InitScr;
+      Play;
+      ClrKbd;
+     Until Not YesNo('Une nouvelle partie (O/N) ?');
+     Finish:=True;
+    End;
+    '3','Q',#27:Finish:=True;
    End;
-   '2','P':Begin
-    Randomize;
-    InitVideo;
-    Repeat
-     InitScr;
-     Play;
-     ClrKbd;
-    Until Not YesNo('Une nouvelle partie (O/N) ?');
-    Finish:=True;
-   End;
-   '3','Q',#27:Finish:=True;
-  End;
- Until Finish;
- TextMode(C80);
- ClrScr;
+  Until Finish;
+  TextMode(C80);
+  ClrScr;
+ End;
 END.
