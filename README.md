@@ -101,6 +101,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>
      <tr>
+         <td><b>LUNAR.PAS</b></td>
+         <td><b>Lunar Lander</b></td>
+         <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrisage lunaire.</td>
+     </tr>
+     <tr>
         <td><b>LODERUNN.PAS</b></td>
         <td><b>Lode Runner</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Lode Runner.</td>
