@@ -51,6 +51,10 @@ Aperçu du jeu Lode Runner (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/182494992-0f869c14-5ecf-4315-8697-901c3ee5c84a.png)
 
+Aperçu du jeu Lunar Lander (sous Free Pascal)
+
+![image](https://github.com/gladir/7iles/assets/11842176/5343668a-0b4d-4a90-a481-70b1c59cb990)
+
 Aperçu du jeu Missile Command sous Turbo Pascal
 
 ![image](https://user-images.githubusercontent.com/11842176/182875951-c8e084ea-2219-441f-a32d-64a7133ada2a.png)
@@ -99,6 +103,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td><b>HANOIS.PAS</b></td>
       <td><b>Tours d'Hanois</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
+     </tr>
+     <tr>
+         <td><b>LUNAR.PAS</b></td>
+         <td><b>Lunar Lander</b></td>
+         <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrisage lunaire.</td>
      </tr>
      <tr>
         <td><b>LODERUNN.PAS</b></td>
