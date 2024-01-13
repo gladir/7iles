@@ -83,7 +83,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     <tr>
         <td><b>CANNONBA.PAS</b></td>
         <td><b>Cannonball</b></td>
-        <td>Ce fichier contient le jeu Cannonball inspiré des Atari 2600. Il s'agit d'un canon tirant un humain et qu'un filet doit rattraper.</td>
+        <td>Ce fichier contient le jeu Cannonball (Human Cannonball) inspiré des Atari 2600. Il s'agit d'un canon tirant un humain et qu'un filet doit rattraper.</td>
     </tr>
     <tr>
         <td><b>GOMOKU.PAS<b/></td>
