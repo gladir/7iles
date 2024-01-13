@@ -23,6 +23,10 @@ Aperçu de Bowling (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181278768-d61424df-c033-45d7-ae1f-402a9a0b9a79.png)
 
+Aperçu de Cannonball (sous Free Pascal)
+
+![image](https://github.com/gladir/7iles/assets/11842176/d996bce9-4aff-4a07-8ae7-3a9ef3941f16)
+
 Aperçu de Peg Leap (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181311079-9a050acd-a403-4812-ad54-30a7b416db63.png)
@@ -75,6 +79,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td><b>BOWLING.PAS</b></td>
       <td><b>Bowling</b></td>
       <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
+    </tr>
+    <tr>
+        <td><b>CANNONBA.PAS</b></td>
+        <td><b>Cannonball</b></td>
+        <td>Ce fichier contient le jeu Cannonball inspiré des Atari 2600. Il s'agit d'un canon tirant un humain et qu'un filet doit rattraper.</td>
     </tr>
     <tr>
         <td><b>GOMOKU.PAS<b/></td>
