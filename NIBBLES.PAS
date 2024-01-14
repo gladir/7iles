@@ -63,9 +63,30 @@ Const
  CurrText:Byte=0;
 
 Var
- InGraf:Boolean;
+ Finish,InGraf,PlayNow:Boolean;
  Speed:Integer;
  X,Y,RX,RY,PR:Array[1..2]of Integer;
+ K:Char;
+
+Function StrToUpper(S:String):String;
+Var
+ I:Byte;
+Begin
+ For I:=1 to Length(S)do Begin
+  If S[I] in['a'..'z']Then S[I]:=Chr(Ord(S[I])-32);
+ End;
+ StrToUpper:=S;
+End;
+
+Function Dupl(C:String;Num:Integer):String;
+Var
+ I:Integer;
+ S:String;
+Begin
+ S:='';
+ For I:=1 to Num do S:=S+C;
+ Dupl:=S;
+End;
 
 Procedure InitScr;
 Var
@@ -259,6 +280,8 @@ Begin
   TextMode(CO40);
   ClrScr;
   CursorOff;
+  GotoXY(1,5);
+  WriteLn('Choisissez le niveau (la vitesse de d‚placement) de votre serpent :');
   For J:=0to(Max)do UndoBar(J);
   PutBar(Y);
   Wait:=0;
@@ -309,7 +332,8 @@ Begin
 End;
 
 Procedure Play;
-Var K,J:Integer;
+Var
+ K,J:Integer;
 Begin
  FillChar(PR,SizeOf(PR),0);
  Speed:=1;
@@ -385,13 +409,101 @@ Begin
     RY[1]:=0;
     RX[1]:=1;
    End;
-   kbEsc:Halt;
+   kbEsc:Begin
+    Finish:=True;
+    Exit;
+   ENd;
   End;
  Until FaLse;
 End;
 
 BEGIN
- InGraf:=False;
- Randomize;
- Play;
+ {$IFDEF FPC}
+  {$IFDEF WINDOWS}
+   SetUseACP(False);
+  {$ENDIF}
+ {$ENDIF}
+ If(ParamStr(1)='/?')or(ParamStr(1)='--help')or(ParamStr(1)='-h')or
+   (ParamStr(1)='/h')or(ParamStr(1)='/H')Then Begin
+  WriteLn('NIBBLES : Cette commande permet de lancer le jeu ',
+                     'Nibbles.');
+  WriteLn;
+  WriteLn('Syntaxe : NIBBLES');
+ End
+  Else
+ Begin
+  Finish:=False;
+  If(StrToUpper(ParamStr(1))='/PLAY')Then PlayNow:=True;
+  Repeat
+   If(PlayNow)Then Begin
+    K:='2';
+   End
+    Else
+   Begin
+    ClrScr;
+    TextColor(Yellow);
+    WriteLn(' ':12,'                                                        ');
+    WriteLn(' ':12,'Ы     ЫЫ   ЫЫ   ЫЫЫ     ЫЫЫ       ЫЫЫ                   ');
+    WriteLn(' ':12,'ЫЫ     Ы   ЫЫ    ЫЫ      ЫЫ        ЫЫ                   ');
+    WriteLn(' ':12,'ЫЫЫ    Ы         ЫЫ      ЫЫ        ЫЫ                   ');
+    WriteLn(' ':12,'Ы ЫЫ   Ы  ЫЫЫ    ЫЫ ЫЫЫ  ЫЫ ЫЫЫ    ЫЫ     ЫЫЫЫЫ  ЫЫЫЫ Ы ');
+    WriteLn(' ':12,'Ы  ЫЫ  Ы   ЫЫ    ЫЫЫ  ЫЫ ЫЫЫ  ЫЫ   ЫЫ    ЫЫ   ЫЫЫЫ   ЫЫ ');
+    WriteLn(' ':12,'Ы   ЫЫ Ы   ЫЫ    ЫЫ   ЫЫ ЫЫ   ЫЫ   ЫЫ    ЫЫЫЫЫЫЫ ЫЫЫ    ');
+    WriteLn(' ':12,'Ы    ЫЫЫ   ЫЫ    ЫЫ   ЫЫ ЫЫ   ЫЫ   ЫЫ    ЫЫ        ЫЫЫ  ');
+    WriteLn(' ':12,'Ы     ЫЫ   ЫЫ    ЫЫ   ЫЫ ЫЫ   ЫЫ   ЫЫ    ЫЫ    ЫЫЫ   ЫЫ ');
+    WriteLn(' ':12,'ЫЫ     Ы  ЫЫЫЫ  ЫЫ ЫЫЫЫ ЫЫ ЫЫЫЫ   ЫЫЫЫ    ЫЫЫЫЫ Ы ЫЫЫЫ  ');
+    WriteLn(' ':12,'                                                        ');
+    WriteLn(' ':12,'                                                        ');
+    TextColor(7);
+    WriteLn;
+    WriteLn(' ':30,Dupl(#196,20));
+    WriteLn;
+    WriteLn(' ':30,'1 - Instructions');
+    WriteLn;
+    WriteLn(' ':30,'2 - Jouer … Nibbles');
+    WriteLn;
+    WriteLn(' ':30,'3 - Quitter');
+    WriteLn;
+    WriteLn(' ':30,Dupl(#196,20));
+    WriteLn;
+    Write('Entrez votre choix : ');
+    K:=UpCase(ReadKey);
+    If K=#0 Then ReadKey;
+    WriteLn(K);
+   End;
+   Case K of
+    '1':Begin
+      { Instruction }
+     ClrScr;
+     GotoXY(32,1);
+     TextColor(Yellow);
+     WriteLn('N I B B L E S');
+     TextColor(7);
+     WriteLn;
+     WriteLn('Nibbles est un jeu dans lequel vous incarnez un serpent et essayez');
+     WriteLn('de manger autant de nourriture que possible. Une fois que vous avez');
+     WriteLn('commenc‚ … bouger, vous ne pouvez plus vous arr€ter. Vous perdez si');
+     WriteLn('vous tombez hors des limites ou si vous essayez de vous manger.');
+     WriteLn('Les limites sont les bords de la fen€tre de la console.');
+     WriteLn;
+     WriteLn('Vous pouvez changer la direction de votre serpent en utilisant les');
+     WriteLn('touches de flЉches du clavier.');
+     WriteLn;
+     Write('Presse une touche pour retourner au menu');
+     If ReadKey=#0 Then ReadKey;
+    End;
+    'P','2':Begin
+     InGraf:=False;
+     Randomize;
+     Play;
+    End;
+    '3','Q',#27:Finish:=True;
+   End;
+  Until Finish;
+  TextMode(C80);
+  TextBackground(0);
+  TextColor(7);
+  ClrScr;
+  CursorOn;
+ End;
 END.
