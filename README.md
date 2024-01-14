@@ -120,6 +120,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Missile Command uniquement compatible qu'avec le Turbo Pascal 7.</td>
      </tr>
      <tr>
+         <td><b>NIBBLES.PAS</b></td>
+         <td><b>Nibbles</b></td>
+         <td>Ce fichier contient le jeu de Nibbles, le jeu de serpent s'allongeant et qu'il ne faut pas avoir d'impact avec un votre serpent ou le serpent de l'ordinateur.</td>
+     </tr>
+     <tr>
       <td><b>PACMAN.PAS</b></td>
        <td><b>Pac-Man</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Pac-Man. Ce jeux consiste a manger les pastilles sans vous faire attraper par les fantomes.</td>
