@@ -104,6 +104,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td><b>Tours d'Hanois</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>
+    <tr>
+        <td><b>L25.PAS</b></td>
+        <td><b>L25</b></td>
+        <td>Ce fichier de jeu permet de lancer le jeu L25. Le but du jeu est de remplir 25 cases (5 x 5) en se déplaçant comme un cheval au échec sans jamais touchés deux fois la même case.</td>
+    </tr>
      <tr>
          <td><b>LUNAR.PAS</b></td>
          <td><b>Lunar Lander</b></td>
