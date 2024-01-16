@@ -90,6 +90,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Cannonball (Human Cannonball) inspiré des Atari 2600. Il s'agit d'un canon tirant un humain et qu'un filet doit rattraper.</td>
     </tr>
     <tr>
+        <td><b>CENTIPED.PAS</b></td>
+        <td><b>Centipede</b></td>
+        <td>Ce fichier contient le jeu Centipede, le jeu où il faut empêcher un mille-pattes de toucher la terre.</td>
+    </tr>
+    <tr>
         <td><b>GOMOKU.PAS<b/></td>
         <td><b>GOMOKO</b></td>
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
