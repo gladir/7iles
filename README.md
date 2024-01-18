@@ -55,6 +55,10 @@ Aperçu du jeu Lunar Lander (sous Free Pascal)
 
 ![image](https://github.com/gladir/7iles/assets/11842176/5343668a-0b4d-4a90-a481-70b1c59cb990)
 
+Aperçu du jeu Space Invaders en Free Pascal : 
+
+![image](https://github.com/gladir/7iles/assets/11842176/77938d19-afda-4ebe-985e-9b2eacfe9b34)
+
 Aperçu du jeu Missile Command sous Turbo Pascal
 
 ![image](https://user-images.githubusercontent.com/11842176/182875951-c8e084ea-2219-441f-a32d-64a7133ada2a.png)
@@ -163,6 +167,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>SOKOBAN.PAS</b></td>
         <td><b>Soko-Ban</b></td>
         <td>Ce fichier de jeu contient le jeu Soko-Ban.</td>
+    </tr>
+    <tr>
+        <td><b>INVADERS.PAS</b></td>
+        <td><b>Space Invaders</b></td>
+        <td>Ce fichier de jeu permet de lancer un clone du jeu Space Invaders originaire d'Atari 2600.</td>
     </tr>
     <tr>
        <td><b>SPACEJOC.PAS</b></td>
