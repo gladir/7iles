@@ -59,6 +59,10 @@ Aperçu du jeu Space Invaders en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/77938d19-afda-4ebe-985e-9b2eacfe9b34)
 
+Aperçu du jeu Asteroids en Free Pascal :
+
+![image](https://github.com/gladir/7iles/assets/11842176/cb6a1f7a-ca6c-4fa5-9109-707a24043a21)
+
 Aperçu du jeu Missile Command sous Turbo Pascal
 
 ![image](https://user-images.githubusercontent.com/11842176/182875951-c8e084ea-2219-441f-a32d-64a7133ada2a.png)
@@ -77,6 +81,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>ANAGRAM.PAS</b></td>
         <td><b>Anagram</b></td>
         <td>Ce fichier contient le jeu ANAGRAM. Trouver un mot ayant les mêmes lettres que l'originale.</td>
+    </tr>
+    <tr>
+        <td><b>ASTEROID.PAS</b></td>
+        <td><b>Asteroids</b></td>
+        <td>Ce fichier contient le jeu Asteroids inspiré du Atari 2600.</td>
     </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
