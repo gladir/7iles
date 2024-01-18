@@ -128,15 +128,15 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier de jeu permet de lancer le jeu L25. Le but du jeu est de remplir 25 cases (5 x 5) en se déplaçant comme un cheval au échec sans jamais touchés deux fois la même case.</td>
     </tr>
      <tr>
-         <td><b>LUNAR.PAS</b></td>
-         <td><b>Lunar Lander</b></td>
-         <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrissage lunaire.</td>
-     </tr>
-     <tr>
         <td><b>LODERUNN.PAS</b></td>
         <td><b>Lode Runner</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Lode Runner.</td>
      </tr>
+     <tr>
+         <td><b>LUNAR.PAS</b></td>
+         <td><b>Lunar Lander</b></td>
+         <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrissage lunaire.</td>
+     </tr>            
      <tr>
         <td><b>MISSILE.PAS</b></td>
         <td><b>Missile Command</b></td>
