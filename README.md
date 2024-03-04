@@ -112,6 +112,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Centipede, le jeu où il faut empêcher un mille-pattes de toucher la terre.</td>
     </tr>
     <tr>
+        <td><b>DRMARIO.PAS</b></td>
+        <td><b>Dr. Mario</b></td>
+        <td>Ce fichier contient un clone du jeu Dr. Mario.</td>
+    </tr>
+    <tr>
         <td><b>FROGGER.PAS</b></td>
         <td><b>Frogger</b></td>
         <td>Ce fichier contient le jeu Frogger, le jeu où il faut traverser une rue et une rivière à une grenouille.</td>
