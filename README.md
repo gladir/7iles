@@ -63,6 +63,10 @@ Aperçu du jeu Asteroids en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/cb6a1f7a-ca6c-4fa5-9109-707a24043a21)
 
+Aperçu du jeu Matching Pairs Memory Game en Free Pascal :
+
+![image](https://github.com/gladir/7iles/assets/11842176/0e94dee8-4a69-433d-ace1-f51b7bc33e9c)
+
 Aperçu du jeu Frogger en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/c40f9183-092d-457b-978e-da7c2c10aab7)
@@ -150,6 +154,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>LUNAR.PAS</b></td>
          <td><b>Lunar Lander</b></td>
          <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrissage lunaire.</td>
+     </tr>  
+     <tr>
+        <td><b>MATCHING.PAS</b></td>
+        <td><b>Matching Pairs Memory Game</b></td>
+        <td>Ce fichier contient le jeu de mémoire par paires.</td>
      </tr>            
      <tr>
         <td><b>MISSILE.PAS</b></td>
