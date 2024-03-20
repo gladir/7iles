@@ -1982,17 +1982,17 @@ Begin
     Firefighter1(True,FirePlace);
    End;
    End;
-   'A':Begin
+   'A','1':Begin
     Firefighter1(False,FirePlace);
     FirePlace:=0;
     Firefighter1(True,FirePlace);
    End;
-   'B':Begin
+   'B','2':Begin
     Firefighter1(False,FirePlace);
     FirePlace:=1;
     Firefighter1(True,FirePlace);
    End;
-   'C':Begin
+   'C','3':Begin
     Firefighter1(False,FirePlace);
     FirePlace:=2;
     Firefighter1(True,FirePlace);
