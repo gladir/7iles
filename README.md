@@ -71,6 +71,10 @@ Aperçu du jeu Frogger en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/c40f9183-092d-457b-978e-da7c2c10aab7)
 
+Aperçu du jeu Bouncing Babies en Turbo Pascal :
+
+![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
+
 Aperçu du jeu Missile Command sous Turbo Pascal
 
 ![image](https://user-images.githubusercontent.com/11842176/182875951-c8e084ea-2219-441f-a32d-64a7133ada2a.png)
@@ -94,6 +98,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>ASTEROID.PAS</b></td>
         <td><b>Asteroids</b></td>
         <td>Ce fichier contient le jeu Asteroids inspiré du Atari 2600.</td>
+    </tr>
+    <tr>
+        <td><b>BABY.PAS</b></td>
+        <td><b>Bouncing Babies</b></td>
+        <td>Ce fichier contient le jeu Bouncing Babies originaire d'IBM PC.</td>
     </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
