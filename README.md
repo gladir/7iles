@@ -75,6 +75,10 @@ Aperçu du jeu Bouncing Babies en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
 
+Aperçu du jeu Pango en Turbo Pascal :
+
+![image](https://github.com/gladir/7iles/assets/11842176/bcc187ef-3a7b-4747-bb7c-a3d426ee66fb)
+
 Aperçu du jeu Bubble Shooter en Free Pascal : 
 
 ![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
@@ -193,6 +197,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
        <td><b>Pac-Man</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu Pac-Man. Ce jeux consiste a manger les pastilles sans vous faire attraper par les fantomes.</td>
      </tr>        
+    <tr>
+        <td><b>PANGO.PAS</b></td>
+        <td><b>Pango</b></td>
+        <td>Ce fichier de jeu permet d'indiquer le jeu Pango. Ce jeu où il faut détruire les abeilles en glissant les blocs.</td>
+    </tr>
      <tr>
         <td><b>PATIENCE.PAS</b></b>
         <td><b>Patience</b></td>
