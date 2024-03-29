@@ -75,6 +75,10 @@ Aperçu du jeu Bouncing Babies en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
 
+Aperçu du jeu Bubble Shooter en Free Pascal : 
+
+![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
+
 Aperçu du jeu Missile Command sous Turbo Pascal
 
 ![image](https://user-images.githubusercontent.com/11842176/182875951-c8e084ea-2219-441f-a32d-64a7133ada2a.png)
@@ -113,6 +117,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td><b>BOWLING.PAS</b></td>
       <td><b>Bowling</b></td>
       <td>Ce fichier contient le jeu de BOWLING de style Atari 2600.</td>
+    </tr>
+    <tr>
+        <td><b>BS.PAS</b></td>
+        <td><b>Bubble Shooter</b></td>
+        <td>Ce fichier contient le jeu Bubble Shooter, un jeu où il faut viser des bulles de façon à avoir 3 bulles de la meme couleurs pour les faires disparaitre.<td>
     </tr>
     <tr>
         <td><b>CANNONBA.PAS</b></td>
