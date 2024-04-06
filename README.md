@@ -152,6 +152,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier de jeu permet de lancer un clone du jeu Color Space Invaders originaire du CoCo 3 (Color Computer 3).</td>
     </tr>    
     <tr>
+        <td><b>CYATHZEE.PAS</b></td>
+        <td><b>Coco-Yathzee</b></td>
+        <td>Ce fichier de jeu permet de lancer le clone du jeu de dés Coco-Yathzee.</td>
+    <tr>
         <td><b>DRMARIO.PAS</b></td>
         <td><b>Dr. Mario</b></td>
         <td>Ce fichier contient un clone du jeu Dr. Mario.</td>
