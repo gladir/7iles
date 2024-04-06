@@ -75,6 +75,11 @@ Aperçu du jeu Bouncing Babies en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
 
+Aperçu du O'Riley's Mine :
+
+![image](https://github.com/gladir/7iles/assets/11842176/b47b5fd1-d748-4d2a-86b6-f8d1b62955de)
+
+
 Aperçu du jeu Pango en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/bcc187ef-3a7b-4747-bb7c-a3d426ee66fb)
@@ -191,6 +196,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>NIBBLES.PAS</b></td>
          <td><b>Nibbles</b></td>
          <td>Ce fichier contient le jeu de Nibbles, le jeu de serpent s'allongeant et qu'il ne faut pas avoir d'impact avec un votre serpent ou le serpent de l'ordinateur.</td>
+     </tr>
+     <tr>
+         <td><b>ORILEYS.PAS</b></td>
+         <td><b>O'Riley's Mine</b></td>
+         <td>Ce fichier contient le jeu O'Riley's Mine. Jeu dans lequel il faut voyager rapidement à travers votre mine pour capturer tous les trésors enfouis et rentrer chez vous en toute sécurité au sommet du puits de mine.</td>
      </tr>
      <tr>
       <td><b>PACMAN.PAS</b></td>
