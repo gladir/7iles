@@ -139,7 +139,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     <tr>
         <td><b>BS.PAS</b></td>
         <td><b>Bubble Shooter</b></td>
-        <td>Ce fichier contient le jeu Bubble Shooter, un jeu où il faut viser des bulles de façon à avoir 3 bulles de la meme couleurs pour les faires disparaitre.<td>
+        <td>Ce fichier contient le jeu Bubble Shooter, un jeu où il faut viser des bulles de façon à avoir 3 bulles de la meme couleurs pour les faires disparaitre.</td>
     </tr>
     <tr>
         <td><b>CANNONBA.PAS</b></td>
