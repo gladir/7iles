@@ -88,6 +88,10 @@ Aperçu du jeu Bubble Shooter en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
 
+Aperçu du jeu Color Space Invaders en Free Pascal :
+
+![image](https://github.com/gladir/7iles/assets/11842176/8747cc02-f9fc-43f1-9aa7-aac453854007)
+
 Aperçu du jeu Missile Command sous Turbo Pascal
 
 ![image](https://user-images.githubusercontent.com/11842176/182875951-c8e084ea-2219-441f-a32d-64a7133ada2a.png)
@@ -142,6 +146,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>Centipede</b></td>
         <td>Ce fichier contient le jeu Centipede, le jeu où il faut empêcher un mille-pattes de toucher la terre.</td>
     </tr>
+    <tr>
+        <td><b>CSI.PAS</b></td>
+        <td><b>Color Space Invaders</b></td>
+        <td>Ce fichier de jeu permet de lancer un clone du jeu Color Space Invaders originaire du CoCo 3 (Color Computer 3).</td>
+    </tr>    
     <tr>
         <td><b>DRMARIO.PAS</b></td>
         <td><b>Dr. Mario</b></td>
