@@ -117,6 +117,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Asteroids inspiré du Atari 2600.</td>
     </tr>
     <tr>
+        <td><b>AVENGER.PAS</b></td>
+        <td><b>VIC Avenger</b></td>
+        <td>Ce fichier contient un clone du jeu VIC Avenger inspiré du Commodore VIC-20 et Commodore 64.</td>
+    </tr>
+    <tr>
         <td><b>BABY.PAS</b></td>
         <td><b>Bouncing Babies</b></td>
         <td>Ce fichier contient le jeu Bouncing Babies originaire d'IBM PC.</td>
