@@ -126,6 +126,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>Bouncing Babies</b></td>
         <td>Ce fichier contient le jeu Bouncing Babies originaire d'IBM PC.</td>
     </tr>
+    <tr>
+        <td><b>BLOX.PAS</b></td>
+        <td><b>Blox</b></td>
+        <td>Ce fichier contient le clone du jeu Blox proposé sur les CoCo 3.</td>
+    </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
       <td><b>BreakOut</b></td>
