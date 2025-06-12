@@ -107,6 +107,29 @@ Begin
     End;
 End;
 
+Function CanCaptureComputer(FromX, FromY: Integer; Var ToX, ToY: Integer): Boolean;
+Begin
+  CanCaptureComputer := False;
+  { Vérifier capture en bas à gauche }
+  If (FromX > 1) and (FromY < 6) Then
+    If (Board[FromX-1,FromY+1] in [ptWhite,ptWhiteKing]) and
+       (Board[FromX-2,FromY+2] = ptEmpty) Then Begin
+      ToX := FromX-2;
+      ToY := FromY+2;
+      CanCaptureComputer := True;
+      Exit;
+    End;
+  { Vérifier capture en bas à droite }
+  If (FromX < 6) and (FromY < 6) Then
+    If (Board[FromX+1,FromY+1] in [ptWhite,ptWhiteKing]) and
+       (Board[FromX+2,FromY+2] = ptEmpty) Then Begin
+      ToX := FromX+2;
+      ToY := FromY+2;
+      CanCaptureComputer := True;
+      Exit;
+    End;
+End;
+
 Procedure DrawBoard;
 Var
   I, J: Integer;
@@ -190,7 +213,7 @@ Begin
     Rectangle(DestCursorX * SQUARE_SIZE + 3, DestCursorY * SQUARE_SIZE + 48,
              DestCursorX * SQUARE_SIZE + SQUARE_SIZE + 7,
              DestCursorY * SQUARE_SIZE + SQUARE_SIZE + 52);
-             
+
     { Aperçu en jaune de la destination - Cercle pointillé }
     SetColor(Yellow);
     SetLineStyle(DottedLn, 0, NormWidth);
@@ -210,17 +233,17 @@ Begin
 
   { Ajouter la légende des couleurs }
   SetColor(White);
-  OutTextXY(500, GetMaxY-60, 'Pièces:');
+  OutTextXY(460, GetMaxY-90, 'Pi�ces:');
 
   SetColor(White);
   SetFillStyle(SolidFill, White);
-  FillEllipse(520, GetMaxY-30, PIECE_RADIUS, PIECE_RADIUS);
-  OutTextXY(540, GetMaxY-35, '- Humain');
+  FillEllipse(480, GetMaxY-50, PIECE_RADIUS, PIECE_RADIUS);
+  OutTextXY(500, GetMaxY-55, '- Humain');
 
   SetColor(Red);
   SetFillStyle(SolidFill, Red);
-  FillEllipse(520, GetMaxY-10, PIECE_RADIUS, PIECE_RADIUS);
-  OutTextXY(540, GetMaxY-15, '- Ordinateur');
+  FillEllipse(480, GetMaxY-30, PIECE_RADIUS, PIECE_RADIUS);
+  OutTextXY(500, GetMaxY-25, '- Ordinateur');
 End;
 
 Procedure DrawMoveHistory;
@@ -243,16 +266,16 @@ Var
   CaptureToX, CaptureToY: Integer;
 Begin
   IsValidMove := False;
-  
+
   { Vérifier d'abord s'il y a une capture possible }
   If CanCapture(FromX, FromY, CaptureToX, CaptureToY) Then Begin
     IsValidMove := (ToX = CaptureToX) and (ToY = CaptureToY);
     Exit;
   End;
-  
-  { Si pas de capture, vérifier le mouvement normal }
+
+  { Si pas de capture, v�rifier le mouvement normal }
   If Board[ToX,ToY] <> ptEmpty Then Exit;
-  
+
   Case Board[FromX,FromY] of
     ptWhite: Begin
       IsValidMove := (ToY = FromY-1) and
@@ -270,20 +293,20 @@ Var
   MovingPiece: TPieceType;
 Begin
   MovingPiece := Board[FromX,FromY];
-  
+
   { Capturer la pièce si c'est un saut }
   If Abs(ToX - FromX) = 2 Then Begin
     Board[(FromX + ToX) div 2, (FromY + ToY) div 2] := ptEmpty;
   End;
-  
+
   { Effectuer le mouvement }
   Board[ToX,ToY] := MovingPiece;
   Board[FromX,FromY] := ptEmpty;
-  
+
   { Si la pièce atteint la dernière rangée, la transformer en dame }
   If (MovingPiece = ptWhite) and (ToY = 0) Then
     Board[ToX,ToY] := ptWhiteKing;
-  
+
   { Enregistrer le mouvement dans l'historique }
   Inc(MoveCount);
   MoveHistory[MoveCount].FromX := FromX;
@@ -294,35 +317,48 @@ Begin
 End;
 
 Function ComputerMove:Boolean;
-Var 
-  I, J: Integer;
-  FoundMove: Boolean;
+Var
+ I,J,ToX,ToY: Integer;
+ FoundMove: Boolean;
 Begin
   FoundMove := False;
-  Delay(500); { Pause pour simuler la réflexion }
+  Delay(500);
 
-  { Chercher une pièce noire qui peut bouger }
+  { D'abord chercher s'il y a des captures possibles }
   For I := 0 to 7 do Begin
-    For J := 7 downto 0 do Begin
+    For J := 0 to 7 do Begin
       If Board[I,J] = ptBlack Then Begin
-        { Essayer de déplacer en diagonale vers le bas }
-        If (J < 7) Then Begin
-          { Essai à gauche }
-          If (I > 0) and (Board[I-1,J+1] = ptEmpty) Then Begin
-            MakeMove(I, J, I-1, J+1);
-            FoundMove := True;
-            Break;
-          End;
-          { Essai à droite }
-          If (I < 7) and (Board[I+1,J+1] = ptEmpty) Then Begin
-            MakeMove(I, J, I+1, J+1);
-            FoundMove := True;
-            Break;
-          End;
+        If CanCaptureComputer(I, J, ToX, ToY) Then Begin
+          MakeMove(I, J, ToX, ToY);
+          FoundMove := True;
+          Break;
         End;
       End;
     End;
     If FoundMove Then Break;
+  End;
+
+  { Si pas de capture, faire un mouvement normal }
+  If Not FoundMove Then Begin
+    For I := 0 to 7 do Begin
+      For J := 7 downto 0 do Begin
+        If Board[I,J] = ptBlack Then Begin
+          If (J < 7) Then Begin
+            If (I > 0) and (Board[I-1,J+1] = ptEmpty) Then Begin
+              MakeMove(I, J, I-1, J+1);
+              FoundMove := True;
+              Break;
+            End;
+            If (I < 7) and (Board[I+1,J+1] = ptEmpty) Then Begin
+              MakeMove(I, J, I+1, J+1);
+              FoundMove := True;
+              Break;
+            End;
+          End;
+        End;
+      End;
+      If FoundMove Then Break;
+    End;
   End;
 
   ComputerMove := FoundMove;
@@ -427,7 +463,7 @@ BEGIN
       If ComputerMove Then CurrentPlayer:=plHuman;
     End;
 
-    { Mise à jour des deux curseurs }
+    { Mise � jour des deux curseurs }
     Inc(CursorTimer);
     Inc(DestCursorTimer);
     If CursorTimer > 5 Then Begin
