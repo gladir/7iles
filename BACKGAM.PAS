@@ -1,3 +1,9 @@
+{ @author: Sylvain Maltais (support@gladir.com)
+  @created: 2025
+  @website(https://www.gladir.com/7iles)
+  @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
+}
+
 Program Backgammon;
 
 Uses {$IFDEF FPC}
@@ -12,7 +18,7 @@ Const
  POINT_HEIGHT = 140; { Réduit de 150 à 140 pour garder les proportions }
  MARGIN_TOP = 60;
  MARGIN_BOTTOM = 40;
- DICE_AREA_LEFT = 550; { Augmenté de 510 à 550 }
+ DICE_AREA_LEFT = 550; { Augment� de 510 � 550 }
  BOARD_TOP_OFFSET = 20;  { Nouvelle constante }
 
 Type
@@ -23,27 +29,31 @@ Type
   color:integer; { 1 = white, 2 = black }
  End;
 
-  TBoard = array[1..24] of TPoint;
+ TBoard=Array[1..24] of TPoint;
 
-Function IntToStr(Value: Integer):String;
-var
-  S: string[11];  { Maximum de 11 caractères pour un Integer }
-begin
-  Str(Value, S);
-  IntToStr := S;
-end;
+ TDiceUsed = Array[1..2] of Boolean;  { Pour suivre l'état des dés }
 
-var
-  gd, gm: integer;
-  board: TBoard;
-  currentPlayer: integer;
-  dice: array[1..2] of integer;
-  player1Type, player2Type: TPlayerType;
-
-procedure InitializeGraphics;
 Var
- Driver,Mode:Integer;
- ErrCode:Integer;
+ Gd,Gm:Integer;
+ Board:TBoard;
+ CurrentPlayer:Integer;
+ Dice:Array[1..2] of Integer;      { d�s de l'ordinateur }
+ HumanDice:Array[1..2] of Integer; { d�s de l'humain }
+ Player1Type,Player2Type:TPlayerType;
+ DiceUsed, HumanDiceUsed: TDiceUsed;  { État des dés (utilisé ou non) }
+
+Function IntToStr(Value:Integer):String;
+Var
+ S:String[11];  { Maximum de 11 caract�res pour un Integer }
+Begin
+ Str(Value, S);
+ IntToStr := S;
+End;
+
+Procedure InitializeGraphics;
+Var
+ Driver, Mode: Integer;
+ ErrCode: Integer;
 Begin
  {$IFDEF FPC}
   Driver:=VGA;
@@ -65,369 +75,477 @@ Begin
  End;
 End;
 
-procedure InitializeBoard;
-var i: integer;
-begin
-  for i := 1 to 24 do
-  begin
-    board[i].count := 0;
-    board[i].color := 0;
-  end;
+Procedure InitializeBoard;
+Var
+ I: Integer;
+Begin
+ For I := 1 To 24 Do Begin
+  Board[I].Count := 0;
+  Board[I].Color := 0;
+ End;
 
-  { Set initial positions }
-  board[1].count := 2; board[1].color := 1;  { White }
-  board[12].count := 5; board[12].color := 1;
-  board[17].count := 3; board[17].color := 1;
-  board[19].count := 5; board[19].color := 1;
+  { Fixe les positions initiales }
+ Board[1].Count := 2; Board[1].Color := 1;  { Blanc }
+ Board[12].Count := 5; Board[12].Color := 1;
+ Board[17].Count := 3; Board[17].Color := 1;
+ Board[19].Count := 5; Board[19].Color := 1;
 
-  board[24].count := 2; board[24].color := 2;  { Black }
-  board[13].count := 5; board[13].color := 2;
-  board[8].count := 3; board[8].color := 2;
-  board[6].count := 5; board[6].color := 2;
-end;
+ Board[24].Count := 2; Board[24].Color := 2;  { Rouge }
+ Board[13].Count := 5; Board[13].Color := 2;
+ Board[8].Count := 3; Board[8].Color := 2;
+ Board[6].Count := 5; Board[6].Color := 2;
+End;
 
-procedure DrawLetters;
-var
-  i: Integer;
-  x: Integer;
-  letter: Char;
-begin
-  SetTextStyle(DefaultFont, HorizDir, 2);
-  for i := 0 to 11 do begin
-    x := i * (BOARD_WIDTH div 12) + (BOARD_WIDTH div 24) - 8;
-    letter := Chr(Ord('A') + i);
-    OutTextXY(x, MARGIN_TOP - 10, letter);
-    letter := Chr(Ord('M') + i);
-    OutTextXY(x, BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET + 30, letter); { Ajouté 20 pixels (de 10 à 30) }
-  end;
-end;
+Procedure DrawLetters;
+Var
+ I:Integer;
+ X:Integer;
+ Letter:Char;
+Begin
+ SetTextStyle(DefaultFont, HorizDir, 2);
+ SetColor(White);  { Force la couleur du texte en blanc }
+ For I:=0 To 11 Do Begin
+  X:=I * (BOARD_WIDTH Div 12) + (BOARD_WIDTH Div 24) - 8;
+  Letter := Chr(Ord('A') + I);
+  OutTextXY(X, MARGIN_TOP - 10, Letter);
+  Letter := Chr(Ord('M') + I);
+  OutTextXY(X, BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET + 30, Letter);
+ End;
+End;
 
-procedure DrawDiceShape(x, y, value: Integer);
-const
-  DICE_SIZE = 40;
-  DOT_SIZE = 6;
-var
-  centerX, centerY: Integer;
-begin
+Procedure DrawDiceShape(X,Y,Value:Integer; Used:Boolean);
+Const
+ DICE_SIZE=40;
+ DOT_SIZE=6;
+Var
+ CenterX,CenterY:Integer;
+Begin
   { Dessine le rectangle arrondi du dé }
-  SetColor(White);
-  SetFillStyle(SolidFill, White);
-  Bar(x, y, x + DICE_SIZE, y + DICE_SIZE);
-  Rectangle(x, y, x + DICE_SIZE, y + DICE_SIZE);
+  If Used Then Begin
+    SetColor(LightGray);
+    SetFillStyle(SolidFill, LightGray);
+  End Else Begin
+    SetColor(White);
+    SetFillStyle(SolidFill, White);
+  End;
+
+  Bar(X,Y,X+DICE_SIZE,Y+DICE_SIZE);
+ Rectangle(X,Y,X+DICE_SIZE,Y+DICE_SIZE);
 
   { Points centraux pour le dé }
-  centerX := x + DICE_SIZE div 2;
-  centerY := y + DICE_SIZE div 2;
+ CenterX:=X + DICE_SIZE Div 2;
+ CenterY:=Y + DICE_SIZE Div 2;
+ SetFillStyle(SolidFill, Black);
+ Case Value Of
+  1:FillEllipse(CenterX, CenterY, DOT_SIZE, DOT_SIZE);
+  2:Begin
+   FillEllipse(CenterX - 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+  End;
+  3:Begin
+   FillEllipse(CenterX - 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX, CenterY, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+  End;
+  4:Begin
+   FillEllipse(CenterX - 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX - 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+  End;
+  5:Begin
+   FillEllipse(CenterX - 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX, CenterY, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX - 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+  End;
+  6:Begin
+   FillEllipse(CenterX - 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY - 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX - 10, CenterY, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX - 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+   FillEllipse(CenterX + 10, CenterY + 10, DOT_SIZE, DOT_SIZE);
+  End;
+ End;
+End;
 
-  SetFillStyle(SolidFill, Black);
+Procedure DrawDice;
+Var
+ Y:Integer;
+Begin
+ Y:=MARGIN_TOP + 45;
+ SetTextStyle(DefaultFont, HorizDir, 2);
 
-  case value of
-    1: FillEllipse(centerX, centerY, DOT_SIZE, DOT_SIZE);
+ { D�s de l'ordinateur }
+ OutTextXY(DICE_AREA_LEFT + 5, Y - 30, 'Ordi:');
+ DrawDiceShape(DICE_AREA_LEFT - 15, Y + 5, Dice[1], DiceUsed[1]);
+ DrawDiceShape(DICE_AREA_LEFT + 45, Y + 5, Dice[2], DiceUsed[2]);
 
-    2: begin
-      FillEllipse(centerX - 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-    end;
+  { D�s de l'humain }
+ OutTextXY(DICE_AREA_LEFT + 15, Y + 60, 'Humain:');
+ DrawDiceShape(DICE_AREA_LEFT - 15, Y + 85, HumanDice[1], HumanDiceUsed[1]);
+ DrawDiceShape(DICE_AREA_LEFT + 45, Y + 85, HumanDice[2], HumanDiceUsed[2]);
 
-    3: begin
-      FillEllipse(centerX - 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX, centerY, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-    end;
-
-    4: begin
-      FillEllipse(centerX - 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX - 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-    end;
-
-    5: begin
-      FillEllipse(centerX - 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX, centerY, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX - 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-    end;
-
-    6: begin
-      FillEllipse(centerX - 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY - 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX - 10, centerY, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX - 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-      FillEllipse(centerX + 10, centerY + 10, DOT_SIZE, DOT_SIZE);
-    end;
-  end;
-end;
-
-procedure DrawDice;
-var
-  y: Integer;
-begin
-  y := MARGIN_TOP + 50;
-  SetTextStyle(DefaultFont, HorizDir, 2);
-
-  { Affiche le joueur courant }
-  if currentPlayer = 1 then
-    OutTextXY(DICE_AREA_LEFT + 5, y - 30, 'Joueur:')
-  else
-    OutTextXY(DICE_AREA_LEFT + 5, y - 30, 'Ordi:');
-
-  { Dessine les dés }
-  DrawDiceShape(DICE_AREA_LEFT + 5, y + 10, dice[1]);
-  DrawDiceShape(DICE_AREA_LEFT + 65, y + 10, dice[2]);
-
-  { Ajoute la légende des couleurs avec textes décalés vers la droite }
+  { Ajoute la légende des couleurs }
   SetTextStyle(DefaultFont, HorizDir, 1);
 
+  SetColor(Red);
+  SetFillStyle(SolidFill, Red);
+  FillEllipse(DICE_AREA_LEFT + 10, Y + 210, 8, 8);  { +20 pixels }
+  OutTextXY(DICE_AREA_LEFT + 50, Y + 207, 'Humain');
+
   SetFillStyle(SolidFill, White);
-  FillEllipse(DICE_AREA_LEFT + 10, y + 90, 8, 8);
-  OutTextXY(DICE_AREA_LEFT + 42, y + 87, 'Humain');
+  FillEllipse(DICE_AREA_LEFT + 10, Y + 230, 8, 8);  { +20 pixels }
+  OutTextXY(DICE_AREA_LEFT + 42, Y + 227, 'Ordi');
+End;
 
-  SetFillStyle(SolidFill, Black);
-  FillEllipse(DICE_AREA_LEFT + 10, y + 110, 8, 8);
-  OutTextXY(DICE_AREA_LEFT + 42, y + 107, 'Ordi');
-end;
+Procedure DrawDirectionArrows;
+Const
+ ARROW_SIZE=30;
+ ARROW_X=DICE_AREA_LEFT+100;
+Begin
+  { Fl�che du haut (ordi - blanc) }
+ SetColor(White);
+ SetFillStyle(SolidFill, White);
+ Line(ARROW_X, MARGIN_TOP + 20, ARROW_X, MARGIN_TOP + 50);
+ Line(ARROW_X - 10, MARGIN_TOP + 35, ARROW_X, MARGIN_TOP + 20);
+ Line(ARROW_X + 10, MARGIN_TOP + 35, ARROW_X, MARGIN_TOP + 20);
 
-procedure DrawBoard;
-var
-  i, j, x, y: integer;
-  trianglePoints: array[1..6] of integer;
-begin
-  ClearDevice;
-  SetBkColor(Green);
+  { Fl�che du bas (humain - noir) }
+ SetColor(Red);
+ SetFillStyle(SolidFill, Red);
+ Line(ARROW_X, MARGIN_TOP + 70, ARROW_X, MARGIN_TOP + 100);
+ Line(ARROW_X - 10, MARGIN_TOP + 85, ARROW_X, MARGIN_TOP + 100);
+ Line(ARROW_X + 10, MARGIN_TOP + 85, ARROW_X, MARGIN_TOP + 100);
+End;
 
-  { Draw board outline }
-  Rectangle(0, MARGIN_TOP + BOARD_TOP_OFFSET,
+Procedure DrawBoard;
+Var
+ I,J,X,Y:Integer;
+ TrianglePoints:Array[1..6] of Integer;
+Begin
+ ClearDevice;
+ SetBkColor(Green);
+
+  { Dessin le tableau }
+ Rectangle(0, MARGIN_TOP + BOARD_TOP_OFFSET,
            BOARD_WIDTH, BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET);
-  Line(BOARD_WIDTH div 2, MARGIN_TOP + BOARD_TOP_OFFSET,
-       BOARD_WIDTH div 2, BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET);
+ Line(BOARD_WIDTH div 2, MARGIN_TOP + BOARD_TOP_OFFSET,
+      BOARD_WIDTH div 2, BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET);
 
-  { Draw points }
-  for i := 1 to 24 do
-  begin
-    x := ((i-1) mod 12) * (BOARD_WIDTH div 12);
-    if i > 12 then
-      y := BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET
-    else
-      y := MARGIN_TOP + BOARD_TOP_OFFSET;
+ { Dessine les points }
+ For I := 1 To 24 do Begin
+  X:=((I-1) Mod 12) * (BOARD_WIDTH Div 12);
+  If I>12 Then Y:=BOARD_HEIGHT + MARGIN_TOP + BOARD_TOP_OFFSET
+          Else Y:=MARGIN_TOP + BOARD_TOP_OFFSET;
 
-    { Draw triangle }
-    if i mod 2 = 0 then
-      SetFillStyle(SolidFill, LightGray)
-    else
-      SetFillStyle(SolidFill, DarkGray);
+ { Dessine le triangle }
+  SetColor(Black);
+  If I Mod 2=0 Then SetFillStyle(SolidFill,LightGray)
+               Else SetFillStyle(SolidFill,DarkGray);
+  TrianglePoints[1] := X;
+  TrianglePoints[2] := Y;
+  TrianglePoints[3] := X + (BOARD_WIDTH Div 12);
+  TrianglePoints[4] := Y;
+  TrianglePoints[5] := X + (BOARD_WIDTH Div 24);
+  If I <= 12 Then
+   TrianglePoints[6] := Y + POINT_HEIGHT  { Triangles du haut pointant vers le bas }
+  Else
+   TrianglePoints[6] := Y - POINT_HEIGHT; { Triangles du bas pointant vers le haut }
+  FillPoly(3, TrianglePoints);
 
-    trianglePoints[1] := x;
-    trianglePoints[2] := y;
-    trianglePoints[3] := x + (BOARD_WIDTH div 12);
-    trianglePoints[4] := y;
-    trianglePoints[5] := x + (BOARD_WIDTH div 24);
-    if i <= 12 then
-      trianglePoints[6] := y + POINT_HEIGHT  { Triangles du haut pointant vers le bas }
-    else
-      trianglePoints[6] := y - POINT_HEIGHT; { Triangles du bas pointant vers le haut }
+   { Dessin la jetons avec positions ajust�es }
+  If Board[I].Count>0 Then Begin
+   If Board[I].Color=1 Then Begin
+    SetColor(Red);  { Ajout pour le contour }
+    SetFillStyle(SolidFill,Red)  { Pour l'humain }
+   End
+    Else
+   Begin
+    SetColor(White);  { Ajout pour le contour }
+    SetFillStyle(SolidFill,White); { Pour l'ordi }
+   End;
+   For J:=1 To Board[I].Count Do Begin
+    If I <= 12 Then FillEllipse(X+(BOARD_WIDTH Div 24),Y+J*30,15,15)
+               Else FillEllipse(X + (BOARD_WIDTH Div 24),Y-J*30,15,15);
+   End;
+  End;
+ End;
+ DrawDice;
+ DrawLetters;
+ DrawDirectionArrows;  { Ajout de l'appel }
+End;
 
-    FillPoly(3, trianglePoints);
+Procedure RollDice;
+Begin
+  Randomize;
+  { Tire les dés pour les deux joueurs }
+  Dice[1] := Random(6) + 1;
+  Dice[2] := Random(6) + 1;
+  HumanDice[1] := Random(6) + 1;
+  HumanDice[2] := Random(6) + 1;
 
-    { Draw checkers avec positions ajustées }
-    if board[i].count > 0 then
-    begin
-      if board[i].color = 1 then
-        SetFillStyle(SolidFill, White)
-      else
-        SetFillStyle(SolidFill, Black);
+  { Réinitialise l'état des dés }
+  DiceUsed[1] := False;
+  DiceUsed[2] := False;
+  HumanDiceUsed[1] := False;
+  HumanDiceUsed[2] := False;
+End;
 
-      for j := 1 to board[i].count do
-      begin
-        if i <= 12 then
-          FillEllipse(x + (BOARD_WIDTH div 24),
-                     y + j * 30,
-                     15, 15)
-        else
-          FillEllipse(x + (BOARD_WIDTH div 24),
-                     y - j * 30,
-                     15, 15);
-      end;
-    end;
-  end;
-
-  DrawDice;
-  DrawLetters;
-end;
-
-procedure RollDice;
-begin
-  randomize;
-  dice[1] := random(6) + 1;
-  dice[2] := random(6) + 1;
-end;
-
-function IsValidMove(fromPos, toPos: integer): boolean;
-begin
-  IsValidMove := false;
-  if (fromPos < 1) or (fromPos > 24) or (toPos < 1) or (toPos > 24) then exit;
+Function IsValidMove(FromPos, ToPos: Integer; Var UsedDice: Integer): Boolean;
+Var
+  D1, D2: Integer;
+Begin
+  IsValidMove := False;
+  UsedDice := 0;
+  If (FromPos < 1) Or (FromPos > 24) Or (ToPos < 1) Or (ToPos > 24) Then Exit;
 
   { Basic move validation }
-  if board[fromPos].color <> currentPlayer then exit;
-  if (board[toPos].count > 1) and (board[toPos].color <> currentPlayer) then exit;
+  If Board[FromPos].Color <> CurrentPlayer Then Exit;
+  If (Board[ToPos].Count > 1) And (Board[ToPos].Color <> CurrentPlayer) Then Exit;
 
-  { Check if move matches dice roll }
-  if (abs(toPos - fromPos) = dice[1]) or
-     (abs(toPos - fromPos) = dice[2]) then
-    IsValidMove := true;
-end;
+  { Utilise les bons dés selon le joueur }
+  If CurrentPlayer = 1 Then Begin
+    D1 := HumanDice[1];
+    D2 := HumanDice[2];
+  End Else Begin
+    D1 := Dice[1];
+    D2 := Dice[2];
+  End;
 
-procedure MakeMove(fromPos, toPos: integer);
-begin
-  if not IsValidMove(fromPos, toPos) then exit;
+  { Vérifie quel dé correspond au mouvement }
+  If CurrentPlayer = 1 Then Begin
+    If (Not HumanDiceUsed[1]) And (Abs(ToPos - FromPos) = HumanDice[1]) Then Begin
+      IsValidMove := True;
+      UsedDice := 1;
+    End
+    Else If (Not HumanDiceUsed[2]) And (Abs(ToPos - FromPos) = HumanDice[2]) Then Begin
+      IsValidMove := True;
+      UsedDice := 2;
+    End;
+  End
+  Else Begin
+    If (Not DiceUsed[1]) And (Abs(ToPos - FromPos) = Dice[1]) Then Begin
+      IsValidMove := True;
+      UsedDice := 1;
+    End
+    Else If (Not DiceUsed[2]) And (Abs(ToPos - FromPos) = Dice[2]) Then Begin
+      IsValidMove := True;
+      UsedDice := 2;
+    End;
+  End;
+End;
+
+Procedure FlashCheckers(FromPos, ToPos: Integer);
+Var
+  I, X, Y, OrigColor: Integer;
+Begin
+  For I := 1 To 5 Do Begin  { 5 cycles de clignotement }
+    { Sauvegarde la couleur originale }
+    OrigColor := Board[FromPos].Color;
+
+    { Change la couleur en rouge }
+    Board[FromPos].Color := Red;
+    If Board[ToPos].Count > 0 Then
+      Board[ToPos].Color := Red;
+    DrawBoard;
+    Delay(200);
+
+    { Retourne à la couleur originale }
+    Board[FromPos].Color := OrigColor;
+    If Board[ToPos].Count > 0 Then
+      Board[ToPos].Color := CurrentPlayer;
+    DrawBoard;
+    Delay(200);
+  End;
+End;
+
+Procedure MakeMove(FromPos, ToPos: Integer);
+Var
+  UsedDice: Integer;
+Begin
+  If Not IsValidMove(FromPos, ToPos, UsedDice) Then Exit;
+  
+  { Marque le dé comme utilisé }
+  If CurrentPlayer = 1 Then
+    HumanDiceUsed[UsedDice] := True
+  Else
+    DiceUsed[UsedDice] := True;
+
+  { Effet de clignotement }
+  FlashCheckers(FromPos, ToPos);
 
   { Update board }
-  dec(board[fromPos].count);
-  if board[fromPos].count = 0 then
-    board[fromPos].color := 0;
+  Dec(Board[FromPos].Count);
+  If Board[FromPos].Count = 0 Then
+    Board[FromPos].Color := 0;
 
-  inc(board[toPos].count);
-  board[toPos].color := currentPlayer;
+  Inc(Board[ToPos].Count);
+  Board[ToPos].Color := CurrentPlayer;
 
   DrawBoard;
-end;
+End;
 
-function LetterToPosition(c: Char; topHalf: Boolean): Integer;
-begin
-  if topHalf then
-    LetterToPosition := Ord(UpCase(c)) - Ord('A') + 1
-  else
-    LetterToPosition := Ord(UpCase(c)) - Ord('M') + 13;  { Modifié pour M-X }
-end;
+Function LetterToPosition(C: Char; TopHalf: Boolean): Integer;
+Begin
+  If TopHalf Then
+    LetterToPosition := Ord(UpCase(C)) - Ord('A') + 1
+  Else
+    LetterToPosition := Ord(UpCase(C)) - Ord('M') + 13;  { Modifié pour M-X }
+End;
 
-procedure ComputerMove;
-var
-  fromPos, toPos, bestFrom, bestTo: Integer;
-  validMoves: Integer;
-begin
-  validMoves := 0;
-  bestFrom := 0;
-  bestTo := 0;
+Procedure ComputerMove;
+Var
+  FromPos, ToPos, BestFrom, BestTo: Integer;
+  MovesLeft, ValidMoves, UsedDice: Integer;  { Ajout de UsedDice }
+Begin
+  MovesLeft := 2;
+  While MovesLeft > 0 Do Begin
+    ValidMoves := 0;
+    BestFrom := 0;
+    BestTo := 0;
 
-  { Simple AI - Trouve le premier mouvement valide }
-  for fromPos := 1 to 24 do
-    for toPos := 1 to 24 do
-      if IsValidMove(fromPos, toPos) then begin
-        bestFrom := fromPos;
-        bestTo := toPos;
-        validMoves := validMoves + 1;
-        break;
-      end;
+    { Cherche un mouvement valide }
+    For FromPos := 1 To 24 Do
+      For ToPos := 1 To 24 Do
+        If IsValidMove(FromPos, ToPos, UsedDice) Then Begin  { Ajout du paramètre UsedDice }
+          BestFrom := FromPos;
+          BestTo := ToPos;
+          ValidMoves := ValidMoves + 1;
+          Break;
+        End;
 
-  if validMoves > 0 then
-    MakeMove(bestFrom, bestTo);
-end;
+    If ValidMoves > 0 Then Begin
+      MakeMove(BestFrom, BestTo);
+      Dec(MovesLeft);
+    End 
+    Else MovesLeft := 0;
+    
+    Delay(500);
+  End;
+End;
 
-procedure SelectFirstPlayer;
-var
-  c: Char;
-  centerX, centerY: Integer;
-begin
+Procedure SelectFirstPlayer;
+Var
+  C: Char;
+  CenterX, CenterY: Integer;
+Begin
   ClearDevice;
   SetBkColor(Black);
-  centerX := GetMaxX div 2;
-  centerY := GetMaxY div 2;
+  CenterX := GetMaxX Div 2;
+  CenterY := GetMaxY Div 2;
 
   { Affiche le titre }
   SetTextStyle(TriplexFont, HorizDir, 4);
   SetTextJustify(CenterText, CenterText);
-  OutTextXY(centerX, centerY - 50, 'BACKGAMMON');
+  OutTextXY(CenterX, CenterY - 50, 'BACKGAMMON');
 
   { Affiche le message de sélection }
   SetTextStyle(DefaultFont, HorizDir, 2);
-  OutTextXY(centerX, centerY, 'Qui commence?');
-  OutTextXY(centerX, centerY + 30, '(H)umain, (O)rdinateur ou (Q)uitter');
+  OutTextXY(CenterX, CenterY, 'Qui commence?');
+  OutTextXY(CenterX, CenterY + 30, '(H)umain, (O)rdinateur ou (Q)uitter');
 
-  repeat
-    c := UpCase(ReadKey);
-  until c in ['H', 'O', 'Q'];
+  Repeat
+    C := UpCase(ReadKey);
+  Until C In ['H', 'O', 'Q'];
 
-  if c = 'Q' then begin
+  If C = 'Q' Then Begin
     CloseGraph;
     Halt;
-  end else if c = 'H' then begin
-    currentPlayer := 1;
-    player1Type := Human;
-    player2Type := Computer;
-  end else begin
-    currentPlayer := 2;
-    player1Type := Computer;
-    player2Type := Human;
-  end;
-end;
+  End Else If C = 'H' Then Begin
+    CurrentPlayer := 1;
+    Player1Type := Human;
+    Player2Type := Computer;
+  End Else Begin
+    CurrentPlayer := 2;
+    Player1Type := Computer;
+    Player2Type := Human;
+  End;
+End;
 
-procedure HandlePlayerMove;
-var
-  c: Char;
-  fromPos, toPos: Integer;
-begin
-  SetTextStyle(DefaultFont, HorizDir, 2);
-  OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 100, 'De: ');
-  repeat
-    c := ReadKey;
-    if c = #27 then begin  { ESC }
-      CloseGraph;
-      Halt;
-    end;
-    c := UpCase(c);
-  until c in ['A'..'L', 'M'..'X'];
+Procedure HandlePlayerMove;
+Var
+  C: Char;
+  FromPos, ToPos: Integer;
+  MovesLeft, UsedDice: Integer;  { Ajout de UsedDice }
+Begin
+  MovesLeft := 2;
+  
+  While MovesLeft > 0 Do Begin
+    SetTextStyle(DefaultFont, HorizDir, 2);
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 180, 'Coups restants: ' + IntToStr(MovesLeft));  { +20 pixels }
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 210, 'De: ');  { +20 pixels }
+    
+    Repeat
+      C := ReadKey;
+      If C = #27 Then Begin { ESC }
+        CloseGraph;
+        Halt;
+      End;
+      If C = #13 Then Begin { ENTER pour passer }
+        MovesLeft := 0;
+        Break;
+      End;
+      C := UpCase(C);
+    Until C in ['A'..'L', 'M'..'X'];
 
-  OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 100, c);
+    If MovesLeft = 0 Then Break;
 
-  if c in ['A'..'L'] then
-    fromPos := LetterToPosition(c, true)
-  else
-    fromPos := LetterToPosition(c, false);
+    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 210, C);  { +20 pixels }
+    
+    If C in ['A'..'L'] Then FromPos := LetterToPosition(C, True)
+                      Else FromPos := LetterToPosition(C, False);
 
-  OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 130, 'Vers: ');
-  repeat
-    c := ReadKey;
-    if c = #27 then begin  { ESC }
-      CloseGraph;
-      Halt;
-    end;
-    c := UpCase(c);
-  until c in ['A'..'L', 'M'..'X'];
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 240, 'Vers: ');  { +20 pixels }
+    Repeat
+      C := ReadKey;
+      If C = #27 Then Begin
+        CloseGraph;
+        Halt;
+      End;
+      C := UpCase(C);
+    Until C in ['A'..'L', 'M'..'X'];
 
-  OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 130, c);
+    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 240, C);  { +20 pixels }
 
-  if c in ['A'..'L'] then
-    toPos := LetterToPosition(c, true)
-  else
-    toPos := LetterToPosition(c, false);
+    If C in ['A'..'L'] Then ToPos := LetterToPosition(C, True)
+                      Else ToPos := LetterToPosition(C, False);
 
-  MakeMove(fromPos, toPos);
-end;
+    If IsValidMove(FromPos, ToPos, UsedDice) Then Begin  { Ajout du paramètre UsedDice }
+      MakeMove(FromPos, ToPos);
+      Dec(MovesLeft);
+    End;
+    
+    DrawBoard; { Rafraîchit l'affichage après chaque coup }
+  End;
+End;
 
 { Programme principal modifié }
 BEGIN
   InitializeGraphics;
   SelectFirstPlayer;
   InitializeBoard;
+  RollDice;  { Lance les dés avant le premier tour }
+  DrawBoard; { Affiche le plateau avec les dés }
 
-  repeat
-    DrawBoard;
-    RollDice;
-
-    if ((currentPlayer = 1) and (player1Type = Human)) or
-       ((currentPlayer = 2) and (player2Type = Human)) then
+  Repeat
+    If ((CurrentPlayer = 1) And (Player1Type = Human)) Or 
+       ((CurrentPlayer = 2) And (Player2Type = Human)) Then
       HandlePlayerMove
-    else
+    Else
       ComputerMove;
 
-    if KeyPressed then
-      if ReadKey = #27 then break;
-
-    currentPlayer := 3 - currentPlayer;
+    If KeyPressed Then Begin
+      If ReadKey = #27 Then Break;
+    End;
+    
+    CurrentPlayer := 3 - CurrentPlayer;
+    RollDice;  { Lance les dés pour le prochain tour }
+    DrawBoard; { Affiche le nouveau plateau }
     Delay(500);
-  until false;
-
+  Until False;
+  
   CloseGraph;
 END.
