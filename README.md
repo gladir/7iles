@@ -15,6 +15,10 @@ Aperçu de Pac-Man
 ![image](https://user-images.githubusercontent.com/11842176/181350205-9c10b332-533e-42f3-a578-82db24c9a400.png)
 ![image](https://user-images.githubusercontent.com/11842176/181349771-4c04f0cd-79e1-444a-929b-5703242b5aeb.png)
 
+Aperçu de Backgammon
+
+![image](https://github.com/user-attachments/assets/43299479-b83b-465c-ad4a-10d7a91d650b)
+
 Apercu de Breakout (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181775528-e7932f33-f995-4eb9-b465-6a38cbc9411f.png)
@@ -126,6 +130,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>Bouncing Babies</b></td>
         <td>Ce fichier contient le jeu Bouncing Babies originaire d'IBM PC.</td>
     </tr>
+    <tr>
+        <td><b>BACKGAM.PAS</b></td>
+        <td><b>Backgammon</b></td>
+        <td>Ce fichier contient le jeu Backgammon.</td>
+    </tr>    
     <tr>
         <td><b>BLOX.PAS</b></td>
         <td><b>Blox</b></td>
