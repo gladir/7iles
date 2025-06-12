@@ -295,8 +295,6 @@ Begin
 End;
 
 Function IsValidMove(FromPos, ToPos: Integer; Var UsedDice: Integer): Boolean;
-Var
-  D1, D2: Integer;
 Begin
   IsValidMove := False;
   UsedDice := 0;
@@ -306,32 +304,22 @@ Begin
   If Board[FromPos].Color <> CurrentPlayer Then Exit;
   If (Board[ToPos].Count > 1) And (Board[ToPos].Color <> CurrentPlayer) Then Exit;
 
-  { Utilise les bons dés selon le joueur }
+  { Pour l'humain, vérifie les deux dés disponibles }
   If CurrentPlayer = 1 Then Begin
-    D1 := HumanDice[1];
-    D2 := HumanDice[2];
-  End Else Begin
-    D1 := Dice[1];
-    D2 := Dice[2];
-  End;
-
-  { Vérifie quel dé correspond au mouvement }
-  If CurrentPlayer = 1 Then Begin
-    If (Not HumanDiceUsed[1]) And (Abs(ToPos - FromPos) = HumanDice[1]) Then Begin
+    If Not HumanDiceUsed[1] And (Abs(ToPos - FromPos) = HumanDice[1]) Then Begin
       IsValidMove := True;
       UsedDice := 1;
-    End
-    Else If (Not HumanDiceUsed[2]) And (Abs(ToPos - FromPos) = HumanDice[2]) Then Begin
+    End;
+    If Not HumanDiceUsed[2] And (Abs(ToPos - FromPos) = HumanDice[2]) Then Begin
       IsValidMove := True;
       UsedDice := 2;
     End;
-  End
-  Else Begin
-    If (Not DiceUsed[1]) And (Abs(ToPos - FromPos) = Dice[1]) Then Begin
+  End Else Begin
+    { Pour l'ordinateur, garde la logique existante }
+    If Not DiceUsed[1] And (Abs(ToPos - FromPos) = Dice[1]) Then Begin
       IsValidMove := True;
       UsedDice := 1;
-    End
-    Else If (Not DiceUsed[2]) And (Abs(ToPos - FromPos) = Dice[2]) Then Begin
+    End Else If Not DiceUsed[2] And (Abs(ToPos - FromPos) = Dice[2]) Then Begin
       IsValidMove := True;
       UsedDice := 2;
     End;
@@ -468,16 +456,18 @@ End;
 Procedure HandlePlayerMove;
 Var
   C: Char;
-  FromPos, ToPos: Integer;
-  MovesLeft, UsedDice: Integer;  { Ajout de UsedDice }
+  FromPos, ToPos, DiceToUse: Integer;
+  MovesLeft, UsedDice: Integer;
+  ValidMove: Boolean;
 Begin
   MovesLeft := 2;
   
   While MovesLeft > 0 Do Begin
     SetTextStyle(DefaultFont, HorizDir, 2);
-    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 180, 'Coups restants: ' + IntToStr(MovesLeft));  { +20 pixels }
-    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 210, 'De: ');  { +20 pixels }
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 180, 'Coups restants: ' + IntToStr(MovesLeft));
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 210, 'De: ');
     
+    { Obtient la position de départ }
     Repeat
       C := ReadKey;
       If C = #27 Then Begin { ESC }
@@ -493,12 +483,13 @@ Begin
 
     If MovesLeft = 0 Then Break;
 
-    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 210, C);  { +20 pixels }
+    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 210, C);
     
     If C in ['A'..'L'] Then FromPos := LetterToPosition(C, True)
                       Else FromPos := LetterToPosition(C, False);
 
-    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 240, 'Vers: ');  { +20 pixels }
+    { Obtient la position d'arrivée }
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 240, 'Vers: ');
     Repeat
       C := ReadKey;
       If C = #27 Then Begin
@@ -508,17 +499,20 @@ Begin
       C := UpCase(C);
     Until C in ['A'..'L', 'M'..'X'];
 
-    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 240, C);  { +20 pixels }
+    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 240, C);
 
     If C in ['A'..'L'] Then ToPos := LetterToPosition(C, True)
                       Else ToPos := LetterToPosition(C, False);
 
-    If IsValidMove(FromPos, ToPos, UsedDice) Then Begin  { Ajout du paramètre UsedDice }
+    { Vérifie si le mouvement est valide }
+    ValidMove := IsValidMove(FromPos, ToPos, UsedDice);
+
+    If ValidMove Then Begin
+      { Effectue le mouvement }
       MakeMove(FromPos, ToPos);
       Dec(MovesLeft);
+      DrawBoard;
     End;
-    
-    DrawBoard; { Rafraîchit l'affichage après chaque coup }
   End;
 End;
 
