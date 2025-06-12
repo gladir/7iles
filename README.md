@@ -138,7 +138,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>BACKGAM.PAS</b></td>
         <td><b>Backgammon</b></td>
         <td>Ce fichier contient le jeu Backgammon.</td>
-    </tr>    
+    </tr>
+    <tr>
+        <td><b>BERZERK.PAS</b></td>
+        <td><b>Berzerk</b></td>
+        <td>Ce fichier contient un jeu du style de Berzerk.</td>
     <tr>
         <td><b>BLOX.PAS</b></td>
         <td><b>Blox</b></td>
