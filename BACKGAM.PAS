@@ -178,13 +178,18 @@ Begin
   Y:=MARGIN_TOP + 45;
   SetTextStyle(DefaultFont, HorizDir, 2);
 
-  { Dés de l'ordinateur }
-  OutTextXY(DICE_AREA_LEFT + 5, Y - 30, 'Ordi:');
+  If Player1Type = Human Then Begin
+    { Si l'humain commence, affiche dans cet ordre }
+    OutTextXY(DICE_AREA_LEFT + 5, Y - 30, 'Ordi:');
+    OutTextXY(DICE_AREA_LEFT + 15, Y + 60, 'Humain:');
+  End Else Begin
+    { Si l'ordi commence, inverse les légendes }
+    OutTextXY(DICE_AREA_LEFT + 5, Y - 30, 'Humain:');
+    OutTextXY(DICE_AREA_LEFT + 15, Y + 60, 'Ordi:');
+  End;
+
   DrawDiceShape(DICE_AREA_LEFT - 15, Y + 5, Dice[1], DiceUsed[1]);
   DrawDiceShape(DICE_AREA_LEFT + 45, Y + 5, Dice[2], DiceUsed[2]);
-
-  { Dés de l'humain }
-  OutTextXY(DICE_AREA_LEFT + 15, Y + 60, 'Humain:');
   DrawDiceShape(DICE_AREA_LEFT - 15, Y + 85, HumanDice[1], HumanDiceUsed[1]);
   DrawDiceShape(DICE_AREA_LEFT + 45, Y + 85, HumanDice[2], HumanDiceUsed[2]);
 
