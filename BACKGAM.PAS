@@ -355,7 +355,7 @@ Var
   UsedDice: Integer;
 Begin
   If Not IsValidMove(FromPos, ToPos, UsedDice) Then Exit;
-  
+
   { Marque le dé comme utilisé }
   If CurrentPlayer = 1 Then
     HumanDiceUsed[UsedDice] := True
@@ -408,9 +408,9 @@ Begin
     If ValidMoves > 0 Then Begin
       MakeMove(BestFrom, BestTo);
       Dec(MovesLeft);
-    End 
+    End
     Else MovesLeft := 0;
-    
+
     Delay(500);
   End;
 End;
@@ -461,12 +461,13 @@ Var
   ValidMove: Boolean;
 Begin
   MovesLeft := 2;
-  
+
   While MovesLeft > 0 Do Begin
     SetTextStyle(DefaultFont, HorizDir, 2);
-    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 180, 'Coups restants: ' + IntToStr(MovesLeft));
-    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 210, 'De: ');
-    
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 180, 'Coups');
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 200, 'restants: ' + IntToStr(MovesLeft));
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 230, 'De: ');
+
     { Obtient la position de départ }
     Repeat
       C := ReadKey;
@@ -483,13 +484,13 @@ Begin
 
     If MovesLeft = 0 Then Break;
 
-    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 210, C);
-    
+    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 230, C);
+
     If C in ['A'..'L'] Then FromPos := LetterToPosition(C, True)
                       Else FromPos := LetterToPosition(C, False);
 
     { Obtient la position d'arrivée }
-    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 240, 'Vers: ');
+    OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 260, 'Vers: ');
     Repeat
       C := ReadKey;
       If C = #27 Then Begin
@@ -499,14 +500,13 @@ Begin
       C := UpCase(C);
     Until C in ['A'..'L', 'M'..'X'];
 
-    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 240, C);
+    OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 260, C);
 
     If C in ['A'..'L'] Then ToPos := LetterToPosition(C, True)
                       Else ToPos := LetterToPosition(C, False);
 
     { Vérifie si le mouvement est valide }
     ValidMove := IsValidMove(FromPos, ToPos, UsedDice);
-
     If ValidMove Then Begin
       { Effectue le mouvement }
       MakeMove(FromPos, ToPos);
@@ -525,7 +525,7 @@ BEGIN
   DrawBoard; { Affiche le plateau avec les dés }
 
   Repeat
-    If ((CurrentPlayer = 1) And (Player1Type = Human)) Or 
+    If ((CurrentPlayer = 1) And (Player1Type = Human)) Or
        ((CurrentPlayer = 2) And (Player2Type = Human)) Then
       HandlePlayerMove
     Else
@@ -534,12 +534,12 @@ BEGIN
     If KeyPressed Then Begin
       If ReadKey = #27 Then Break;
     End;
-    
+
     CurrentPlayer := 3 - CurrentPlayer;
     RollDice;  { Lance les dés pour le prochain tour }
     DrawBoard; { Affiche le nouveau plateau }
     Delay(500);
   Until False;
-  
+
   CloseGraph;
 END.
