@@ -174,6 +174,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Centipede, le jeu où il faut empêcher un mille-pattes de toucher la terre.</td>
     </tr>
     <tr>
+        <td><b>CHECKERS.PAS</b></td>
+        <td><b>Checkers (Jeu de dame)</b>
+        <td>Ce fichier contient le jeu de dames ou Checkers en anglais.</td>
+    <tr>
         <td><b>CSI.PAS</b></td>
         <td><b>Color Space Invaders</b></td>
         <td>Ce fichier de jeu permet de lancer un clone du jeu Color Space Invaders originaire du CoCo 3 (Color Computer 3).</td>
