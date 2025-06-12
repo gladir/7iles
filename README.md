@@ -55,6 +55,10 @@ Aperçu du jeu Lode Runner (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/182494992-0f869c14-5ecf-4315-8697-901c3ee5c84a.png)
 
+Aperçu du jeu Q*Bert (sous Free Pascal)
+
+![image](https://github.com/user-attachments/assets/702c603e-f344-4d20-bcbe-ee166d213208)
+
 Aperçu du jeu Lunar Lander (sous Free Pascal)
 
 ![image](https://github.com/gladir/7iles/assets/11842176/5343668a-0b4d-4a90-a481-70b1c59cb990)
@@ -254,6 +258,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>Peg Leap</b></td>
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
+    <tr>
+        <td><b>QBERT.PAS</b></td>
+        <td><b>Q*Bert</b></td>
+        <td>Ce fichier contient un clone du jeu QBert.</td>
+    </tr>
     <tr>
         <td><b>RENJU.PAS<b/></td>
         <td><b>Renju</b></td>
