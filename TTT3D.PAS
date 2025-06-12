@@ -122,14 +122,16 @@ Begin
 End;
 
 Procedure Draw3DCube;
-Var 
+Var
   I, J, K: Integer;
   X1, Y1, X2, Y2: Integer;
   OffsetX, OffsetY: Integer;
+  GridSize3D: Integer;
 Begin
   { Position de base du cube }
   OffsetX := CUBE_OFFSET_X;
   OffsetY := CUBE_OFFSET_Y;
+  GridSize3D := CUBE_SIZE_3D div GRID_SIZE;
 
   SetColor(LightGray);
 
@@ -143,7 +145,7 @@ Begin
            OffsetX + Round(CUBE_SIZE_3D * (1 + PERSPECTIVE)),
            OffsetY - Round(CUBE_SIZE_3D * PERSPECTIVE));
 
-  { Lignes de connexion }
+  { Lignes de connexion des coins }
   For I := 0 To 1 do
     For J := 0 To 1 do Begin
       Line(OffsetX + I*CUBE_SIZE_3D,
@@ -152,23 +154,46 @@ Begin
            OffsetY - Round(CUBE_SIZE_3D * (PERSPECTIVE + J)));
     End;
 
-  { Dessiner les symboles dans le cube 3D }
+  { Dessiner la grille sur la face avant }
+  For I := 1 to GRID_SIZE-1 do Begin
+    Line(OffsetX + I*GridSize3D, OffsetY,
+         OffsetX + I*GridSize3D, OffsetY - CUBE_SIZE_3D);
+    Line(OffsetX, OffsetY - I*GridSize3D,
+         OffsetX + CUBE_SIZE_3D, OffsetY - I*GridSize3D);
+  End;
+
+  { Dessiner les grilles des autres faces avec perspective }
+  For I := 1 to GRID_SIZE-1 do Begin
+    { Face du dessus }
+    Line(OffsetX + I*GridSize3D,
+         OffsetY - CUBE_SIZE_3D,
+         OffsetX + I*GridSize3D + Round(CUBE_SIZE_3D*PERSPECTIVE),
+         OffsetY - CUBE_SIZE_3D - Round(CUBE_SIZE_3D*PERSPECTIVE));
+
+    { Face de droite }
+    Line(OffsetX + CUBE_SIZE_3D,
+         OffsetY - I*GridSize3D,
+         OffsetX + CUBE_SIZE_3D + Round(CUBE_SIZE_3D*PERSPECTIVE),
+         OffsetY - I*GridSize3D - Round(CUBE_SIZE_3D*PERSPECTIVE));
+  End;
+
+  { Dessiner les symboles dans le cube avec perspective }
   For K := 0 to GRID_SIZE-1 do
     For I := 0 to GRID_SIZE-1 do
       For J := 0 to GRID_SIZE-1 do
         If Grid[I,J,K] <> Empty Then Begin
-          X1 := OffsetX + Round((I * CUBE_SIZE_3D/GRID_SIZE));
-          Y1 := OffsetY - Round((J * CUBE_SIZE_3D/GRID_SIZE));
-          X2 := X1 + Round((K * CUBE_SIZE_3D/GRID_SIZE * PERSPECTIVE));
-          Y2 := Y1 - Round((K * CUBE_SIZE_3D/GRID_SIZE * PERSPECTIVE));
-          
+          X1 := OffsetX + I*GridSize3D;
+          Y1 := OffsetY - J*GridSize3D;
+          X2 := X1 + Round(K*GridSize3D*PERSPECTIVE);
+          Y2 := Y1 - Round(K*GridSize3D*PERSPECTIVE);
+
           If Grid[I,J,K] = X Then Begin
             SetColor(LightRed);
-            Line(X2-3, Y2-3, X2+3, Y2+3);
-            Line(X2-3, Y2+3, X2+3, Y2-3);
+            Line(X2-5, Y2-5, X2+5, Y2+5);
+            Line(X2-5, Y2+5, X2+5, Y2-5);
           End Else Begin
             SetColor(LightBlue);
-            Circle(X2, Y2, 3);
+            Circle(X2, Y2, 5);
           End;
         End;
 End;
@@ -179,14 +204,14 @@ Var
   PlayerSymbol: String[1];
 Begin
   ClearDevice;
-  
+
   { Dessiner les 4 niveaux côte à côte }
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 20 + I*(GRID_SIZE*CELL_SIZE + 20));
 
   { Dessiner le cube 3D }
   Draw3DCube;
-  
+
   { Préparer le symbole du joueur }
   If CurrentPlayer = 1 Then PlayerSymbol := 'X'
                       Else PlayerSymbol := 'O';
