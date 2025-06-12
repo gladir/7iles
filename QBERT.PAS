@@ -1,3 +1,9 @@
+{ @author: Sylvain Maltais (support@gladir.com)
+  @created: 2025
+  @website(https://www.gladir.com/7iles)
+  @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
+}
+
 Program QBert;
 
 Uses {$IFDEF FPC}
@@ -33,29 +39,29 @@ Type
     Completed: Boolean;
   END;
 
-  TCharacter = RECORD
+  TCharacter = Record
     Row, Col: Integer;
     Position: TPosition;
     IsJumping: Boolean;
     StartPos, TargetPos: TPosition;
     JumpProgress: Real;
-  END;
+  End;
 
   TSnake = Record
     Active: Boolean;
     Row, Col: Integer;
     Position: TPosition;
-    Direction: Integer; // -1: gauche, 1: droite
+    Direction: Integer; { -1: gauche, 1: droite }
     Speed: Real;
   End;
 
-  TPyramid = ARRAY[0..PYRAMID_LEVELS-1, 0..PYRAMID_LEVELS-1] OF TCube;
+  TPyramid = Array[0..PYRAMID_LEVELS-1, 0..PYRAMID_LEVELS-1] OF TCube;
 
-VAR
+Var
   GraphDriver, GraphMode: Integer;
   Pyramid: TPyramid;
   Q_Bert: TCharacter;
-  Enemies: ARRAY[1..MAX_ENEMIES] OF TCharacter;
+  Enemies: Array[1..MAX_ENEMIES] OF TCharacter;
   Snakes: Array[1..MAX_SNAKES] of TSnake;
   Score, Lives, CompletedCubes, TotalCubes: Integer;
   GameRunning, GameOver: Boolean;
@@ -63,6 +69,7 @@ VAR
   Key:Char;
   ElapsedTime: Real;
   SnakeSpawnTimer: Real;
+  I:Integer;
 
 Function GetCurrentTime:LongInt;Begin
  {$IFDEF FPC}
@@ -264,12 +271,12 @@ Begin
   If Snake.Active Then Begin
     SetColor(MAGENTA);
     SetFillStyle(SolidFill, MAGENTA);
-    FillEllipse(Snake.Position.X, Snake.Position.Y - CUBE_SIZE DIV 2, 
+    FillEllipse(Snake.Position.X, Snake.Position.Y - CUBE_SIZE DIV 2,
                 CUBE_SIZE DIV 3, CUBE_SIZE DIV 4);
     { Dessiner la langue }
     SetColor(RED);
     Line(Snake.Position.X, Snake.Position.Y - CUBE_SIZE DIV 2,
-         Snake.Position.X + Snake.Direction * CUBE_SIZE DIV 2, 
+         Snake.Position.X + Snake.Direction * CUBE_SIZE DIV 2,
          Snake.Position.Y - CUBE_SIZE DIV 2);
   End;
 End;
@@ -324,37 +331,37 @@ End;
 
 Procedure UpdateSnakes(ElapsedTime: Real);
 Var
-  I: Integer;
+ I: Integer;
 Begin
-  SnakeSpawnTimer := SnakeSpawnTimer + ElapsedTime;
-  
-  { Créer un nouveau serpent toutes les 5 secondes }
-  If SnakeSpawnTimer >= 5.0 Then Begin
-    SpawnSnake;
-    SnakeSpawnTimer := 0;
-  End;
+ SnakeSpawnTimer := SnakeSpawnTimer + ElapsedTime;
 
-  For I := 1 to MAX_SNAKES do Begin
-    If Snakes[I].Active Then Begin
-      { Déplacer le serpent }
-      Snakes[I].Col := Snakes[I].Col + Round(Snakes[I].Direction * Snakes[I].Speed * ElapsedTime);
-      
-      { Vérifier si le serpent est sorti de la pyramide }
-      If (Snakes[I].Col < 0) or (Snakes[I].Col > Snakes[I].Row) Then
-        Snakes[I].Active := False
-      Else
-        CalculatePosition(Snakes[I].Row, Snakes[I].Col, Snakes[I].Position);
-        
-      { Vérifier la collision avec Q*bert }
-      If abs(Snakes[I].Position.X - Q_Bert.Position.X) < CUBE_SIZE div 2 Then
-        If abs(Snakes[I].Position.Y - Q_Bert.Position.Y) < CUBE_SIZE div 2 Then Begin
-          Dec(Lives);
-          InitializeQBert;
-          InitializeSnakes;
-          Break;
-        End;
-    End;
+ { Créer un nouveau serpent toutes les 5 secondes }
+ If SnakeSpawnTimer >= 5.0 Then Begin
+  SpawnSnake;
+  SnakeSpawnTimer := 0;
+ End;
+
+ For I := 1 to MAX_SNAKES do Begin
+  If Snakes[I].Active Then Begin
+    { Déplacer le serpent }
+   Snakes[I].Col := Snakes[I].Col + Round(Snakes[I].Direction * Snakes[I].Speed * ElapsedTime);
+
+    { Vérifier si le serpent est sorti de la pyramide }
+   If (Snakes[I].Col < 0) or (Snakes[I].Col > Snakes[I].Row) Then
+    Snakes[I].Active := False
+   Else
+    CalculatePosition(Snakes[I].Row, Snakes[I].Col, Snakes[I].Position);
+
+    { Vérifier la collision avec Q*bert }
+   If Abs(Snakes[I].Position.X - Q_Bert.Position.X) < CUBE_SIZE div 2 Then
+    If Abs(Snakes[I].Position.Y - Q_Bert.Position.Y) < CUBE_SIZE div 2 Then Begin
+     Dec(Lives);
+     InitializeQBert;
+     InitializeSnakes;
+     Break;
+   End;
   End;
+ End;
 End;
 
 { Proc�dure pour afficher l'interface utilisateur }
@@ -393,20 +400,19 @@ Begin
     SetColor(YELLOW);
     OutTextXY(GetMaxX DIV 2 - TextWidth('Appuyez sur ESPACE pour rejouer') DIV 2,
               GetMaxY DIV 2 + 10, 'Appuyez sur ESPACE pour rejouer');
-  END;
+  End;
 
   { �cran de victoire }
-  IF CompletedCubes = TotalCubes THEN
-  BEGIN
-    SetFillStyle(SolidFill,BLACK);
-    Bar(GetMaxX DIV 2 - 150, GetMaxY DIV 2 - 50, GetMaxX DIV 2 + 150, GetMaxY DIV 2 + 50);
-    SetColor(LIGHTGREEN);
-    OutTextXY(GetMaxX DIV 2 - TextWidth('NIVEAU TERMIN�!') DIV 2, GetMaxY DIV 2 - 20, 'NIVEAU TERMIN�!');
-    SetColor(YELLOW);
-    OutTextXY(GetMaxX DIV 2 - TextWidth('Appuyez sur ESPACE pour continuer') DIV 2,
-              GetMaxY DIV 2 + 10, 'Appuyez sur ESPACE pour continuer');
-  END;
-END;
+  If CompletedCubes = TotalCubes Then Begin
+   SetFillStyle(SolidFill,BLACK);
+   Bar(GetMaxX DIV 2 - 150, GetMaxY DIV 2 - 50, GetMaxX DIV 2 + 150, GetMaxY DIV 2 + 50);
+   SetColor(LIGHTGREEN);
+   OutTextXY(GetMaxX DIV 2 - TextWidth('NIVEAU TERMIN�!') DIV 2, GetMaxY DIV 2 - 20, 'NIVEAU TERMIN�!');
+   SetColor(YELLOW);
+   OutTextXY(GetMaxX DIV 2 - TextWidth('Appuyez sur ESPACE pour continuer') DIV 2,
+             GetMaxY DIV 2 + 10, 'Appuyez sur ESPACE pour continuer');
+  End;
+End;
 
 BEGIN
  InitScr;
@@ -440,10 +446,10 @@ BEGIN
     End
     Else If Not Q_Bert.IsJumping AND GameRunning Then Begin
       Case Key of
-        'q', 'Q': JumpQBert(Q_Bert.Row+1, Q_Bert.Col);   { Bas-Gauche }
+        's', 'S': JumpQBert(Q_Bert.Row+1, Q_Bert.Col);   { Bas-Gauche }
         'w', 'W': JumpQBert(Q_Bert.Row-1, Q_Bert.Col-1); { Haut-Gauche }
         'e', 'E': JumpQBert(Q_Bert.Row-1, Q_Bert.Col);   { Haut-Droite }
-        'r', 'R': JumpQBert(Q_Bert.Row+1, Q_Bert.Col+1); { Bas-Droite }
+        'd', 'D': JumpQBert(Q_Bert.Row+1, Q_Bert.Col+1); { Bas-Droite }
       End;
     End;
   End;
@@ -458,18 +464,14 @@ BEGIN
    End;
   End;
   DrawPyramid;
-  
+
   { Dessiner les serpents avant Q*bert pour qu'il apparaisse au-dessus }
   For I := 1 to MAX_SNAKES do
     If Snakes[I].Active Then DrawSnake(Snakes[I]);
-  
+
   DrawQBert(Q_Bert.Position.X, Q_Bert.Position.Y);
   DrawUI; { Cette ligne affichera maintenant les instructions au d�marrage }
   Delay(20);
  End;
  CloseGraph;
 END.
-
-
-
-
