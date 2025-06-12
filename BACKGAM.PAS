@@ -193,12 +193,12 @@ Begin
 
   SetColor(Red);
   SetFillStyle(SolidFill, Red);
-  FillEllipse(DICE_AREA_LEFT + 10, Y + 210, 8, 8);  { +20 pixels }
-  OutTextXY(DICE_AREA_LEFT + 50, Y + 207, 'Humain');
+  FillEllipse(DICE_AREA_LEFT + 10, Y + 310, 8, 8);
+  OutTextXY(DICE_AREA_LEFT + 50, Y + 307, 'Humain');
 
   SetFillStyle(SolidFill, White);
-  FillEllipse(DICE_AREA_LEFT + 10, Y + 230, 8, 8);  { +20 pixels }
-  OutTextXY(DICE_AREA_LEFT + 42, Y + 227, 'Ordi');
+  FillEllipse(DICE_AREA_LEFT + 10, Y + 330, 8, 8);
+  OutTextXY(DICE_AREA_LEFT + 42, Y + 327, 'Ordi');
 End;
 
 Procedure DrawDirectionArrows;
@@ -455,10 +455,10 @@ End;
 
 Procedure HandlePlayerMove;
 Var
-  C: Char;
-  FromPos, ToPos, DiceToUse: Integer;
-  MovesLeft, UsedDice: Integer;
-  ValidMove: Boolean;
+ C: Char;
+ FromPos, ToPos, DiceToUse: Integer;
+ MovesLeft, UsedDice: Integer;
+ ValidMove: Boolean;
 Begin
   MovesLeft := 2;
 
@@ -516,30 +516,25 @@ Begin
   End;
 End;
 
-{ Programme principal modifié }
 BEGIN
-  InitializeGraphics;
-  SelectFirstPlayer;
-  InitializeBoard;
-  RollDice;  { Lance les dés avant le premier tour }
-  DrawBoard; { Affiche le plateau avec les dés }
-
-  Repeat
-    If ((CurrentPlayer = 1) And (Player1Type = Human)) Or
-       ((CurrentPlayer = 2) And (Player2Type = Human)) Then
-      HandlePlayerMove
-    Else
-      ComputerMove;
-
-    If KeyPressed Then Begin
-      If ReadKey = #27 Then Break;
-    End;
-
-    CurrentPlayer := 3 - CurrentPlayer;
-    RollDice;  { Lance les dés pour le prochain tour }
-    DrawBoard; { Affiche le nouveau plateau }
-    Delay(500);
-  Until False;
-
-  CloseGraph;
+ InitializeGraphics;
+ SelectFirstPlayer;
+ InitializeBoard;
+ RollDice;  { Lance les dés avant le premier tour }
+ DrawBoard; { Affiche le plateau avec les dés }
+ Repeat
+  If ((CurrentPlayer = 1) And (Player1Type = Human)) Or
+     ((CurrentPlayer = 2) And (Player2Type = Human)) Then
+    HandlePlayerMove
+  Else
+   ComputerMove;
+  If KeyPressed Then Begin
+    If ReadKey = #27 Then Break;
+  End;
+  CurrentPlayer := 3 - CurrentPlayer;
+  RollDice;  { Lance les dés pour le prochain tour }
+  DrawBoard; { Affiche le nouveau plateau }
+  Delay(500);
+ Until False;
+ CloseGraph;
 END.
