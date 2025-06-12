@@ -175,30 +175,43 @@ Procedure DrawDice;
 Var
  Y:Integer;
 Begin
- Y:=MARGIN_TOP + 45;
- SetTextStyle(DefaultFont, HorizDir, 2);
+  Y:=MARGIN_TOP + 45;
+  SetTextStyle(DefaultFont, HorizDir, 2);
 
- { D�s de l'ordinateur }
- OutTextXY(DICE_AREA_LEFT + 5, Y - 30, 'Ordi:');
- DrawDiceShape(DICE_AREA_LEFT - 15, Y + 5, Dice[1], DiceUsed[1]);
- DrawDiceShape(DICE_AREA_LEFT + 45, Y + 5, Dice[2], DiceUsed[2]);
+  { Dés de l'ordinateur }
+  OutTextXY(DICE_AREA_LEFT + 5, Y - 30, 'Ordi:');
+  DrawDiceShape(DICE_AREA_LEFT - 15, Y + 5, Dice[1], DiceUsed[1]);
+  DrawDiceShape(DICE_AREA_LEFT + 45, Y + 5, Dice[2], DiceUsed[2]);
 
-  { D�s de l'humain }
- OutTextXY(DICE_AREA_LEFT + 15, Y + 60, 'Humain:');
- DrawDiceShape(DICE_AREA_LEFT - 15, Y + 85, HumanDice[1], HumanDiceUsed[1]);
- DrawDiceShape(DICE_AREA_LEFT + 45, Y + 85, HumanDice[2], HumanDiceUsed[2]);
+  { Dés de l'humain }
+  OutTextXY(DICE_AREA_LEFT + 15, Y + 60, 'Humain:');
+  DrawDiceShape(DICE_AREA_LEFT - 15, Y + 85, HumanDice[1], HumanDiceUsed[1]);
+  DrawDiceShape(DICE_AREA_LEFT + 45, Y + 85, HumanDice[2], HumanDiceUsed[2]);
 
-  { Ajoute la légende des couleurs }
+  { Ajoute la légende des couleurs selon qui commence }
   SetTextStyle(DefaultFont, HorizDir, 1);
 
-  SetColor(Red);
-  SetFillStyle(SolidFill, Red);
-  FillEllipse(DICE_AREA_LEFT + 10, Y + 310, 8, 8);
-  OutTextXY(DICE_AREA_LEFT + 50, Y + 307, 'Humain');
+  If Player1Type = Human Then Begin
+    { Si l'humain commence: humain = rouge, ordi = blanc }
+    SetColor(Red);
+    SetFillStyle(SolidFill, Red);
+    FillEllipse(DICE_AREA_LEFT + 10, Y + 310, 8, 8);
+    OutTextXY(DICE_AREA_LEFT + 50, Y + 307, 'Humain');
 
-  SetFillStyle(SolidFill, White);
-  FillEllipse(DICE_AREA_LEFT + 10, Y + 330, 8, 8);
-  OutTextXY(DICE_AREA_LEFT + 42, Y + 327, 'Ordi');
+    SetFillStyle(SolidFill, White);
+    FillEllipse(DICE_AREA_LEFT + 10, Y + 330, 8, 8);
+    OutTextXY(DICE_AREA_LEFT + 42, Y + 327, 'Ordi');
+  End Else Begin
+    { Si l'ordi commence: ordi = rouge, humain = blanc }
+    SetColor(Red);
+    SetFillStyle(SolidFill, Red);
+    FillEllipse(DICE_AREA_LEFT + 10, Y + 310, 8, 8);
+    OutTextXY(DICE_AREA_LEFT + 50, Y + 307, 'Ordi');
+
+    SetFillStyle(SolidFill, White);
+    FillEllipse(DICE_AREA_LEFT + 10, Y + 330, 8, 8);
+    OutTextXY(DICE_AREA_LEFT + 42, Y + 327, 'Humain');
+  End;
 End;
 
 Procedure DrawDirectionArrows;
@@ -455,20 +468,18 @@ End;
 
 Procedure HandlePlayerMove;
 Var
- C: Char;
- FromPos, ToPos, DiceToUse: Integer;
- MovesLeft, UsedDice: Integer;
- ValidMove: Boolean;
+  C: Char;
+  FromPos, ToPos: Integer;
+  MovesLeft, UsedDice: Integer;
 Begin
   MovesLeft := 2;
-
+  
   While MovesLeft > 0 Do Begin
     SetTextStyle(DefaultFont, HorizDir, 2);
     OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 180, 'Coups');
     OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 200, 'restants: ' + IntToStr(MovesLeft));
     OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 230, 'De: ');
-
-    { Obtient la position de départ }
+    
     Repeat
       C := ReadKey;
       If C = #27 Then Begin { ESC }
@@ -485,11 +496,10 @@ Begin
     If MovesLeft = 0 Then Break;
 
     OutTextXY(DICE_AREA_LEFT + 80, MARGIN_TOP + 230, C);
-
+    
     If C in ['A'..'L'] Then FromPos := LetterToPosition(C, True)
                       Else FromPos := LetterToPosition(C, False);
 
-    { Obtient la position d'arrivée }
     OutTextXY(DICE_AREA_LEFT, MARGIN_TOP + 260, 'Vers: ');
     Repeat
       C := ReadKey;
@@ -505,10 +515,7 @@ Begin
     If C in ['A'..'L'] Then ToPos := LetterToPosition(C, True)
                       Else ToPos := LetterToPosition(C, False);
 
-    { Vérifie si le mouvement est valide }
-    ValidMove := IsValidMove(FromPos, ToPos, UsedDice);
-    If ValidMove Then Begin
-      { Effectue le mouvement }
+    If IsValidMove(FromPos, ToPos, UsedDice) Then Begin
       MakeMove(FromPos, ToPos);
       Dec(MovesLeft);
       DrawBoard;
@@ -516,25 +523,35 @@ Begin
   End;
 End;
 
+{ Programme principal modifié }
 BEGIN
- InitializeGraphics;
- SelectFirstPlayer;
- InitializeBoard;
- RollDice;  { Lance les dés avant le premier tour }
- DrawBoard; { Affiche le plateau avec les dés }
- Repeat
-  If ((CurrentPlayer = 1) And (Player1Type = Human)) Or
-     ((CurrentPlayer = 2) And (Player2Type = Human)) Then
-    HandlePlayerMove
-  Else
-   ComputerMove;
-  If KeyPressed Then Begin
-    If ReadKey = #27 Then Break;
+  InitializeGraphics;
+  SelectFirstPlayer;
+  InitializeBoard;
+  RollDice;
+  DrawBoard;
+
+  { Si l'ordinateur commence, joue immédiatement }
+  If Player1Type = Computer Then Begin
+    ComputerMove;
+    CurrentPlayer := 3 - CurrentPlayer;
+    RollDice;
+    DrawBoard;
   End;
-  CurrentPlayer := 3 - CurrentPlayer;
-  RollDice;  { Lance les dés pour le prochain tour }
-  DrawBoard; { Affiche le nouveau plateau }
-  Delay(500);
- Until False;
- CloseGraph;
+  
+  Repeat
+    If ((CurrentPlayer = 1) And (Player1Type = Human)) Or 
+       ((CurrentPlayer = 2) And (Player2Type = Human)) Then
+      HandlePlayerMove
+    Else
+      ComputerMove;
+
+    If KeyPressed Then Begin
+      If ReadKey = #27 Then Break;
+    End;
+    CurrentPlayer := 3 - CurrentPlayer;
+    RollDice;  { Lance les dés pour le prochain tour }
+    DrawBoard; { Affiche le nouveau plateau }
+    Delay(500);
+  Until False;
 END.
