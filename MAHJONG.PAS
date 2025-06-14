@@ -433,7 +433,7 @@ Begin
  End;
 End;
 
-Function Point(x,y:Integer):TPoint;Begin
+Procedure Point(x,y:Integer;Var Point:TPoint);Begin
  Point.x:=x;
  Point.y:=y;
 End;
@@ -460,18 +460,18 @@ Begin
   );
 
     { Face sup‚rieure 3D avec remplissage }
-  points[0] := Point(baseX, baseY);
-  points[1] := Point(baseX + TILE_DEPTH, baseY - TILE_DEPTH);
-  points[2] := Point(baseX + TILE_WIDTH + TILE_DEPTH, baseY - TILE_DEPTH);
-  points[3] := Point(baseX + TILE_WIDTH, baseY);
+  Point(baseX, baseY,points[0]);
+  Point(baseX + TILE_DEPTH, baseY - TILE_DEPTH,points[1]);
+  Point(baseX + TILE_WIDTH + TILE_DEPTH, baseY - TILE_DEPTH,points[2]);
+  Point(baseX + TILE_WIDTH, baseY,points[3]);
   SetFillStyle(SolidFill, LightGray);
   FillPoly(4, points);
 
     { Face lat‚rale 3D avec remplissage }
-  points[0] := Point(baseX + TILE_WIDTH, baseY);
-  points[1] := Point(baseX + TILE_WIDTH + TILE_DEPTH, baseY - TILE_DEPTH);
-  points[2] := Point(baseX + TILE_WIDTH + TILE_DEPTH, baseY + TILE_HEIGHT - TILE_DEPTH);
-  points[3] := Point(baseX + TILE_WIDTH, baseY + TILE_HEIGHT);
+  Point(baseX + TILE_WIDTH, baseY,points[0]);
+  Point(baseX + TILE_WIDTH + TILE_DEPTH, baseY - TILE_DEPTH,points[1]);
+  Point(baseX + TILE_WIDTH + TILE_DEPTH, baseY + TILE_HEIGHT - TILE_DEPTH,points[2]);
+  Point(baseX + TILE_WIDTH, baseY + TILE_HEIGHT,points[3]);
   If Board[x,y,z].Visible Then Begin
    Case Board[x,y,z].Value of
     1:ShowTileA(baseX+(TILE_WIDTH div 4),baseY+(TILE_HEIGHT div 3),highlighted);
