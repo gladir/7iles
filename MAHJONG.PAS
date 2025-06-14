@@ -18,7 +18,7 @@ Const
   BOARD_HEIGHT = 8;    { Hauteur du plateau }
   BOARD_DEPTH = 3;    { Nombre de niveaux }
   TILE_WIDTH = 40;     { Largeur d'une tuile }
-  TILE_HEIGHT = 30;    { Hauteur d'une tuile }
+  TILE_HEIGHT = 50;    { Hauteur d'une tuile }
   TILE_DEPTH = 5;     { Profondeur de l'effet 3D }
 
 Type
@@ -179,8 +179,8 @@ Begin
       SetTextStyle(DefaultFont, HorizDir, 2);  { Taille de police augmentée }
       SetColor(Blue);
       OutTextXY(
-        baseX + (TILE_WIDTH Div 4),    { Centrage horizontal }
-        baseY + (TILE_HEIGHT Div 4),   { Centrage vertical }
+        baseX + (TILE_WIDTH div 4),
+        baseY + (TILE_HEIGHT div 3),    { Ajusté pour centrer dans la tuile plus haute }
         Chr(Board[x,y,z].Value + 64)
       );
     End;
