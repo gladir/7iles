@@ -87,6 +87,9 @@ Aperçu du O'Riley's Mine :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/b47b5fd1-d748-4d2a-86b6-f8d1b62955de)
 
+Aperçu du jeu Mahjong en Free Pascal :
+
+![image](https://github.com/user-attachments/assets/0a83a343-42f6-4c3b-bb5b-0f1fec383707)
 
 Aperçu du jeu Pango en Turbo Pascal :
 
@@ -226,11 +229,16 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>Lunar Lander</b></td>
          <td>Ce fichier de jeu permet de lancer le jeu Lunar Lander, soit un jeu d'atterrissage lunaire.</td>
      </tr>  
+    <tr>
+        <td><b>MAHJONG.PAS</b></td>
+        <td><b>Mahjong</b></td>
+        <td>Ce fichier contient le jeu Mahjong.</td>
+    </tr>
      <tr>
         <td><b>MATCHING.PAS</b></td>
         <td><b>Matching Pairs Memory Game</b></td>
         <td>Ce fichier contient le jeu de mémoire par paires.</td>
-     </tr>            
+     </tr>
      <tr>
         <td><b>MISSILE.PAS</b></td>
         <td><b>Missile Command</b></td>
