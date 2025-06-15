@@ -215,9 +215,9 @@ begin
   MouthOpen := not MouthOpen;  { Alterner l'Ã©tat de la bouche }
 end;
 
-procedure DrawCats;
-var
-  i, x, y: Integer;
+Procedure DrawCats;
+Var
+ i,x,y:Integer;
 begin
   for i := 1 to CAT_COUNT do
     if Cats[i].active then
@@ -265,18 +265,18 @@ begin
     end;
 end;
 
-function IsDoorClosed(x, y: Integer): Boolean;
-var
-  i: Integer;
-begin
-  IsDoorClosed := False;
-  for i := 1 to 8 do
-    if (x = Doors[i].pos.x) and (y = Doors[i].pos.y) and not Doors[i].isOpen then
-    begin
-      IsDoorClosed := True;
-      Exit;
-    end;
-end;
+Function IsDoorClosed(x,y:Integer):Boolean;
+Var
+ i:Integer;
+Begin
+ IsDoorClosed := False;
+ For i := 1 to 8 do
+  if (x = Doors[i].pos.x) and (y = Doors[i].pos.y) and not Doors[i].isOpen then
+   Begin
+    IsDoorClosed := True;
+    Exit;
+   End;
+End;
 
 function FindNearestDoor: Integer;
 var
@@ -338,86 +338,110 @@ Begin
 End;
 
 Procedure HandleInput;
-Var
-  doorIndex: Integer;
-Begin
-  If KeyPressed Then
-    Case ReadKey Of
-      #27: QuitGame := True;
-      #0: Case ReadKey Of
-        #72: If (Grid[PlayerPos.x, PlayerPos.y-1] <> '#') And
-                Not IsDoorClosed(PlayerPos.x, PlayerPos.y-1) Then Dec(PlayerPos.y);
-        #80: If (Grid[PlayerPos.x, PlayerPos.y+1] <> '#') And
-                Not IsDoorClosed(PlayerPos.x, PlayerPos.y+1) Then Inc(PlayerPos.y);
-        #75: If (Grid[PlayerPos.x-1, PlayerPos.y] <> '#') And
-                Not IsDoorClosed(PlayerPos.x-1, PlayerPos.y) Then Dec(PlayerPos.x);
-        #77: If (Grid[PlayerPos.x+1, PlayerPos.y] <> '#') And
-                Not IsDoorClosed(PlayerPos.x+1, PlayerPos.y) Then Inc(PlayerPos.x);
-      End;
-      ' ': Begin { Toggle nearest door }
-        doorIndex := FindNearestDoor;
-        If doorIndex > 0 Then
-        Begin
-          Doors[doorIndex].isOpen := Not Doors[doorIndex].isOpen;
-          Inc(Score);  { Bonus pour utiliser une porte }
-        End;
-      End;
-    End;
-End;
-
-Procedure CheckCollisions;
-var
-  i: Integer;
 begin
-  for i := 1 to CAT_COUNT do
-    if Cats[i].active and
-       (Cats[i].pos.x = PlayerPos.x) and
-       (Cats[i].pos.y = PlayerPos.y) then
-    begin
-      ShowCaughtMessage;
-      Dec(Lives);
-      if Lives <= 0 then
-        QuitGame := True
-      else
-      begin
-        PlayerPos.x := 2;
-        PlayerPos.y := 2;
+  if KeyPressed then
+    case ReadKey of
+      #27: QuitGame := True;
+      #0: case ReadKey of
+        #72: if (Grid[PlayerPos.x, PlayerPos.y-1] <> '#') and
+                not IsDoorClosed(PlayerPos.x, PlayerPos.y-1) then
+              begin
+                Dec(PlayerPos.y);
+                if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+                begin
+                  Grid[PlayerPos.x, PlayerPos.y] := ' ';  { Efface le point }
+                  Inc(Score, 10);  { Augmente le score }
+                end;
+              end;
+        #80: if (Grid[PlayerPos.x, PlayerPos.y+1] <> '#') and
+                not IsDoorClosed(PlayerPos.x, PlayerPos.y+1) then
+              begin
+                Inc(PlayerPos.y);
+                if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+                begin
+                  Grid[PlayerPos.x, PlayerPos.y] := ' ';
+                  Inc(Score, 10);
+                end;
+              end;
+        #75: if (Grid[PlayerPos.x-1, PlayerPos.y] <> '#') and
+                not IsDoorClosed(PlayerPos.x-1, PlayerPos.y) then
+              begin
+                Dec(PlayerPos.x);
+                if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+                begin
+                  Grid[PlayerPos.x, PlayerPos.y] := ' ';
+                  Inc(Score, 10);
+                end;
+              end;
+        #77: if (Grid[PlayerPos.x+1, PlayerPos.y] <> '#') and
+                not IsDoorClosed(PlayerPos.x+1, PlayerPos.y) then
+              begin
+                Inc(PlayerPos.x);
+                if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+                begin
+                  Grid[PlayerPos.x, PlayerPos.y] := ' ';
+                  Inc(Score, 10);
+                end;
+              end;
+      end;
+      ' ': begin
+        { Add door toggle logic here }
       end;
     end;
 end;
 
-procedure ShowCaughtMessage;
-var
-  centerX, centerY, i: Integer;
-  message: String;
-begin
-  centerX := GetMaxX div 2;
-  centerY := GetMaxY div 2;
-  message := 'LA SOURIS EST ATTRAPEE!';
+Procedure CheckCollisions;
+Var
+ i:Integer;
+Begin
+ For i:=1 to CAT_COUNT do
+  If Cats[i].active and(Cats[i].pos.x = PlayerPos.x) and
+    (Cats[i].pos.y = PlayerPos.y) Then Begin
+   ShowCaughtMessage;
+   Dec(Lives);
+   If Lives <= 0 Then QuitGame := True
+    Else
+   Begin
+    PlayerPos.x := 2;
+    PlayerPos.y := 2;
+   End;
+  End;
+End;
 
-  for i := 1 to 6 do
-  begin
-    {ClearDevice;}
-    if i mod 2 = 0 then
-      SetColor(Yellow)
-    else
-      SetColor(Red);
+Procedure ShowCaughtMessage;
+Var
+ centerX,centerY,i:Integer;
+ message: String;
+ oldTextInfo:TextSettingsType;
+Begin
+  { Sauvegarder les paramŠtres de texte actuels }
+ GetTextSettings(oldTextInfo);
 
-    SetTextStyle(DefaultFont, HorizDir, 2);
-    OutTextXY(centerX - 100, centerY, message);
-    Delay(500);
-  end;
-end;
+ centerX:=GetMaxX div 2;
+ centerY:=GetMaxY div 2;
+ message:='LA SOURIS EST ATTRAPEE!';
+
+ For i := 1 to 6 do Begin
+  If i mod 2=0 Then SetColor(Yellow)
+               Else SetColor(Red);
+  SetTextStyle(DefaultFont, HorizDir, 2);
+  OutTextXY(centerX - 100, centerY, message);
+  Delay(500);
+ End;
+
+  { Restaurer les paramŠtres de texte }
+ With oldTextInfo do SetTextStyle(Font, Direction, CharSize);
+End;
 
 Procedure ShowStatus;
 Var
-  s: String;
+ s:String;
 Begin
-  SetColor(White);
-  Str(Score, s);
-  OutTextXY(10, 10, 'Pointage : ' + s);
-  Str(Lives, S);
-  OutTextXY(GetMaxX - 100, 10, 'Vies : ' + s);
+ SetColor(White);
+ Str(Score, s);
+ OutTextXY(10, 10, 'Pointage : ' + s);
+ Str(Lives, S);
+ OutTextXY(GetMaxX - 100, 10, 'Vies : ' + s);
 End;
 
 BEGIN
@@ -439,4 +463,4 @@ BEGIN
  CloseGraph;
  WriteLn('Partie terminer ! Pointages : ', Score);
 END.
-END.
+
