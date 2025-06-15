@@ -132,11 +132,11 @@ Begin
   { Initialise les portes et les intersections strat�giques }
   { Réinitialisation des positions des portes aux intersections avec des points }
   Doors[1].pos.x := 7;
-  Doors[1].pos.y := 5;
+  Doors[1].pos.y := 6;
   Doors[1].isHorizontal := True;
 
   Doors[2].pos.x := 15;
-  Doors[2].pos.y := 5;
+  Doors[2].pos.y := 6;
   Doors[2].isHorizontal := True;
 
   Doors[3].pos.x := 21;
@@ -144,15 +144,15 @@ Begin
   Doors[3].isHorizontal := True;
 
   Doors[4].pos.x := 7;
-  Doors[4].pos.y := 9;
+  Doors[4].pos.y := 10;
   Doors[4].isHorizontal := True;
 
   Doors[5].pos.x := 15;
-  Doors[5].pos.y := 9;
+  Doors[5].pos.y := 10;
   Doors[5].isHorizontal := True;
 
   Doors[6].pos.x := 21;
-  Doors[6].pos.y := 9;
+  Doors[6].pos.y := 10;
   Doors[6].isHorizontal := True;
 
   Doors[7].pos.x := 7;
@@ -515,6 +515,21 @@ End;
 Procedure CheckCollisions;
 Var
  i:Integer;
+Procedure ResetCatPositions;
+var
+  i: Integer;
+begin
+  Cats[1].pos.x := GRID_WIDTH - 3;
+  Cats[1].pos.y := 2;
+  Cats[2].pos.x := GRID_WIDTH - 3;
+  Cats[2].pos.y := GRID_HEIGHT div 2;
+  Cats[3].pos.x := GRID_WIDTH - 3;
+  Cats[3].pos.y := GRID_HEIGHT - 2;
+
+  for i := 1 to CAT_COUNT do
+    Cats[i].direction := Random(4);
+end;
+
 Begin
  For i:=1 to CAT_COUNT do
   If Cats[i].active and(Cats[i].pos.x = PlayerPos.x) and
@@ -526,6 +541,7 @@ Begin
    Begin
     PlayerPos.x := 2;
     PlayerPos.y := 2;
+    ResetCatPositions;  { Ajout de la réinitialisation des chats }
    End;
   End;
 End;
