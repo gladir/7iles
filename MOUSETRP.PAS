@@ -37,6 +37,7 @@ Type
 { Ajouter les déclarations forward ici, après les types et avant les variables }
 procedure ShowCaughtMessage; forward;
 procedure CheckCollisions; forward;
+function FindNearestDoor: Integer; forward;
 
 Var
   GraphDriver, GraphMode: Integer;
@@ -176,12 +177,16 @@ Procedure DrawDoors;
 Var
   i: Integer;
 Begin
-  SetColor(Brown);
-  For i := 1 To 8 Do
-    With Doors[i] Do
-      If Not isOpen Then
-        Rectangle(pos.x*GRID_SIZE, pos.y*GRID_SIZE,
-                 pos.x*GRID_SIZE+GRID_SIZE, pos.y*GRID_SIZE+GRID_SIZE);
+  for i := 1 to 8 do
+    if not Doors[i].isOpen then
+    begin
+      SetColor(Brown);
+      SetFillStyle(SolidFill, Brown);
+      Bar(Doors[i].pos.x * GRID_SIZE,
+          Doors[i].pos.y * GRID_SIZE,
+          Doors[i].pos.x * GRID_SIZE + GRID_SIZE,
+          Doors[i].pos.y * GRID_SIZE + GRID_SIZE);
+    end;
 End;
 
 procedure DrawPlayer;
@@ -278,66 +283,9 @@ Begin
    End;
 End;
 
-function FindNearestDoor: Integer;
+procedure HandleInput;
 var
-  i, dx, dy, dist, minDist: Integer;
-  nearest: Integer;
-begin
-  nearest := 0;
-  minDist := 999;
-  for i := 1 to 8 do
-  begin
-    dx := Abs(PlayerPos.x - Doors[i].pos.x);
-    dy := Abs(PlayerPos.y - Doors[i].pos.y);
-    dist := dx + dy;
-    if dist < minDist then
-    begin
-      minDist := dist;
-      nearest := i;
-    end;
-  end;
-  if minDist <= 2 then  { Portée maximale pour activer une porte }
-    FindNearestDoor := nearest
-  else
-    FindNearestDoor := 0;
-end;
-
-Procedure MoveCats;
-Var
-  i: Integer;
-  newX, newY: Integer;
-Begin
-  For i := 1 To CAT_COUNT Do
-    If Cats[i].active Then
-    Begin
-      newX := Cats[i].pos.x;
-      newY := Cats[i].pos.y;
-
-      Case Cats[i].direction Of
-        0: newX := newX + 1;
-        1: newX := newX - 1;
-        2: newY := newY + 1;
-        3: newY := newY - 1;
-      End;
-
-      { Vérifier les limites du labyrinthe }
-      If (newX > 1) And (newX < GRID_WIDTH) And
-         (newY > 1) And (newY < GRID_HEIGHT) And
-         (Grid[newX, newY] <> '#') And
-         Not IsDoorClosed(newX, newY) Then
-      Begin
-        Cats[i].pos.x := newX;
-        Cats[i].pos.y := newY;
-      End
-      Else
-        Cats[i].direction := Random(4);  { Changer de direction si bloqué }
-
-      If Random(20) = 0 Then
-        Cats[i].direction := Random(4);
-    End;
-End;
-
-Procedure HandleInput;
+  doorIndex: Integer;
 begin
   if KeyPressed then
     case ReadKey of
@@ -384,11 +332,76 @@ begin
                 end;
               end;
       end;
-      ' ': begin
-        { Add door toggle logic here }
+      ' ': begin  { Touche espace pour les portes }
+        doorIndex := FindNearestDoor;
+        if doorIndex > 0 then
+        begin
+          Doors[doorIndex].isOpen := not Doors[doorIndex].isOpen;
+          { Son ou effet visuel optionnel }
+          Inc(Score);  { Point bonus pour utilisation de porte }
+        end;
       end;
     end;
 end;
+
+function FindNearestDoor: Integer;
+var
+  i, dx, dy, dist, minDist: Integer;
+  nearest: Integer;
+begin
+  nearest := 0;
+  minDist := 999;
+  for i := 1 to 8 do
+  begin
+    dx := Abs(PlayerPos.x - Doors[i].pos.x);
+    dy := Abs(PlayerPos.y - Doors[i].pos.y);
+    dist := dx + dy;
+    if dist < 3 then  { Distance maximale pour activer une porte }
+    begin
+      if dist < minDist then
+      begin
+        minDist := dist;
+        nearest := i;
+      end;
+    end;
+  end;
+  FindNearestDoor := nearest;
+end;
+
+Procedure MoveCats;
+Var
+  i: Integer;
+  newX, newY: Integer;
+Begin
+  For i := 1 To CAT_COUNT Do
+    If Cats[i].active Then
+    Begin
+      newX := Cats[i].pos.x;
+      newY := Cats[i].pos.y;
+
+      Case Cats[i].direction Of
+        0: newX := newX + 1;
+        1: newX := newX - 1;
+        2: newY := newY + 1;
+        3: newY := newY - 1;
+      End;
+
+      { Vérifier les limites du labyrinthe }
+      If (newX > 1) And (newX < GRID_WIDTH) And
+         (newY > 1) And (newY < GRID_HEIGHT) And
+         (Grid[newX, newY] <> '#') And
+         Not IsDoorClosed(newX, newY) Then
+      Begin
+        Cats[i].pos.x := newX;
+        Cats[i].pos.y := newY;
+      End
+      Else
+        Cats[i].direction := Random(4);  { Changer de direction si bloqué }
+
+      If Random(20) = 0 Then
+        Cats[i].direction := Random(4);
+    End;
+End;
 
 Procedure CheckCollisions;
 Var
@@ -414,7 +427,7 @@ Var
  message: String;
  oldTextInfo:TextSettingsType;
 Begin
-  { Sauvegarder les param�tres de texte actuels }
+  { Sauvegarder les paramStres de texte actuels }
  GetTextSettings(oldTextInfo);
 
  centerX:=GetMaxX div 2;
@@ -429,7 +442,7 @@ Begin
   Delay(500);
  End;
 
-  { Restaurer les param�tres de texte }
+  { Restaurer les paramStres de texte }
  With oldTextInfo do SetTextStyle(Font, Direction, CharSize);
 End;
 
