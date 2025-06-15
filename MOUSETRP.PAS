@@ -47,6 +47,7 @@ Function  FindNearestDoor:Integer; Forward;
 Function  IsDoorClosed(x,y:Integer):Boolean;Forward;
 Procedure ShowCaughtMessage; Forward;
 procedure CheckCheese; forward;
+procedure ShowTitleScreen; forward;
 
 Var
  GraphDriver, GraphMode: Integer;
@@ -587,6 +588,7 @@ Procedure ShowStatus;
 Var
  s:String;
 Begin
+ SetTextStyle(SmallFont, HorizDir, 1);
  SetColor(White);
  Str(Score, s);
  OutTextXY(10, 10, 'Pointage : ' + s);
@@ -594,9 +596,53 @@ Begin
  OutTextXY(GetMaxX - 100, 10, 'Vies : ' + s);
 End;
 
+Procedure ShowTitleScreen;
+Var
+ centerX,mouseX,mouseY,targetY:Integer;
+ movingDown:Boolean;
+ ch:Char;
+Begin
+ ClearDevice;
+ centerX := GetMaxX div 2;
+ SetTextStyle(TriplexFont, HorizDir, 6);
+ SetColor(Yellow);
+ OutTextXY(centerX - 200, 50, 'MOUSE TRAP');
+ mouseX:=50;
+ mouseY:=150;
+ targetY:=300;
+ MovingDown:=False;
+ Repeat
+  SetColor(Black);
+  SetFillStyle(SolidFill, Black);
+  Bar(mouseX - 10, mouseY - 10, mouseX + 30, mouseY + 30);
+  If Not movingDown Then Begin
+   Inc(mouseX,2);
+   If mouseX >= centerX Then movingDown := True;
+  End
+   Else
+  If mouseY<targetY Then Inc(mouseY, 2);
+  SetColor(Yellow);
+  SetFillStyle(SolidFill, Yellow);
+  Bar(mouseX + 4, mouseY + 4, mouseX + GRID_SIZE - 4, mouseY + GRID_SIZE - 4);
+  Bar(mouseX + 4, mouseY + 2, mouseX + 8, mouseY + 6);
+  Bar(mouseX + GRID_SIZE - 8, mouseY + 2, mouseX + GRID_SIZE - 4, mouseY + 6);
+  SetColor(Black);
+  SetFillStyle(SolidFill, Black);
+  Bar(mouseX + 7, mouseY + 7, mouseX + 9, mouseY + 9);
+  Bar(mouseX + GRID_SIZE - 9, mouseY + 7, mouseX + GRID_SIZE - 7, mouseY + 9);
+  SetColor(White);
+  SetTextStyle(DefaultFont, HorizDir, 2);
+  OutTextXY(centerX - 240, GetMaxY - 50, 'Presse une touche pour commencer');
+  Delay(20);
+ Until KeyPressed;
+ If(KeyPressed)Then ch:=ReadKey;
+ ClearDevice;
+End;
+
 BEGIN
  InitializeGraphics;
  Randomize;
+ ShowTitleScreen;  { Ajout de l'écran titre }
  InitGame;
  Repeat
   ClearDevice;
