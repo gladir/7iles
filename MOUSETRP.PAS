@@ -34,6 +34,10 @@ Type
     active: Boolean;
   End;
 
+{ Ajouter les déclarations forward ici, après les types et avant les variables }
+procedure ShowCaughtMessage; forward;
+procedure CheckCollisions; forward;
+
 Var
   GraphDriver, GraphMode: Integer;
   Grid: array[1..GRID_WIDTH, 1..GRID_HEIGHT] of Char;
@@ -186,41 +190,80 @@ var
 begin
   x := PlayerPos.x * GRID_SIZE;
   y := PlayerPos.y * GRID_SIZE;
-  
+
   { Corps principal jaune }
   SetColor(Yellow);
   SetFillStyle(SolidFill, Yellow);
   Bar(x + 4, y + 4, x + GRID_SIZE - 4, y + GRID_SIZE - 4);
-  
+
   { Oreilles }
   Bar(x + 4, y + 2, x + 8, y + 6);
   Bar(x + GRID_SIZE - 8, y + 2, x + GRID_SIZE - 4, y + 6);
-  
+
   { Yeux }
   SetColor(Black);
   SetFillStyle(SolidFill, Black);
   Bar(x + 7, y + 7, x + 9, y + 9);
   Bar(x + GRID_SIZE - 9, y + 7, x + GRID_SIZE - 7, y + 9);
-  
+
   { Bouche animée }
   if MouthOpen then
     Bar(x + 8, y + GRID_SIZE - 8, x + GRID_SIZE - 8, y + GRID_SIZE - 6)
   else
     Bar(x + 10, y + GRID_SIZE - 7, x + GRID_SIZE - 10, y + GRID_SIZE - 7);
-    
+
   MouthOpen := not MouthOpen;  { Alterner l'état de la bouche }
 end;
 
-Procedure DrawCats;
-Var
-  i: Integer;
-Begin
-  SetColor(Red);
-  For i := 1 To CAT_COUNT Do
-    If Cats[i].active Then
-      FillEllipse(Cats[i].pos.x*GRID_SIZE+GRID_SIZE Div 2,
-                  Cats[i].pos.y*GRID_SIZE+GRID_SIZE Div 2, 8, 8);
-End;
+procedure DrawCats;
+var
+  i, x, y: Integer;
+begin
+  for i := 1 to CAT_COUNT do
+    if Cats[i].active then
+    begin
+      x := Cats[i].pos.x * GRID_SIZE;
+      y := Cats[i].pos.y * GRID_SIZE;
+
+      { Corps principal }
+      SetColor(LightGray);
+      SetFillStyle(SolidFill, LightGray);
+
+      { Corps central - légèrement réduit }
+      Bar(x + 5, y + 5, x + GRID_SIZE - 5, y + GRID_SIZE - 5);
+
+      { Queue - maintenant plus visible avec un espace }
+      case Cats[i].direction of
+        0: begin { Droite }
+          Bar(x + GRID_SIZE - 3, y + 8, x + GRID_SIZE, y + 11);
+        end;
+        1: begin { Gauche }
+          Bar(x, y + 8, x + 3, y + 11);
+        end;
+        2: begin { Bas }
+          Bar(x + 8, y + GRID_SIZE - 3, x + 11, y + GRID_SIZE);
+        end;
+        3: begin { Haut }
+          Bar(x + 8, y, x + 11, y + 3);
+        end;
+      end;
+
+      { Oreilles pointues }
+      Bar(x + 2, y + 2, x + 6, y + 6);
+      Bar(x + GRID_SIZE - 6, y + 2, x + GRID_SIZE - 2, y + 6);
+
+      { Yeux }
+      SetColor(Black);
+      SetFillStyle(SolidFill, Black);
+      Bar(x + 7, y + 7, x + 9, y + 9);
+      Bar(x + GRID_SIZE - 9, y + 7, x + GRID_SIZE - 7, y + 9);
+
+      { Museau }
+      SetColor(DarkGray);
+      SetFillStyle(SolidFill, DarkGray);
+      Bar(x + 8, y + GRID_SIZE - 8, x + GRID_SIZE - 8, y + GRID_SIZE - 6);
+    end;
+end;
 
 function IsDoorClosed(x, y: Integer): Boolean;
 var
@@ -271,14 +314,17 @@ Begin
       newY := Cats[i].pos.y;
 
       Case Cats[i].direction Of
-        0: Inc(newX);
-        1: Dec(newX);
-        2: Inc(newY);
-        3: Dec(newY);
+        0: newX := newX + 1;
+        1: newX := newX - 1;
+        2: newY := newY + 1;
+        3: newY := newY - 1;
       End;
 
-      { Vérifier si le chat peut se déplacer }
-      If (Grid[newX, newY] <> '#') And Not IsDoorClosed(newX, newY) Then
+      { Vérifier les limites du labyrinthe }
+      If (newX > 1) And (newX < GRID_WIDTH) And
+         (newY > 1) And (newY < GRID_HEIGHT) And
+         (Grid[newX, newY] <> '#') And
+         Not IsDoorClosed(newX, newY) Then
       Begin
         Cats[i].pos.x := newX;
         Cats[i].pos.y := newY;
@@ -320,24 +366,48 @@ Begin
 End;
 
 Procedure CheckCollisions;
-Var
+var
   i: Integer;
-Begin
-  For i := 1 To CAT_COUNT Do
-    If Cats[i].active And
-       (Cats[i].pos.x = PlayerPos.x) And
-       (Cats[i].pos.y = PlayerPos.y) Then
-    Begin
+begin
+  for i := 1 to CAT_COUNT do
+    if Cats[i].active and
+       (Cats[i].pos.x = PlayerPos.x) and
+       (Cats[i].pos.y = PlayerPos.y) then
+    begin
+      ShowCaughtMessage;
       Dec(Lives);
-      If Lives <= 0 Then
+      if Lives <= 0 then
         QuitGame := True
-      Else
-      Begin
+      else
+      begin
         PlayerPos.x := 2;
         PlayerPos.y := 2;
-      End;
-    End;
-End;
+      end;
+    end;
+end;
+
+procedure ShowCaughtMessage;
+var
+  centerX, centerY, i: Integer;
+  message: String;
+begin
+  centerX := GetMaxX div 2;
+  centerY := GetMaxY div 2;
+  message := 'LA SOURIS EST ATTRAPEE!';
+
+  for i := 1 to 6 do
+  begin
+    {ClearDevice;}
+    if i mod 2 = 0 then
+      SetColor(Yellow)
+    else
+      SetColor(Red);
+
+    SetTextStyle(DefaultFont, HorizDir, 2);
+    OutTextXY(centerX - 100, centerY, message);
+    Delay(500);
+  end;
+end;
 
 Procedure ShowStatus;
 Var
@@ -345,9 +415,9 @@ Var
 Begin
   SetColor(White);
   Str(Score, s);
-  OutTextXY(10, 10, 'Score: ' + s);
+  OutTextXY(10, 10, 'Pointage : ' + s);
   Str(Lives, S);
-  OutTextXY(GetMaxX - 100, 10, 'Lives: ' + s);
+  OutTextXY(GetMaxX - 100, 10, 'Vies : ' + s);
 End;
 
 BEGIN
@@ -367,5 +437,6 @@ BEGIN
   Delay(50);
  Until QuitGame;
  CloseGraph;
- WriteLn('Game Over! Score: ', Score);
+ WriteLn('Partie terminer ! Pointages : ', Score);
+END.
 END.
