@@ -275,6 +275,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
     <tr>
+        <td><b>PONG.PAS</b></td>
+        <td><b>Pong</b></td>
+        <td>Ce fichier contient une clone du célèbre jeu Pong.</td>
+    </tr>
+    <tr>
         <td><b>QBERT.PAS</b></td>
         <td><b>Q*Bert</b></td>
         <td>Ce fichier contient un clone du jeu QBert.</td>
