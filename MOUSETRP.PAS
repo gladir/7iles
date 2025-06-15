@@ -27,7 +27,7 @@ Type
 
  TDoor=Record
   pos:TPosition;
-  isOpen:Boolean;
+  isHorizontal:Boolean;  { Alterne entre horizontal et vertical }
  End;
 
  TCat=Record
@@ -116,7 +116,7 @@ Begin
  PlayerPos.x:=2;
  PlayerPos.y:=2;
 
-  { Initialise les chats et la position strat‚gique }
+  { Initialise les chats et la position stratï¿½gique }
  Cats[1].pos.x:=GRID_WIDTH - 3;
  Cats[1].pos.y:=2;
  Cats[2].pos.x:=GRID_WIDTH - 3;
@@ -129,7 +129,7 @@ Begin
   Cats[i].active:=True;
  End;
 
-  { Initialise les portes et les intersections strat‚giques }
+  { Initialise les portes et les intersections stratï¿½giques }
  Doors[1].pos.x := 7;
  Doors[1].pos.y := 5;
  Doors[2].pos.x := 15;
@@ -147,7 +147,7 @@ Begin
  Doors[8].pos.x := 23;
  Doors[8].pos.y := 15;
 
- For i:=1 to 8 do Doors[i].isOpen:=False;
+ For i:=1 to 8 do Doors[i].isHorizontal:=True;  { Position initiale horizontale }
 
   { Initialise le fromage }
  For i:=1 to CHEESE_COUNT do Begin
@@ -185,15 +185,27 @@ End;
 
 Procedure DrawDoors;
 Var
- i:Integer;
+ i, x, y: Integer;
 Begin
- For i := 1 to 8 do If not Doors[i].isOpen Then Begin
-  SetColor(Brown);
-  SetFillStyle(SolidFill, Brown);
-  Bar(Doors[i].pos.x * GRID_SIZE,
-      Doors[i].pos.y * GRID_SIZE,
-      Doors[i].pos.x * GRID_SIZE + GRID_SIZE,
-      Doors[i].pos.y * GRID_SIZE + GRID_SIZE);
+ SetColor(Brown);
+ SetFillStyle(SolidFill, Brown);
+ 
+ For i := 1 to 8 do Begin
+  x := Doors[i].pos.x * GRID_SIZE;
+  y := Doors[i].pos.y * GRID_SIZE;
+  
+  If Doors[i].isHorizontal Then
+  Begin
+   { Porte en position horizontale - permet passage vers le haut }
+   Bar(x, y + GRID_SIZE - 2,
+       x + GRID_SIZE, y + GRID_SIZE + 2);
+  End
+  Else
+  Begin
+   { Porte en position verticale - permet passage vers la gauche }
+   Bar(x + GRID_SIZE - 2, y,
+       x + GRID_SIZE + 2, y + GRID_SIZE);
+  End;
  End;
 End;
 
@@ -225,7 +237,7 @@ Begin
  Else
   Bar(x + 10, y + GRID_SIZE - 7, x + GRID_SIZE - 10, y + GRID_SIZE - 7);
 
- MouthOpen := not MouthOpen;  { Alterner l'‚tat de la bouche }
+ MouthOpen := not MouthOpen;  { Alterner l'ï¿½tat de la bouche }
 End;
 
 Procedure DrawCats;
@@ -312,62 +324,96 @@ Var
 Begin
  IsDoorClosed := False;
  For i := 1 to 8 do
-  if (x = Doors[i].pos.x) and (y = Doors[i].pos.y) and not Doors[i].isOpen then
+  if (x = Doors[i].pos.x) and (y = Doors[i].pos.y) then
    Begin
-    IsDoorClosed := True;
+    if Doors[i].isHorizontal then
+    begin
+      if y = Doors[i].pos.y then
+        IsDoorClosed := True;
+    end
+    else
+    begin
+      if x = Doors[i].pos.x then
+        IsDoorClosed := True;
+    end;
     Exit;
    End;
+End;
+
+Function IsDoorBlocking(x, y, newX, newY: Integer): Boolean;
+Var
+  i: Integer;
+  dx, dy: Integer;
+Begin
+  IsDoorBlocking := False;
+  dx := newX - x;
+  dy := newY - y;
+  
+  for i := 1 to 8 do
+    if (x = Doors[i].pos.x) and (y = Doors[i].pos.y) then
+    begin
+      if Doors[i].isHorizontal then
+      begin
+        { Si la porte est horizontale }
+        if dy > 0 then { Mouvement vers le bas }
+          IsDoorBlocking := True
+        else if dy < 0 then { Mouvement vers le haut }
+          IsDoorBlocking := False;
+      end
+      else
+      begin
+        { Si la porte est verticale }
+        if dx > 0 then { Mouvement vers la droite }
+          IsDoorBlocking := True
+        else if dx < 0 then { Mouvement vers la gauche }
+          IsDoorBlocking := False;
+      end;
+      Exit;
+    end;
 End;
 
 Procedure HandleInput;
 Var
  doorIndex: Integer;
+ newX, newY: Integer;
 Begin
  If KeyPressed Then Case ReadKey of
   #27: QuitGame := True;
   #0: Case ReadKey of
-    #72: If (Grid[PlayerPos.x, PlayerPos.y-1] <> '#') and
-               not IsDoorClosed(PlayerPos.x, PlayerPos.y-1) then
-              Begin
-                Dec(PlayerPos.y);
-                If Grid[PlayerPos.x, PlayerPos.y] = '.' Then Begin
-                  Grid[PlayerPos.x, PlayerPos.y] := ' ';  { Efface le point }
-                  Inc(Score, 10);  { Augmente le pointage }
-                End;
-              End;
-    #80: If (Grid[PlayerPos.x, PlayerPos.y+1] <> '#') and
-                not IsDoorClosed(PlayerPos.x, PlayerPos.y+1) Then
-              Begin
-                Inc(PlayerPos.y);
-                If Grid[PlayerPos.x, PlayerPos.y] = '.' Then Begin
-                  Grid[PlayerPos.x, PlayerPos.y] := ' ';
-                  Inc(Score, 10);
-                End;
-              End;
-    #75: If (Grid[PlayerPos.x-1, PlayerPos.y] <> '#') and
-                not IsDoorClosed(PlayerPos.x-1, PlayerPos.y)Then
-              Begin
-                Dec(PlayerPos.x);
-                If Grid[PlayerPos.x, PlayerPos.y] = '.' Then Begin
-                  Grid[PlayerPos.x, PlayerPos.y] := ' ';
-                  Inc(Score, 10);
-                End;
-              End;
-        #77: If (Grid[PlayerPos.x+1, PlayerPos.y] <> '#') and
-                not IsDoorClosed(PlayerPos.x+1, PlayerPos.y)Then Begin
-                Inc(PlayerPos.x);
-                If Grid[PlayerPos.x, PlayerPos.y] = '.'Then Begin
-                  Grid[PlayerPos.x, PlayerPos.y] := ' ';
-                  Inc(Score, 10);
-                End;
-              End;
+    #72: begin { Up }
+          newX := PlayerPos.x;
+          newY := PlayerPos.y - 1;
+          if (Grid[newX, newY] <> '#') and
+             not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+            Dec(PlayerPos.y);
+        end;
+    #80: begin { Down }
+          newX := PlayerPos.x;
+          newY := PlayerPos.y + 1;
+          if (Grid[newX, newY] <> '#') and
+             not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+            Inc(PlayerPos.y);
+        end;
+    #75: begin { Left }
+          newX := PlayerPos.x - 1;
+          newY := PlayerPos.y;
+          if (Grid[newX, newY] <> '#') and
+             not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+            Dec(PlayerPos.x);
+        end;
+        #77: begin { Right }
+          newX := PlayerPos.x + 1;
+          newY := PlayerPos.y;
+          if (Grid[newX, newY] <> '#') and
+             not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+            Inc(PlayerPos.x);
+        end;
       End;
       ' ':Begin  { Touche espace pour les portes }
         doorIndex := FindNearestDoor;
         If doorIndex > 0 Then Begin
-          Doors[doorIndex].isOpen := not Doors[doorIndex].isOpen;
-          { Son ou effet visuel optionnel }
-          Inc(Score);  { Point bonus pour utilisation de porte }
+          Doors[doorIndex].isHorizontal := not Doors[doorIndex].isHorizontal;
+          Inc(Score);
         End;
       End;
     End;
@@ -409,7 +455,7 @@ Begin
    3: newY:=newY - 1;
   End;
 
-  { V‚rifier les limites du labyrinthe }
+  { Vï¿½rifier les limites du labyrinthe }
   If (newX > 1) And (newX < GRID_WIDTH) And
      (newY > 1) And (newY < GRID_HEIGHT) And
      (Grid[newX, newY] <> '#') And
@@ -418,7 +464,7 @@ Begin
    Cats[i].pos.y := newY;
   End
    Else
-  Cats[i].direction:=Random(4);  { Changer de direction si bloqu‚ }
+  Cats[i].direction:=Random(4);  { Changer de direction si bloquï¿½ }
   If Random(20)=0 Then Cats[i].direction:=Random(4);
  End;
 End;
