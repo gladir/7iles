@@ -130,24 +130,38 @@ Begin
  End;
 
   { Initialise les portes et les intersections strat�giques }
- Doors[1].pos.x := 7;
- Doors[1].pos.y := 5;
- Doors[2].pos.x := 15;
- Doors[2].pos.y := 5;
- Doors[3].pos.x := 23;
- Doors[3].pos.y := 5;
- Doors[4].pos.x := 7;
- Doors[4].pos.y := 10;
- Doors[5].pos.x := 15;
- Doors[5].pos.y := 10;
- Doors[6].pos.x := 23;
- Doors[6].pos.y := 10;
- Doors[7].pos.x := 7;
- Doors[7].pos.y := 15;
- Doors[8].pos.x := 23;
- Doors[8].pos.y := 15;
+  { Réinitialisation des positions des portes aux intersections avec des points }
+  Doors[1].pos.x := 7;
+  Doors[1].pos.y := 5;
+  Doors[1].isHorizontal := True;
 
- For i:=1 to 8 do Doors[i].isHorizontal:=True;  { Position initiale horizontale }
+  Doors[2].pos.x := 15;
+  Doors[2].pos.y := 5;
+  Doors[2].isHorizontal := True;
+
+  Doors[3].pos.x := 21;
+  Doors[3].pos.y := 5;
+  Doors[3].isHorizontal := True;
+
+  Doors[4].pos.x := 7;
+  Doors[4].pos.y := 9;
+  Doors[4].isHorizontal := True;
+
+  Doors[5].pos.x := 15;
+  Doors[5].pos.y := 9;
+  Doors[5].isHorizontal := True;
+
+  Doors[6].pos.x := 21;
+  Doors[6].pos.y := 9;
+  Doors[6].isHorizontal := True;
+
+  Doors[7].pos.x := 7;
+  Doors[7].pos.y := 15;
+  Doors[7].isHorizontal := True;
+
+  Doors[8].pos.x := 21;
+  Doors[8].pos.y := 15;
+  Doors[8].isHorizontal := True;
 
   { Initialise le fromage }
  For i:=1 to CHEESE_COUNT do Begin
@@ -373,42 +387,71 @@ Begin
 End;
 
 Procedure HandleInput;
-Var
- doorIndex: Integer;
- newX, newY: Integer;
-Begin
- If KeyPressed Then Case ReadKey of
-  #27: QuitGame := True;
-  #0: Case ReadKey of
-    #72: begin { Up }
+var
+  doorIndex: Integer;
+  newX, newY: Integer;
+begin
+  if KeyPressed then
+    case ReadKey of
+      #27: QuitGame := True;
+      #0: case ReadKey of
+        #72: begin { Up }
           newX := PlayerPos.x;
           newY := PlayerPos.y - 1;
           if (Grid[newX, newY] <> '#') and
              not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+          begin
             Dec(PlayerPos.y);
+            if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+            begin
+              Grid[PlayerPos.x, PlayerPos.y] := ' ';
+              Inc(Score, 10);
+            end;
+          end;
         end;
-    #80: begin { Down }
+        #80: begin { Down }
           newX := PlayerPos.x;
           newY := PlayerPos.y + 1;
           if (Grid[newX, newY] <> '#') and
              not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+          begin
             Inc(PlayerPos.y);
+            if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+            begin
+              Grid[PlayerPos.x, PlayerPos.y] := ' ';
+              Inc(Score, 10);
+            end;
+          end;
         end;
-    #75: begin { Left }
+        #75: begin { Left }
           newX := PlayerPos.x - 1;
           newY := PlayerPos.y;
           if (Grid[newX, newY] <> '#') and
              not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+          begin
             Dec(PlayerPos.x);
+            if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+            begin
+              Grid[PlayerPos.x, PlayerPos.y] := ' ';
+              Inc(Score, 10);
+            end;
+          end;
         end;
         #77: begin { Right }
           newX := PlayerPos.x + 1;
           newY := PlayerPos.y;
           if (Grid[newX, newY] <> '#') and
              not IsDoorBlocking(PlayerPos.x, PlayerPos.y, newX, newY) then
+          begin
             Inc(PlayerPos.x);
+            if Grid[PlayerPos.x, PlayerPos.y] = '.' then
+            begin
+              Grid[PlayerPos.x, PlayerPos.y] := ' ';
+              Inc(Score, 10);
+            end;
+          end;
         end;
-      End;
+      end;
       ' ':Begin  { Touche espace pour les portes }
         doorIndex := FindNearestDoor;
         If doorIndex > 0 Then Begin
@@ -416,8 +459,8 @@ Begin
           Inc(Score);
         End;
       End;
-    End;
-End;
+    end;
+end;
 
 Function FindNearestDoor:Integer;
 Var
