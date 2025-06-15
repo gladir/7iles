@@ -42,6 +42,7 @@ Var
   Doors: array[1..8] of TDoor;
   Score, Lives: Integer;
   QuitGame: Boolean;
+  MouthOpen: Boolean;  { Nouvelle variable pour l'animation }
 
 Procedure InitializeGraphics;
 Var
@@ -141,6 +142,7 @@ begin
   Score := 0;
   Lives := 3;
   QuitGame := False;
+  MouthOpen := False;
 end;
 
 procedure DrawGrid;
@@ -199,6 +201,14 @@ begin
   SetFillStyle(SolidFill, Black);
   Bar(x + 7, y + 7, x + 9, y + 9);
   Bar(x + GRID_SIZE - 9, y + 7, x + GRID_SIZE - 7, y + 9);
+  
+  { Bouche animée }
+  if MouthOpen then
+    Bar(x + 8, y + GRID_SIZE - 8, x + GRID_SIZE - 8, y + GRID_SIZE - 6)
+  else
+    Bar(x + 10, y + GRID_SIZE - 7, x + GRID_SIZE - 10, y + GRID_SIZE - 7);
+    
+  MouthOpen := not MouthOpen;  { Alterner l'état de la bouche }
 end;
 
 Procedure DrawCats;
