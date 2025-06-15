@@ -17,6 +17,8 @@ Const
   GRID_WIDTH = 28;    { Réduit de 30 à 28 }
   GRID_HEIGHT = 20;
   CAT_COUNT = 3;
+  CHEESE_COUNT = 5;
+  CHEESE_POINTS = 50;  { Points pour chaque fromage }
 
 Type
   TPosition = Record
@@ -34,10 +36,17 @@ Type
     active: Boolean;
   End;
 
-{ Ajouter les déclarations forward ici, après les types et avant les variables }
-procedure ShowCaughtMessage; forward;
-procedure CheckCollisions; forward;
-function FindNearestDoor: Integer; forward;
+  TCheese = record
+    x, y: Integer;
+    active: Boolean;
+  end;
+
+{ Ajouter les d�clarations forward ici, après les types et avant les variables }
+Procedure CheckCollisions; Forward;
+Function  FindNearestDoor:Integer; Forward;
+Function  IsDoorClosed(x,y:Integer):Boolean;Forward;
+Procedure ShowCaughtMessage; Forward;
+procedure CheckCheese; forward;
 
 Var
   GraphDriver, GraphMode: Integer;
@@ -45,6 +54,7 @@ Var
   PlayerPos: TPosition;
   Cats: array[1..CAT_COUNT] of TCat;
   Doors: array[1..8] of TDoor;
+  Cheese: array[1..CHEESE_COUNT] of TCheese;
   Score, Lives: Integer;
   QuitGame: Boolean;
   MouthOpen: Boolean;  { Nouvelle variable pour l'animation }
@@ -143,6 +153,17 @@ begin
 
   for i := 1 to 8 do
     Doors[i].isOpen := False;
+
+  { Initialize cheese }
+  for i := 1 to CHEESE_COUNT do
+  begin
+    repeat
+      Cheese[i].x := 2 + Random(GRID_WIDTH-2);
+      Cheese[i].y := 2 + Random(GRID_HEIGHT-2);
+    until (Grid[Cheese[i].x, Cheese[i].y] = '.') and
+          not IsDoorClosed(Cheese[i].x, Cheese[i].y);
+    Cheese[i].active := True;
+  end;
 
   Score := 0;
   Lives := 3;
@@ -267,6 +288,22 @@ begin
       SetColor(DarkGray);
       SetFillStyle(SolidFill, DarkGray);
       Bar(x + 8, y + GRID_SIZE - 8, x + GRID_SIZE - 8, y + GRID_SIZE - 6);
+    end;
+end;
+
+Procedure DrawCheese;
+var
+  i: Integer;
+begin
+  SetColor(Yellow);
+  SetFillStyle(SolidFill, Yellow);
+  for i := 1 to CHEESE_COUNT do
+    if Cheese[i].active then
+    begin
+      Bar(Cheese[i].x * GRID_SIZE + 6,
+          Cheese[i].y * GRID_SIZE + 6,
+          Cheese[i].x * GRID_SIZE + GRID_SIZE - 6,
+          Cheese[i].y * GRID_SIZE + GRID_SIZE - 6);
     end;
 end;
 
@@ -446,6 +483,20 @@ Begin
  With oldTextInfo do SetTextStyle(Font, Direction, CharSize);
 End;
 
+procedure CheckCheese;
+var
+  i: Integer;
+begin
+  for i := 1 to CHEESE_COUNT do
+    if Cheese[i].active and
+       (PlayerPos.x = Cheese[i].x) and
+       (PlayerPos.y = Cheese[i].y) then
+    begin
+      Cheese[i].active := False;
+      Inc(Score, CHEESE_POINTS);
+    end;
+end;
+
 Procedure ShowStatus;
 Var
  s:String;
@@ -465,12 +516,14 @@ BEGIN
   ClearDevice;
   DrawGrid;
   DrawDoors;
+  DrawCheese;  { Ajouter cette ligne }
   DrawPlayer;
   DrawCats;
   ShowStatus;
   HandleInput;
   MoveCats;
   CheckCollisions;
+  CheckCheese;  { Ajouter cette ligne }
   Delay(50);
  Until QuitGame;
  CloseGraph;
