@@ -156,11 +156,11 @@ Begin
   Doors[6].isHorizontal := True;
 
   Doors[7].pos.x := 7;
-  Doors[7].pos.y := 15;
+  Doors[7].pos.y := 14;
   Doors[7].isHorizontal := True;
 
   Doors[8].pos.x := 21;
-  Doors[8].pos.y := 15;
+  Doors[8].pos.y := 14;
   Doors[8].isHorizontal := True;
 
   { Initialise le fromage }
@@ -203,11 +203,11 @@ Var
 Begin
  SetColor(Brown);
  SetFillStyle(SolidFill, Brown);
- 
+
  For i := 1 to 8 do Begin
   x := Doors[i].pos.x * GRID_SIZE;
   y := Doors[i].pos.y * GRID_SIZE;
-  
+
   If Doors[i].isHorizontal Then
   Begin
    { Porte en position horizontale - permet passage vers le haut }
@@ -362,7 +362,7 @@ Begin
   IsDoorBlocking := False;
   dx := newX - x;
   dy := newY - y;
-  
+
   for i := 1 to 8 do
     if (x = Doors[i].pos.x) and (y = Doors[i].pos.y) then
     begin
