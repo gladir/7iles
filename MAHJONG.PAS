@@ -7,40 +7,41 @@
 Program MAHJONG;
 
 Uses {$IFDEF FPC}
-      Crt,PtcGraph,PtcCrt,PtcMouse
+      Crt,PtcCrt,PtcGraph,PtcMouse
      {$ELSE}
       Crt,Graph
      {$ENDIF};
 
 Const
-  TILES = 52;          { Nombre total de tuiles }
-  BOARD_WIDTH = 8;     { Largeur du plateau }
-  BOARD_HEIGHT = 8;    { Hauteur du plateau }
-  BOARD_DEPTH = 3;    { Nombre de niveaux }
-  TILE_WIDTH = 40;     { Largeur d'une tuile }
-  TILE_HEIGHT = 50;    { Hauteur d'une tuile }
-  TILE_DEPTH = 5;     { Profondeur de l'effet 3D }
+ TILES = 52;         { Nombre total de tuiles }
+ BOARD_WIDTH = 8;    { Largeur du plateau }
+ BOARD_HEIGHT = 8;   { Hauteur du plateau }
+ BOARD_DEPTH = 3;    { Nombre de niveaux }
+ TILE_WIDTH = 40;    { Largeur d'une tuile }
+ TILE_HEIGHT = 50;   { Hauteur d'une tuile }
+ TILE_DEPTH = 5;     { Profondeur de l'effet 3D }
 
 Type
-  TTile = Record
-    Value: Integer;    { Valeur de la tuile (1-26) }
-    Visible: Boolean;  { Si la tuile est visible }
-    Active: Boolean;   { Si la tuile est encore en jeu }
-    Z: Integer;       { Niveau de la tuile }
-  End;
+ TTile=Record
+  Value:Integer;   { Valeur de la tuile (1-26) }
+  Visible:Boolean; { Si la tuile est visible }
+  Active:Boolean;  { Si la tuile est encore en jeu }
+  Z:Integer;       { Niveau de la tuile }
+ End;
 
-  TPoint = record
-    x, y: Integer;
-  end;
+ TPoint=Record
+  x,y:Integer;
+ End;
 
 Var
-  Board: Array[1..BOARD_WIDTH, 1..BOARD_HEIGHT, 1..BOARD_DEPTH] of TTile;
-  CursorX, CursorY: Integer;
-  GraphDriver, GraphMode: Integer;
-  FirstSelect: Boolean;
-  FirstX, FirstY, FirstZ: Integer;
-  RemainingTiles: Integer;
-  QuitGame: Boolean;  { Nouvelle variable }
+ Board:Array[1..BOARD_WIDTH, 1..BOARD_HEIGHT, 1..BOARD_DEPTH] of TTile;
+ CursorX,CursorY:Integer;
+ GraphDriver,GraphMode:Integer;
+ FirstSelect:Boolean;
+ FirstX,FirstY,FirstZ:Integer;
+ RemainingTiles:Integer;
+ QuitGame:Boolean;  { Nouvelle variable }
+ SolvedTiles:Integer;  { Nouvelle variable }
 
 Procedure InitializeGraphics;
 Var
@@ -2780,7 +2781,7 @@ Begin
     For z:=1 To BOARD_DEPTH Do
      Board[i,j,z].Active:=False;
 
-  { Placer les tuiles alÃ©atoirement sur diffÃ©rents niveaux }
+  { Placer les tuiles al‚atoirement sur diff‚rents niveaux }
  k := 0;
  While k<TILES do Begin
   i:=Random(BOARD_WIDTH) + 1;
@@ -2801,7 +2802,7 @@ Var
  i:Integer;
 Begin
  IsTileBlocked:=False;
-  { V‚rifie si une tuile active existe au-dessus }
+  { Vï¿½rifie si une tuile active existe au-dessus }
  For i := z + 1 To BOARD_DEPTH do If Board[x,y,i].Active Then Begin
   IsTileBlocked := True;
   Exit;
@@ -2897,19 +2898,33 @@ Begin
      DrawTile(i,j,z, (i = CursorX) And (j = CursorY));
 End;
 
-Procedure MoveCursor(Var x, y: Integer);
+Procedure ShowScore;
+Var
+ TempStr:String;
+Begin
+ SetFillStyle(SolidFill, Black);
+ Bar(380, 10, 639, 100);  { Efface la zone de pointage }
+ SetTextStyle(DefaultFont, HorizDir, 2);
+ SetColor(White);
+ Str(SolvedTiles, TempStr);
+ OutTextXY(380, 20, 'R‚solues : ' + TempStr);
+ Str(RemainingTiles, TempStr);
+ OutTextXY(380, 50, 'Restantes : ' + TempStr);
+End;
+
+Procedure MoveCursor(Var x,y:Integer);
 Var
  ch:Char;
  visibleZ:Integer;
 Begin
  ch:=ReadKey;
  Case ch Of
-  #27: QuitGame := True;  { ESC key }
+  #27: QuitGame := True;  { Touche ESC }
   #0: Case ReadKey Of
-   #72: If y > 1 Then Dec(y);           { Up }
-   #80: If y < BOARD_HEIGHT Then Inc(y); { Down }
-   #75: If x > 1 Then Dec(x);           { Left }
-   #77: If x < BOARD_WIDTH Then Inc(x);  { Right }
+   #72: If y > 1 Then Dec(y);           { Haut }
+   #80: If y < BOARD_HEIGHT Then Inc(y); { Bas }
+   #75: If x > 1 Then Dec(x);           { Gauche }
+   #77: If x < BOARD_WIDTH Then Inc(x);  { Droite }
   End;
   #13: Begin { Enter }
    visibleZ := GetVisibleTileLevel(x, y);
@@ -2928,8 +2943,10 @@ Begin
       Board[FirstX,FirstY,FirstZ].Active := False;
       Board[x,y,visibleZ].Active := False;
       Dec(RemainingTiles, 2);
+      Inc(SolvedTiles, 2);
+      ShowScore;  { Mise … jour du pointage }
      End;
-     FirstSelect := False;
+     FirstSelect:=False;
     End;
    End;
   End;
@@ -2943,8 +2960,10 @@ BEGIN
  CursorY := 1;
  FirstSelect := False;
  QuitGame := False;  { Initialisation }
+ SolvedTiles := 0;
  Repeat
   DrawBoard;
+  ShowScore;  { Affichage initial du pointage }
   MoveCursor(CursorX, CursorY);
  Until (RemainingTiles = 0) Or QuitGame;
  CloseGraph;
