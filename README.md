@@ -118,6 +118,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <th>Description</th>
      </tr>
     <tr>
+        <td><b>2048.PAS</b></td>
+        <td><b>2048</b></td>
+        <td>Ce fichier contient le jeu 2048.</td>
+    </tr>
+    <tr>
         <td><b>ANAGRAM.PAS</b></td>
         <td><b>Anagram</b></td>
         <td>Ce fichier contient le jeu ANAGRAM. Trouver un mot ayant les mêmes lettres que l'originale.</td>
