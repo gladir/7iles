@@ -15,48 +15,48 @@ Uses
 {$ENDIF};
 
 Const
-  SCREEN_WIDTH = 640;
-  SCREEN_HEIGHT = 480;
-  CARD_WIDTH = 50;
-  CARD_HEIGHT = 70;
-  CARD_SPACING = 60;
-  CARD_OVERLAP = 20;
-  
-  DECK_X = 50;
-  DECK_Y = 50;
-  WASTE_X = 120;
+ SCREEN_WIDTH = 640;
+ SCREEN_HEIGHT = 480;
+ CARD_WIDTH = 50;
+ CARD_HEIGHT = 70;
+ CARD_SPACING = 60;
+ CARD_OVERLAP = 20;
+
+ DECK_X = 50;
+ DECK_Y = 50;
+ WASTE_X = 120;
   WASTE_Y = 50;
-  
+
   FOUNDATION_START_X = 300;
   FOUNDATION_Y = 50;
-  
+
   TABLEAU_START_X = 50;
   TABLEAU_Y = 150;
-  
+
   MAX_CARDS = 52;
   MAX_TABLEAU_CARDS = 25;
 
 Type
   TSuit = (Hearts, Diamonds, Clubs, Spades);
   TRank = (Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King);
-  
+
   TCard = Record
     suit: TSuit;
     rank: TRank;
     faceUp: Boolean;
     visible: Boolean;
   End;
-  
+
   TCardStack = Record
     cards: array[1..MAX_CARDS] of TCard;
     count: Integer;
   End;
-  
+
   TTableauColumn = Record
     cards: array[1..MAX_TABLEAU_CARDS] of TCard;
     count: Integer;
   End;
-  
+
   TGameState = Record
     deck: TCardStack;
     waste: TCardStack;
@@ -66,14 +66,14 @@ Type
     moves: Integer;
     gameWon: Boolean;
   End;
-  
+
   TSelection = Record
     sourceType: Integer; { 0=aucun, 1=defausse, 2=fondation, 3=tableau }
     sourceIndex: Integer;
     cardIndex: Integer;
     active: Boolean;
   End;
-  
+
   TCursor = Record
     areaType: Integer;    { 0=paquet, 1=defausse, 2=fondation, 3=tableau }
     areaIndex: Integer;   { Index dans la zone (1-4 pour fondation, 1-7 pour tableau) }
@@ -131,21 +131,21 @@ Var
   i: Integer;
 Begin
   GetSequenceStart := cardIndex;
-  
+
   { Chercher le début de la séquence déplaçable }
   For i := cardIndex - 1 downto 1 do
   Begin
     { Arrêter si la carte n'est pas face visible }
     If not Game.tableau[columnIndex].cards[i].faceUp then
       Break;
-    
+
     { Arrêter si la séquence n'est pas valide }
-    If (GetCardValue(Game.tableau[columnIndex].cards[i].rank) <> 
+    If (GetCardValue(Game.tableau[columnIndex].cards[i].rank) <>
         GetCardValue(Game.tableau[columnIndex].cards[i + 1].rank) + 1) or
-       (IsRed(Game.tableau[columnIndex].cards[i].suit) = 
+       (IsRed(Game.tableau[columnIndex].cards[i].suit) =
         IsRed(Game.tableau[columnIndex].cards[i + 1].suit)) then
       Break;
-    
+
     GetSequenceStart := i;
   End;
 End;
@@ -155,7 +155,7 @@ Var
   i: Integer;
 Begin
   CanMoveSequence := True;
-  
+
   { Vérifier que toutes les cartes de la séquence sont face visible }
   For i := startCard to Game.tableau[sourceIndex].count do
   Begin
@@ -165,13 +165,13 @@ Begin
       Exit;
     End;
   End;
-  
+
   { Vérifier que la séquence est bien ordonnée (décroissante et alternée) }
   For i := startCard to Game.tableau[sourceIndex].count - 1 do
   Begin
-    If (GetCardValue(Game.tableau[sourceIndex].cards[i].rank) <> 
+    If (GetCardValue(Game.tableau[sourceIndex].cards[i].rank) <>
         GetCardValue(Game.tableau[sourceIndex].cards[i + 1].rank) + 1) or
-       (IsRed(Game.tableau[sourceIndex].cards[i].suit) = 
+       (IsRed(Game.tableau[sourceIndex].cards[i].suit) =
         IsRed(Game.tableau[sourceIndex].cards[i + 1].suit)) then
     Begin
       CanMoveSequence := False;
@@ -192,7 +192,7 @@ Begin
   Driver := Detect;
   Mode := VGAHi;
 {$ENDIF}
-  
+
   InitGraph(Driver, Mode, '');
   ErrCode := GraphResult;
   If ErrCode = grOk Then
@@ -227,7 +227,7 @@ Begin
       Inc(k);
     End;
   Game.deck.count := 52;
-  
+
   { Mélanger le deck }
   For i := 1 to 52 do
   Begin
@@ -248,22 +248,22 @@ Begin
     Game.foundations[i].count := 0;
   For i := 1 to 7 do
     Game.tableau[i].count := 0;
-  
+
   Game.score := 0;
   Game.moves := 0;
   Game.gameWon := False;
-  
+
   Selection.active := False;
   Selection.sourceType := 0;
-  
+
   { Initialiser le curseur }
   Cursor.areaType := 0;
   Cursor.areaIndex := 1;
   Cursor.cardIndex := 1;
-  
+
   { Initialiser le deck }
   InitializeDeck;
-  
+
   { Distribuer les cartes sur le tableau }
   cardIndex := 1;
   For i := 1 to 7 do
@@ -277,7 +277,7 @@ Begin
         Inc(cardIndex);
       End;
     End;
-  
+
   { Ajuster le deck }
   For i := cardIndex to 52 do
     Game.deck.cards[i - cardIndex + 1] := Game.deck.cards[i];
@@ -297,11 +297,11 @@ Begin
     SetColor(15); { White }
   SetFillStyle(1, GetColor); { SolidFill }
   Bar(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
-  
+
   { Bordure }
   SetColor(0); { Black }
   Rectangle(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
-  
+
   If card.faceUp then
   Begin
     { Déterminer la couleur }
@@ -309,7 +309,7 @@ Begin
       color := 4 { Red }
     Else
       color := 0; { Black }
-    
+
     { Symbole de la suite }
     Case card.suit of
       Hearts: suitChar := #3;
@@ -317,7 +317,7 @@ Begin
       Clubs: suitChar := #5;
       Spades: suitChar := #6;
     End;
-    
+
     { Rang de la carte }
     Case card.rank of
       Ace: rankStr := 'A';
@@ -334,13 +334,13 @@ Begin
       Queen: rankStr := 'Q';
       King: rankStr := 'K';
     End;
-    
+
     { Dessiner le rang et la suite }
     SetColor(color);
     SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
     OutTextXY(x + 3, y + 3, rankStr);
     OutTextXY(x + 3, y + 15, suitChar);
-    
+
     { Symbole central pour les figures }
     If card.rank >= Jack then
     Begin
@@ -451,7 +451,7 @@ Begin
   For i := 1 to 7 do
   Begin
     x := TABLEAU_START_X + (i - 1) * CARD_SPACING;
-    
+
     If Game.tableau[i].count = 0 then
       DrawEmptySlot(x, TABLEAU_Y)
     Else
@@ -470,16 +470,16 @@ Procedure DrawHUD;
 Var
   s: String;
 Begin
-  { Score }
-  SetColor(15); { White }
+  { Pointage }
+  SetColor(15); { Blanc }
   SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
   Str(Game.score, s);
-  OutTextXY(10, 10, 'Points: ' + s);
-  
+  OutTextXY(10, 10, 'Points : ' + s);
+
   { Moves }
   Str(Game.moves, s);
-  OutTextXY(150, 10, 'Coups: ' + s);
-  
+  OutTextXY(200, 10, 'Coups : ' + s);
+
   { Instructions }
   SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
   OutTextXY(10, SCREEN_HEIGHT - 110, 'Fleches: Deplacer curseur');
@@ -497,15 +497,15 @@ Begin
   SetFillStyle(1, 14); { SolidFill, Yellow }
   Bar(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 - 30,
       SCREEN_WIDTH div 2 + 100, SCREEN_HEIGHT div 2 + 30);
-  
+
   SetColor(4); { Red }
   Rectangle(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 - 30,
             SCREEN_WIDTH div 2 + 100, SCREEN_HEIGHT div 2 + 30);
-  
+
   SetColor(0); { Black }
   SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
   OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 - 15, 'VICTOIRE !');
-  
+
   SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
   OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 + 5, 'Appuyez R pour rejouer');
 End;
@@ -545,7 +545,7 @@ Begin
     2: card := Game.foundations[sourceIndex].cards[Game.foundations[sourceIndex].count];
     3: card := Game.tableau[sourceIndex].cards[cardIndex];
   End;
-  
+
   { Placer la carte à destination }
   Case destType of
     2: Begin { Foundation }
@@ -559,7 +559,7 @@ Begin
       If sourceType = 2 then Dec(Game.score, 15); { Pénalité pour retirer de foundation }
     End;
   End;
-  
+
   { Supprimer la carte source }
   Case sourceType of
     1: Dec(Game.waste.count);
@@ -569,7 +569,7 @@ Begin
       For i := cardIndex to Game.tableau[sourceIndex].count - 1 do
         Game.tableau[sourceIndex].cards[i] := Game.tableau[sourceIndex].cards[i + 1];
       Dec(Game.tableau[sourceIndex].count);
-      
+
       { Retourner la carte qui devient visible si elle existe et est face cachée }
       If (Game.tableau[sourceIndex].count > 0) and
          (cardIndex <= Game.tableau[sourceIndex].count) and
@@ -581,7 +581,7 @@ Begin
         Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
     End;
   End;
-  
+
   Inc(Game.moves);
   NeedRedraw := True;
 End;
@@ -593,26 +593,26 @@ Var
 Begin
   { Calculer la longueur de la séquence }
   sequenceLength := Game.tableau[sourceIndex].count - startCard + 1;
-  
+
   { Copier la séquence dans un tableau temporaire }
   For i := 1 to sequenceLength do
     tempCards[i] := Game.tableau[sourceIndex].cards[startCard + i - 1];
-  
+
   { Supprimer la séquence de la source }
   Game.tableau[sourceIndex].count := startCard - 1;
-  
+
   { Retourner la carte qui devient visible si elle existe et est face cachée }
   If (Game.tableau[sourceIndex].count > 0) and
      (not Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp) then
     Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
-  
+
   { Ajouter la séquence à la destination }
   For i := 1 to sequenceLength do
   Begin
     Inc(Game.tableau[destIndex].count);
     Game.tableau[destIndex].cards[Game.tableau[destIndex].count] := tempCards[i];
   End;
-  
+
   Inc(Game.moves);
   NeedRedraw := True;
 End;
@@ -737,7 +737,7 @@ Begin
   If Cursor.areaType = 3 then
   Begin
     columnIndex := Cursor.areaIndex;
-    
+
     { Vérifier s'il y a des cartes dans cette colonne }
     If Game.tableau[columnIndex].count > 0 then
     Begin
@@ -766,7 +766,7 @@ Var
   moved: Boolean;
 Begin
   moved := False;
-  
+
   { Essayer de déplacer depuis la waste }
   If Game.waste.count > 0 then
   Begin
@@ -780,7 +780,7 @@ Begin
       End;
     End;
   End;
-  
+
   { Essayer de déplacer depuis le tableau }
   If not moved then
   Begin
@@ -801,7 +801,7 @@ Begin
       If moved then Break;
     End;
   End;
-  
+
   If moved then NeedRedraw := True;
 End;
 
@@ -814,7 +814,7 @@ Begin
   areaType := Cursor.areaType;
   areaIndex := Cursor.areaIndex;
   cardIndex := Cursor.cardIndex;
-  
+
   If not Selection.active then
   Begin
     { Sélectionner une carte }
@@ -860,7 +860,7 @@ Begin
   Begin
     { Tenter de déplacer la carte sélectionnée }
     canMove := False;
-    
+
     Case areaType of
       2: { Foundation }
         If Selection.sourceType = 1 then
@@ -885,10 +885,10 @@ Begin
           End;
         End;
     End;
-    
+
     If canMove then
       MoveCard(Selection.sourceType, Selection.sourceIndex, Selection.cardIndex, areaType, areaIndex);
-    
+
     Selection.active := False;
     NeedRedraw := True;
   End;
@@ -947,15 +947,15 @@ Var
 Begin
   InitializeGraphics;
   InitializeGame;
-  
+
   { Dessiner le fond une seule fois }
   SetColor(2); { Green }
   SetFillStyle(1, 2); { SolidFill, Green }
   Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  
+
   firstDraw := True;
   NeedRedraw := True;
-  
+
   Repeat
     { Redessiner seulement si nécessaire }
     If firstDraw or NeedRedraw then
@@ -964,7 +964,7 @@ Begin
       SetColor(2); { Green }
       SetFillStyle(1, 2); { SolidFill, Green }
       Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-      
+
       DrawDeck;
       DrawWaste;
       DrawFoundations;
@@ -974,18 +974,18 @@ Begin
       firstDraw := False;
       NeedRedraw := False;
     End;
-    
+
     If CheckWin then
     Begin
       Game.gameWon := True;
       DrawWinMessage;
     End;
-    
+
     HandleInput;
-    
+
     Delay(50);
   Until Game.gameWon and KeyPressed;
-  
+
   CloseGraph;
 End;
 
