@@ -309,6 +309,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier de jeu contient le jeu Soko-Ban.</td>
     </tr>
     <tr>
+        <td><b>SOLITAIR.PAS</b></td>
+        <td><b>Solitaire</b></td>
+        <td>Ce fichier de jeu contient le jeu de cartes Solitaire Klondike.</td>
+    </tr>
+    <tr>
         <td><b>INVADERS.PAS</b></td>
         <td><b>Space Invaders</b></td>
         <td>Ce fichier de jeu permet de lancer un clone du jeu Space Invaders originaire d'Atari 2600.</td>
