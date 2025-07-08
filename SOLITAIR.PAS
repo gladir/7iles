@@ -81,7 +81,6 @@ Type
  End;
 
 Var
- GraphDriver,GraphMode:Integer;
  Game:TGameState;
  Selection:TSelection;
  Cursor:TCursor;
@@ -442,13 +441,14 @@ Begin
  SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
  Str(Game.score, s);
  OutTextXY(10, 10, 'Points : ' + s);
-  { D�placements }
+  { D�placements }
  Str(Game.moves, s);
  OutTextXY(200, 10, 'Coups : ' + s);
   { Instructions }
  SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
- OutTextXY(10, SCREEN_HEIGHT - 110, 'Fleches: Deplacer curseur');
- OutTextXY(10, SCREEN_HEIGHT - 95, 'ESPACE: Selectionner/Deplacer');
+ OutTextXY(10, SCREEN_HEIGHT - 125, 'Fleches: Deplacer curseur');
+ OutTextXY(10, SCREEN_HEIGHT - 110, 'ESPACE: Selectionner/Deplacer');
+ OutTextXY(10, SCREEN_HEIGHT - 95, 'SOURIS: Cliquer pour jouer');
  OutTextXY(10, SCREEN_HEIGHT - 80, 'D: Retourner paquet');
  OutTextXY(10, SCREEN_HEIGHT - 65, 'F: Retourner carte tableau');
  OutTextXY(10, SCREEN_HEIGHT - 50, 'A: Deplacement auto fondations');
@@ -856,10 +856,203 @@ Begin
  End;
 End;
 
+Function GetCardAtPosition(x, y: Integer; var areaType, areaIndex, cardIndex: Integer): Boolean;
+Var
+  i, j: Integer;
+Begin
+  GetCardAtPosition := False;
+  
+  { Vérifier le deck }
+  If (x >= DECK_X) and (x <= DECK_X + CARD_WIDTH) and
+     (y >= DECK_Y) and (y <= DECK_Y + CARD_HEIGHT) then
+  Begin
+    areaType := 0;
+    areaIndex := 1;
+    cardIndex := 1;
+    GetCardAtPosition := True;
+    Exit;
+  End;
+  
+  { Vérifier la défausse }
+  If (x >= WASTE_X) and (x <= WASTE_X + CARD_WIDTH) and
+     (y >= WASTE_Y) and (y <= WASTE_Y + CARD_HEIGHT) then
+  Begin
+    areaType := 1;
+    areaIndex := 1;
+    cardIndex := 1;
+    GetCardAtPosition := True;
+    Exit;
+  End;
+  
+  { Vérifier les fondations }
+  For i := 1 to 4 do
+  Begin
+    If (x >= FOUNDATION_START_X + (i - 1) * CARD_SPACING) and
+       (x <= FOUNDATION_START_X + (i - 1) * CARD_SPACING + CARD_WIDTH) and
+       (y >= FOUNDATION_Y) and (y <= FOUNDATION_Y + CARD_HEIGHT) then
+    Begin
+      areaType := 2;
+      areaIndex := i;
+      cardIndex := 1;
+      GetCardAtPosition := True;
+      Exit;
+    End;
+  End;
+  
+  { Vérifier le tableau }
+  For i := 1 to 7 do
+  Begin
+    If (x >= TABLEAU_START_X + (i - 1) * CARD_SPACING) and
+       (x <= TABLEAU_START_X + (i - 1) * CARD_SPACING + CARD_WIDTH) then
+    Begin
+      { Déterminer quelle carte dans la colonne }
+      If Game.tableau[i].count = 0 then
+      Begin
+        If (y >= TABLEAU_Y) and (y <= TABLEAU_Y + CARD_HEIGHT) then
+        Begin
+          areaType := 3;
+          areaIndex := i;
+          cardIndex := 1;
+          GetCardAtPosition := True;
+          Exit;
+        End;
+      End
+      Else
+      Begin
+        { Vérifier chaque carte de la colonne (de bas en haut) }
+        For j := Game.tableau[i].count downto 1 do
+        Begin
+          If (y >= TABLEAU_Y + (j - 1) * CARD_OVERLAP) and
+             (y <= TABLEAU_Y + (j - 1) * CARD_OVERLAP + CARD_HEIGHT) then
+          Begin
+            areaType := 3;
+            areaIndex := i;
+            cardIndex := j;
+            GetCardAtPosition := True;
+            Exit;
+          End;
+        End;
+      End;
+    End;
+  End;
+End;
+
+Procedure HandleMouseInput;
+Var
+  mouseX, mouseY, mouseButton: LongInt;
+  areaType, areaIndex, cardIndex: Integer;
+  canMove: Boolean;
+Begin
+  Begin
+    { Obtenir l'état actuel de la souris }
+    GetMouseState(mouseX, mouseY, mouseButton);
+
+    { Vérifier si le bouton gauche vient d'être pressé }
+    If (mouseButton and 1) <> 0 then
+    Begin
+      { Attendre que le bouton soit relâché pour éviter les clics multiples }
+      repeat
+        GetMouseState(mouseX, mouseY, mouseButton);
+        Delay(10);
+      until (mouseButton and 1) = 0;
+
+      { Déterminer quelle carte a été cliquée }
+      If GetCardAtPosition(mouseX, mouseY, areaType, areaIndex, cardIndex) then
+      Begin
+        { Mettre à jour la position du curseur }
+        Cursor.areaType := areaType;
+        Cursor.areaIndex := areaIndex;
+        Cursor.cardIndex := cardIndex;
+
+        If not Selection.active then
+        Begin
+          { Sélectionner une carte }
+          Case areaType of
+            0: FlipDeckCard; { Deck }
+            1: If Game.waste.count > 0 then { Waste }
+               Begin
+                 Selection.active := True;
+                 Selection.sourceType := 1;
+                 Selection.sourceIndex := 0;
+                 Selection.cardIndex := Game.waste.count;
+                 NeedRedraw := True;
+               End;
+            2: If Game.foundations[areaIndex].count > 0 then { Foundation }
+               Begin
+                 Selection.active := True;
+                 Selection.sourceType := 2;
+                 Selection.sourceIndex := areaIndex;
+                 Selection.cardIndex := Game.foundations[areaIndex].count;
+                 NeedRedraw := True;
+               End;
+            3: If (Game.tableau[areaIndex].count > 0) and { Tableau }
+                  (cardIndex <= Game.tableau[areaIndex].count) and
+                  (Game.tableau[areaIndex].cards[cardIndex].faceUp) then
+               Begin
+                 Selection.active := True;
+                 Selection.sourceType := 3;
+                 Selection.sourceIndex := areaIndex;
+                 { Sélectionner le début de la séquence déplaçable }
+                 Selection.cardIndex := GetSequenceStart(areaIndex, cardIndex);
+                 NeedRedraw := True;
+               End
+               Else If (Game.tableau[areaIndex].count > 0) and
+                       (cardIndex <= Game.tableau[areaIndex].count) and
+                       (not Game.tableau[areaIndex].cards[cardIndex].faceUp) then
+               Begin
+                 { Si la carte est cachée, la retourner automatiquement }
+                 FlipTableauCard;
+               End;
+          End;
+        End
+        Else
+        Begin
+          { Tenter de déplacer la carte sélectionnée }
+          canMove := False;
+
+          Case areaType of
+            2: { Foundation }
+              If Selection.sourceType = 1 then
+                canMove := CanPlaceOnFoundation(Game.waste.cards[Game.waste.count], areaIndex)
+              Else If Selection.sourceType = 3 then
+                canMove := CanPlaceOnFoundation(Game.tableau[Selection.sourceIndex].cards[Selection.cardIndex], areaIndex);
+            3: { Tableau }
+              If Selection.sourceType = 1 then
+                canMove := CanPlaceOnTableau(Game.waste.cards[Game.waste.count], areaIndex)
+              Else If Selection.sourceType = 2 then
+                canMove := CanPlaceOnTableau(Game.foundations[Selection.sourceIndex].cards[Selection.cardIndex], areaIndex)
+              Else If Selection.sourceType = 3 then
+              Begin
+                { Vérifier si on peut placer la carte sélectionnée }
+                canMove := CanPlaceOnTableau(Game.tableau[Selection.sourceIndex].cards[Selection.cardIndex], areaIndex);
+                { Vérifier si on peut déplacer toute la séquence }
+                If canMove and CanMoveSequence(Selection.sourceIndex, Selection.cardIndex) then
+                Begin
+                  { Déplacer la séquence complète }
+                  MoveSequence(Selection.sourceIndex, Selection.cardIndex, areaIndex);
+                  canMove := False; { Pour éviter le MoveCard normal }
+                End;
+              End;
+          End;
+
+          If canMove then
+            MoveCard(Selection.sourceType, Selection.sourceIndex, Selection.cardIndex, areaType, areaIndex);
+
+          Selection.active := False;
+          NeedRedraw := True;
+        End;
+      End;
+    End;
+  End;
+End;
+
 Procedure HandleInput;
 Var
   key: Char;
 Begin
+  { Gérer la souris }
+  HandleMouseInput;
+
   { Gérer le clavier }
   If KeyPressed then
   Begin
