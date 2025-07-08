@@ -426,9 +426,10 @@ Begin
   
   { Instructions }
   SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-  OutTextXY(10, SCREEN_HEIGHT - 80, 'Arrow keys: Move cursor');
-  OutTextXY(10, SCREEN_HEIGHT - 65, 'SPACE: Select/Move card');
-  OutTextXY(10, SCREEN_HEIGHT - 50, 'D: Flip deck');
+  OutTextXY(10, SCREEN_HEIGHT - 95, 'Arrow keys: Move cursor');
+  OutTextXY(10, SCREEN_HEIGHT - 80, 'SPACE: Select/Move card');
+  OutTextXY(10, SCREEN_HEIGHT - 65, 'D: Flip deck');
+  OutTextXY(10, SCREEN_HEIGHT - 50, 'F: Flip tableau card');
   OutTextXY(10, SCREEN_HEIGHT - 35, 'A: Auto-move to Foundation');
   OutTextXY(10, SCREEN_HEIGHT - 20, 'R: Restart, ESC: Quit');
 End;
@@ -507,14 +508,20 @@ Begin
     1: Dec(Game.waste.count);
     2: Dec(Game.foundations[sourceIndex].count);
     3: Begin
+      { Supprimer la carte du tableau }
       For i := cardIndex to Game.tableau[sourceIndex].count - 1 do
         Game.tableau[sourceIndex].cards[i] := Game.tableau[sourceIndex].cards[i + 1];
       Dec(Game.tableau[sourceIndex].count);
       
-      { Retourner la carte suivante si elle existe }
-      If (cardIndex <= Game.tableau[sourceIndex].count) and
+      { Retourner la carte qui devient visible si elle existe et est face cachée }
+      If (Game.tableau[sourceIndex].count > 0) and
+         (cardIndex <= Game.tableau[sourceIndex].count) and
          (not Game.tableau[sourceIndex].cards[cardIndex].faceUp) then
-        Game.tableau[sourceIndex].cards[cardIndex].faceUp := True;
+        Game.tableau[sourceIndex].cards[cardIndex].faceUp := True
+      Else If (Game.tableau[sourceIndex].count > 0) and
+              (cardIndex > Game.tableau[sourceIndex].count) and
+              (not Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp) then
+        Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
     End;
   End;
   
@@ -595,10 +602,7 @@ Begin
           If Cursor.cardIndex > 1 then
           Begin
             Dec(Cursor.cardIndex);
-            { S'assurer que la carte est face visible }
-            If (Cursor.cardIndex <= Game.tableau[Cursor.areaIndex].count) and
-               (not Game.tableau[Cursor.areaIndex].cards[Cursor.cardIndex].faceUp) then
-              Cursor.cardIndex := Game.tableau[Cursor.areaIndex].count;
+            { Permettre de naviguer sur toutes les cartes, même cachées }
           End;
         End;
         Else
@@ -636,6 +640,37 @@ Begin
     End;
   End;
   NeedRedraw := True;
+End;
+
+Procedure FlipTableauCard;
+Var
+  columnIndex: Integer;
+Begin
+  { Vérifier si on est sur le tableau }
+  If Cursor.areaType = 3 then
+  Begin
+    columnIndex := Cursor.areaIndex;
+    
+    { Vérifier s'il y a des cartes dans cette colonne }
+    If Game.tableau[columnIndex].count > 0 then
+    Begin
+      { Si on est sur une carte cachée, la retourner }
+      If (Cursor.cardIndex <= Game.tableau[columnIndex].count) and
+         (not Game.tableau[columnIndex].cards[Cursor.cardIndex].faceUp) then
+      Begin
+        Game.tableau[columnIndex].cards[Cursor.cardIndex].faceUp := True;
+        NeedRedraw := True;
+        Inc(Game.score, 5); { Bonus pour retourner une carte }
+      End
+      { Sinon, retourner la dernière carte si elle est cachée }
+      Else If not Game.tableau[columnIndex].cards[Game.tableau[columnIndex].count].faceUp then
+      Begin
+        Game.tableau[columnIndex].cards[Game.tableau[columnIndex].count].faceUp := True;
+        NeedRedraw := True;
+        Inc(Game.score, 5); { Bonus pour retourner une carte }
+      End;
+    End;
+  End;
 End;
 
 Procedure AutoMoveToFoundation;
@@ -723,6 +758,13 @@ Begin
            Selection.sourceIndex := areaIndex;
            Selection.cardIndex := cardIndex;
            NeedRedraw := True;
+         End
+         Else If (Game.tableau[areaIndex].count > 0) and
+                 (cardIndex <= Game.tableau[areaIndex].count) and
+                 (not Game.tableau[areaIndex].cards[cardIndex].faceUp) then
+         Begin
+           { Si la carte est cachée, la retourner automatiquement }
+           FlipTableauCard;
          End;
     End;
   End
@@ -783,6 +825,7 @@ Begin
       End;
       ' ': HandleKeyboardInput; { Espace }
       'd', 'D': FlipDeckCard; { D pour flip deck }
+      'f', 'F': FlipTableauCard; { F pour flip tableau card }
       'a', 'A': AutoMoveToFoundation; { A pour auto-move }
       #27: Game.gameWon := True; { ESC pour quitter }
       'r', 'R': If Game.gameWon then
