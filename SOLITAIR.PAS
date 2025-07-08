@@ -244,7 +244,7 @@ End;
 
 Procedure InitializeGame;
 Var
-  i,j,cardIndex:Integer;
+ i,j,cardIndex:Integer;
 Begin
   { Initialiser les structures }
  Game.waste.count:=0;
@@ -255,335 +255,286 @@ Begin
  Game.gameWon:=False;
  Selection.active:=False;
  Selection.sourceType := 0;
-
   { Initialiser le curseur }
-  Cursor.areaType := 0;
-  Cursor.areaIndex := 1;
-  Cursor.cardIndex := 1;
-
+ Cursor.areaType := 0;
+ Cursor.areaIndex := 1;
+ Cursor.cardIndex := 1;
   { Initialiser le deck }
-  InitializeDeck;
-
+ InitializeDeck;
   { Distribuer les cartes sur le tableau }
-  cardIndex := 1;
-  For i := 1 to 7 do
-    For j := 1 to i do
-    Begin
-      With Game.tableau[i] do
-      Begin
-        Inc(count);
-        cards[count] := Game.deck.cards[cardIndex];
-        cards[count].faceUp := (j = i); { Seule la dernière carte est face visible }
-        Inc(cardIndex);
-      End;
-    End;
-
+ cardIndex := 1;
+ For i := 1 to 7 do For j := 1 to i do Begin
+  With Game.tableau[i] do Begin
+   Inc(count);
+   cards[count]:=Game.deck.cards[cardIndex];
+   cards[count].faceUp := (j = i); { Seule la dernière carte est face visible }
+   Inc(cardIndex);
+  End;
+ End;
   { Ajuster le deck }
-  For i := cardIndex to 52 do
-    Game.deck.cards[i - cardIndex + 1] := Game.deck.cards[i];
-  Game.deck.count := 52 - cardIndex + 1;
+ For i:=cardIndex to 52 do Game.deck.cards[i - cardIndex + 1] := Game.deck.cards[i];
+ Game.deck.count := 52 - cardIndex + 1;
 End;
 
-Procedure DrawCard(x, y: Integer; card: TCard; selected: Boolean);
+Procedure DrawCard(x,y:Integer;card:TCard;selected:Boolean);
 Var
-  suitChar: Char;
-  rankStr: String;
-  color: Integer;
+ suitChar:Char;
+ rankStr:String;
+ color:Integer;
 Begin
   { Fond de la carte }
-  If selected then
-    SetColor(14) { Yellow }
-  Else
-    SetColor(15); { White }
-  SetFillStyle(1, GetColor); { SolidFill }
-  Bar(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
-
+ If selected Then SetColor(14) { Yellow }
+             Else SetColor(15); { White }
+ SetFillStyle(1, GetColor); { SolidFill }
+ Bar(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
   { Bordure }
-  SetColor(0); { Black }
-  Rectangle(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
-
-  If card.faceUp then
-  Begin
-    { Déterminer la couleur }
-    If IsRed(card.suit) then
-      color := 4 { Red }
-    Else
-      color := 0; { Black }
-
-    { Symbole de la suite }
-    Case card.suit of
-      Hearts: suitChar := #3;
-      Diamonds: suitChar := #4;
-      Clubs: suitChar := #5;
-      Spades: suitChar := #6;
-    End;
-
-    { Rang de la carte }
-    Case card.rank of
-      Ace: rankStr := 'A';
-      Two: rankStr := '2';
-      Three: rankStr := '3';
-      Four: rankStr := '4';
-      Five: rankStr := '5';
-      Six: rankStr := '6';
-      Seven: rankStr := '7';
-      Eight: rankStr := '8';
-      Nine: rankStr := '9';
-      Ten: rankStr := '10';
-      Jack: rankStr := 'J';
-      Queen: rankStr := 'Q';
-      King: rankStr := 'K';
-    End;
-
-    { Dessiner le rang et la suite }
-    SetColor(color);
-    SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-    OutTextXY(x + 3, y + 3, rankStr);
-    OutTextXY(x + 3, y + 15, suitChar);
-
-    { Symbole central pour les figures }
-    If card.rank >= Jack then
-    Begin
-      SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
-      OutTextXY(x + CARD_WIDTH div 2 - 5, y + CARD_HEIGHT div 2 - 5, rankStr);
-    End
-    Else
-    Begin
-      SetTextStyle(0, 0, 3); { DefaultFont, HorizDir, size 3 }
-      OutTextXY(x + CARD_WIDTH div 2 - 8, y + CARD_HEIGHT div 2 - 8, suitChar);
-    End;
+ SetColor(0); { Black }
+ Rectangle(x,y,x+CARD_WIDTH,y+CARD_HEIGHT);
+ If card.faceUp Then Begin
+   { Déterminer la couleur }
+  If IsRed(card.suit)Then color:=4 { Red }
+                     Else color:=0; { Black }
+   { Symbole de la suite }
+  Case card.suit of
+   Hearts:suitChar:=#3;
+   Diamonds:suitChar:=#4;
+   Clubs:suitChar:=#5;
+   Spades:suitChar:=#6;
+  End;
+   { Rang de la carte }
+  Case card.rank of
+   Ace:rankStr := 'A';
+   Two:rankStr := '2';
+   Three:rankStr := '3';
+   Four:rankStr := '4';
+   Five:rankStr := '5';
+   Six:rankStr := '6';
+   Seven:rankStr := '7';
+   Eight:rankStr := '8';
+   Nine:rankStr := '9';
+   Ten:rankStr := '10';
+   Jack:rankStr := 'J';
+   Queen:rankStr := 'Q';
+   King:rankStr := 'K';
+  End;
+   { Dessiner le rang et la suite }
+  SetColor(color);
+  SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
+  OutTextXY(x + 3, y + 3, rankStr);
+  OutTextXY(x + 3, y + 15, suitChar);
+   { Symbole central pour les figures }
+  If card.rank>=Jack Then Begin
+   SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
+   OutTextXY(x + CARD_WIDTH div 2 - 5, y + CARD_HEIGHT div 2 - 5, rankStr);
   End
-  Else
+   Else
   Begin
-    { Dos de carte }
-    SetColor(1); { Blue }
-    SetFillStyle(1, 1); { SolidFill, Blue }
-    Bar(x + 3, y + 3, x + CARD_WIDTH - 3, y + CARD_HEIGHT - 3);
-    SetColor(15); { White }
-    Rectangle(x + 6, y + 6, x + CARD_WIDTH - 6, y + CARD_HEIGHT - 6);
+   SetTextStyle(0, 0, 3); { DefaultFont, HorizDir, size 3 }
+   OutTextXY(x + CARD_WIDTH div 2 - 8, y + CARD_HEIGHT div 2 - 8, suitChar);
   End;
+ End
+  Else
+ Begin
+   { Dos de carte }
+  SetColor(1); { Blue }
+  SetFillStyle(1, 1); { SolidFill, Blue }
+  Bar(x + 3, y + 3, x + CARD_WIDTH - 3, y + CARD_HEIGHT - 3);
+  SetColor(15); { White }
+  Rectangle(x + 6, y + 6, x + CARD_WIDTH - 6, y + CARD_HEIGHT - 6);
+ End;
 End;
 
-Procedure DrawEmptySlot(x, y: Integer);
-Begin
-  SetColor(8); { DarkGray }
-  SetFillStyle(1, 8); { SolidFill, DarkGray }
-  Bar(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
-  SetColor(7); { LightGray }
-  Rectangle(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
+Procedure DrawEmptySlot(x,y:Integer);Begin
+ SetColor(8); { DarkGray }
+ SetFillStyle(1, 8); { SolidFill, DarkGray }
+ Bar(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
+ SetColor(7); { LightGray }
+ Rectangle(x, y, x + CARD_WIDTH, y + CARD_HEIGHT);
 End;
 
-Procedure GetCursorPosition(var x, y: Integer);
-Begin
-  Case Cursor.areaType of
-    0: Begin { Paquet }
-      x := DECK_X;
-      y := DECK_Y;
-    End;
-    1: Begin { Defausse }
-      x := WASTE_X;
-      y := WASTE_Y;
-    End;
-    2: Begin { Fondation }
-      x := FOUNDATION_START_X + (Cursor.areaIndex - 1) * CARD_SPACING;
-      y := FOUNDATION_Y;
-    End;
-    3: Begin { Tableau }
-      x := TABLEAU_START_X + (Cursor.areaIndex - 1) * CARD_SPACING;
-      If Game.tableau[Cursor.areaIndex].count > 0 then
-        y := TABLEAU_Y + (Cursor.cardIndex - 1) * CARD_OVERLAP
-      Else
-        y := TABLEAU_Y;
-    End;
+Procedure GetCursorPosition(Var x,y:Integer);Begin
+ Case Cursor.areaType of
+  0:Begin { Paquet }
+   x:=DECK_X;
+   y:=DECK_Y;
   End;
+  1:Begin { Defausse }
+   x:=WASTE_X;
+   y:=WASTE_Y;
+  End;
+  2:Begin { Fondation }
+   x:=FOUNDATION_START_X+(Cursor.areaIndex - 1)*CARD_SPACING;
+   y:=FOUNDATION_Y;
+  End;
+  3:Begin { Tableau }
+   x:=TABLEAU_START_X + (Cursor.areaIndex - 1)*CARD_SPACING;
+   If Game.tableau[Cursor.areaIndex].count>0 Then y:=TABLEAU_Y + (Cursor.cardIndex - 1) * CARD_OVERLAP
+                                             Else y:=TABLEAU_Y;
+  End;
+ End;
 End;
 
 Procedure DrawCursor;
 Var
-  x, y: Integer;
+ x,y:Integer;
 Begin
-  GetCursorPosition(x, y);
+ GetCursorPosition(x, y);
   { Dessiner le curseur autour de la zone sélectionnée }
-  SetColor(11); { Cyan }
-  SetLineStyle(0, 0, 3);
-  Rectangle(x - 2, y - 2, x + CARD_WIDTH + 2, y + CARD_HEIGHT + 2);
-  SetLineStyle(0, 0, 1);
+ SetColor(11); { Cyan }
+ SetLineStyle(0, 0, 3);
+ Rectangle(x - 2, y - 2, x + CARD_WIDTH + 2, y + CARD_HEIGHT + 2);
+ SetLineStyle(0, 0, 1);
 End;
 
-Procedure DrawDeck;
-Begin
-  If Game.deck.count > 0 then
-    DrawCard(DECK_X, DECK_Y, Game.deck.cards[Game.deck.count], False)
-  Else
-    DrawEmptySlot(DECK_X, DECK_Y);
+Procedure DrawDeck;Begin
+ If Game.deck.count > 0 then
+  DrawCard(DECK_X, DECK_Y, Game.deck.cards[Game.deck.count], False)
+ Else
+  DrawEmptySlot(DECK_X, DECK_Y);
 End;
 
-Procedure DrawWaste;
-Begin
-  If Game.waste.count > 0 then
-    DrawCard(WASTE_X, WASTE_Y, Game.waste.cards[Game.waste.count],
-             Selection.active and (Selection.sourceType = 1))
-  Else
-    DrawEmptySlot(WASTE_X, WASTE_Y);
+Procedure DrawWaste;Begin
+ If Game.waste.count > 0 then
+  DrawCard(WASTE_X, WASTE_Y, Game.waste.cards[Game.waste.count],Selection.active and (Selection.sourceType = 1))
+ Else
+  DrawEmptySlot(WASTE_X, WASTE_Y);
 End;
 
 Procedure DrawFoundations;
 Var
-  i: Integer;
+ i:Integer;
 Begin
-  For i := 1 to 4 do
-  Begin
-    If Game.foundations[i].count > 0 then
-      DrawCard(FOUNDATION_START_X + (i - 1) * CARD_SPACING, FOUNDATION_Y,
-               Game.foundations[i].cards[Game.foundations[i].count],
-               Selection.active and (Selection.sourceType = 2) and (Selection.sourceIndex = i))
-    Else
-      DrawEmptySlot(FOUNDATION_START_X + (i - 1) * CARD_SPACING, FOUNDATION_Y);
-  End;
+ For i:=1 to 4 do Begin
+  If Game.foundations[i].count>0 Then
+   DrawCard(FOUNDATION_START_X + (i - 1) * CARD_SPACING, FOUNDATION_Y,
+            Game.foundations[i].cards[Game.foundations[i].count],
+            Selection.active and (Selection.sourceType = 2) and (Selection.sourceIndex = i))
+  Else
+   DrawEmptySlot(FOUNDATION_START_X + (i - 1) * CARD_SPACING, FOUNDATION_Y);
+ End;
 End;
 
 Procedure DrawTableau;
 Var
-  i, j: Integer;
-  x, y: Integer;
-  selected: Boolean;
+ i,j:Integer;
+ x,y:Integer;
+ selected:Boolean;
 Begin
-  For i := 1 to 7 do
-  Begin
-    x := TABLEAU_START_X + (i - 1) * CARD_SPACING;
-
-    If Game.tableau[i].count = 0 then
-      DrawEmptySlot(x, TABLEAU_Y)
-    Else
-      For j := 1 to Game.tableau[i].count do
-      Begin
-        y := TABLEAU_Y + (j - 1) * CARD_OVERLAP;
-        { Mettre en surbrillance toute la séquence si elle est sélectionnée }
-        selected := Selection.active and (Selection.sourceType = 3) and
-                   (Selection.sourceIndex = i) and (j >= Selection.cardIndex);
-        DrawCard(x, y, Game.tableau[i].cards[j], selected);
-      End;
+ For i:=1 to 7 do Begin
+  x := TABLEAU_START_X + (i - 1) * CARD_SPACING;
+  If Game.tableau[i].count=0 Then DrawEmptySlot(x, TABLEAU_Y) Else
+  For j := 1 to Game.tableau[i].count do Begin
+   y := TABLEAU_Y + (j - 1) * CARD_OVERLAP;
+    { Mettre en surbrillance toute la séquence si elle est sélectionnée }
+   selected := Selection.active and (Selection.sourceType = 3) and
+              (Selection.sourceIndex = i) and (j >= Selection.cardIndex);
+   DrawCard(x, y, Game.tableau[i].cards[j], selected);
   End;
+ End;
 End;
 
 Procedure DrawHUD;
 Var
-  s: String;
+ s:String;
 Begin
   { Pointage }
-  SetColor(15); { Blanc }
-  SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
-  Str(Game.score, s);
-  OutTextXY(10, 10, 'Points : ' + s);
-
-  { Moves }
-  Str(Game.moves, s);
-  OutTextXY(200, 10, 'Coups : ' + s);
-
+ SetColor(15); { Blanc }
+ SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
+ Str(Game.score, s);
+ OutTextXY(10, 10, 'Points : ' + s);
+  { D�placements }
+ Str(Game.moves, s);
+ OutTextXY(200, 10, 'Coups : ' + s);
   { Instructions }
-  SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-  OutTextXY(10, SCREEN_HEIGHT - 110, 'Fleches: Deplacer curseur');
-  OutTextXY(10, SCREEN_HEIGHT - 95, 'ESPACE: Selectionner/Deplacer');
-  OutTextXY(10, SCREEN_HEIGHT - 80, 'D: Retourner paquet');
-  OutTextXY(10, SCREEN_HEIGHT - 65, 'F: Retourner carte tableau');
-  OutTextXY(10, SCREEN_HEIGHT - 50, 'A: Deplacement auto fondations');
-  OutTextXY(10, SCREEN_HEIGHT - 35, 'R: Recommencer, ESC: Quitter');
-  OutTextXY(10, SCREEN_HEIGHT - 20, 'Sequences auto-selectionnees');
+ SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
+ OutTextXY(10, SCREEN_HEIGHT - 110, 'Fleches: Deplacer curseur');
+ OutTextXY(10, SCREEN_HEIGHT - 95, 'ESPACE: Selectionner/Deplacer');
+ OutTextXY(10, SCREEN_HEIGHT - 80, 'D: Retourner paquet');
+ OutTextXY(10, SCREEN_HEIGHT - 65, 'F: Retourner carte tableau');
+ OutTextXY(10, SCREEN_HEIGHT - 50, 'A: Deplacement auto fondations');
+ OutTextXY(10, SCREEN_HEIGHT - 35, 'R: Recommencer, ESC: Quitter');
+ OutTextXY(10, SCREEN_HEIGHT - 20, 'Sequences auto-selectionnees');
 End;
 
-Procedure DrawWinMessage;
-Begin
-  SetColor(14); { Yellow }
-  SetFillStyle(1, 14); { SolidFill, Yellow }
-  Bar(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 - 30,
-      SCREEN_WIDTH div 2 + 100, SCREEN_HEIGHT div 2 + 30);
-
-  SetColor(4); { Red }
-  Rectangle(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 - 30,
-            SCREEN_WIDTH div 2 + 100, SCREEN_HEIGHT div 2 + 30);
-
-  SetColor(0); { Black }
-  SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
-  OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 - 15, 'VICTOIRE !');
-
-  SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-  OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 + 5, 'Appuyez R pour rejouer');
+Procedure DrawWinMessage;Begin
+ SetColor(14); { Yellow }
+ SetFillStyle(1, 14); { SolidFill, Yellow }
+ Bar(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 - 30,SCREEN_WIDTH div 2 + 100, SCREEN_HEIGHT div 2 + 30);
+ SetColor(4); { Red }
+ Rectangle(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 - 30,SCREEN_WIDTH div 2 + 100, SCREEN_HEIGHT div 2 + 30);
+ SetColor(0); { Black }
+ SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
+ OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 - 15, 'VICTOIRE !');
+ SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
+ OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 + 5, 'Appuyez R pour rejouer');
 End;
 
-Procedure FlipDeckCard;
-Begin
-  If Game.deck.count > 0 then
-  Begin
-    { Déplacer la carte du deck vers la waste }
-    Inc(Game.waste.count);
-    Game.waste.cards[Game.waste.count] := Game.deck.cards[Game.deck.count];
-    Game.waste.cards[Game.waste.count].faceUp := True;
-    Dec(Game.deck.count);
-  End
-  Else If Game.waste.count > 0 then
-  Begin
-    { Remettre toutes les cartes de la waste dans le deck }
-    While Game.waste.count > 0 do
-    Begin
-      Inc(Game.deck.count);
-      Game.deck.cards[Game.deck.count] := Game.waste.cards[Game.waste.count];
-      Game.deck.cards[Game.deck.count].faceUp := False;
-      Dec(Game.waste.count);
-    End;
+Procedure FlipDeckCard;Begin
+ If Game.deck.count>0 Then Begin
+   { Déplacer la carte du deck vers la waste }
+  Inc(Game.waste.count);
+  Game.waste.cards[Game.waste.count] := Game.deck.cards[Game.deck.count];
+  Game.waste.cards[Game.waste.count].faceUp := True;
+  Dec(Game.deck.count);
+ End
+  Else
+ If Game.waste.count>0 Then Begin
+   { Remettre toutes les cartes de la waste dans le deck }
+  While Game.waste.count>0 do Begin
+   Inc(Game.deck.count);
+   Game.deck.cards[Game.deck.count] := Game.waste.cards[Game.waste.count];
+   Game.deck.cards[Game.deck.count].faceUp := False;
+   Dec(Game.waste.count);
   End;
-  NeedRedraw := True;
+ End;
+ NeedRedraw:=True;
 End;
 
 Procedure MoveCard(sourceType, sourceIndex, cardIndex, destType, destIndex: Integer);
 Var
-  card: TCard;
-  i: Integer;
+ card:TCard;
+ i:Integer;
 Begin
-  { Prendre la carte source }
-  Case sourceType of
-    1: card := Game.waste.cards[Game.waste.count];
-    2: card := Game.foundations[sourceIndex].cards[Game.foundations[sourceIndex].count];
-    3: card := Game.tableau[sourceIndex].cards[cardIndex];
-  End;
-
+ { Prendre la carte source }
+ Case sourceType of
+  1:card:=Game.waste.cards[Game.waste.count];
+  2:card:=Game.foundations[sourceIndex].cards[Game.foundations[sourceIndex].count];
+  3:card:=Game.tableau[sourceIndex].cards[cardIndex];
+ End;
   { Placer la carte à destination }
-  Case destType of
-    2: Begin { Foundation }
-      Inc(Game.foundations[destIndex].count);
-      Game.foundations[destIndex].cards[Game.foundations[destIndex].count] := card;
-      Inc(Game.score, 10);
-    End;
-    3: Begin { Tableau }
-      Inc(Game.tableau[destIndex].count);
-      Game.tableau[destIndex].cards[Game.tableau[destIndex].count] := card;
-      If sourceType = 2 then Dec(Game.score, 15); { Pénalité pour retirer de foundation }
-    End;
+ Case destType of
+  2: Begin { Foundation }
+   Inc(Game.foundations[destIndex].count);
+   Game.foundations[destIndex].cards[Game.foundations[destIndex].count]:=card;
+   Inc(Game.score, 10);
   End;
-
+  3:Begin { Tableau }
+   Inc(Game.tableau[destIndex].count);
+   Game.tableau[destIndex].cards[Game.tableau[destIndex].count] := card;
+   If sourceType = 2 then Dec(Game.score, 15); { Pénalité pour retirer de foundation }
+  End;
+ End;
   { Supprimer la carte source }
-  Case sourceType of
-    1: Dec(Game.waste.count);
-    2: Dec(Game.foundations[sourceIndex].count);
-    3: Begin
-      { Supprimer la carte du tableau }
-      For i := cardIndex to Game.tableau[sourceIndex].count - 1 do
-        Game.tableau[sourceIndex].cards[i] := Game.tableau[sourceIndex].cards[i + 1];
-      Dec(Game.tableau[sourceIndex].count);
-
-      { Retourner la carte qui devient visible si elle existe et est face cachée }
-      If (Game.tableau[sourceIndex].count > 0) and
-         (cardIndex <= Game.tableau[sourceIndex].count) and
-         (not Game.tableau[sourceIndex].cards[cardIndex].faceUp) then
-        Game.tableau[sourceIndex].cards[cardIndex].faceUp := True
-      Else If (Game.tableau[sourceIndex].count > 0) and
-              (cardIndex > Game.tableau[sourceIndex].count) and
-              (not Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp) then
-        Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
-    End;
+ Case sourceType of
+  1:Dec(Game.waste.count);
+  2:Dec(Game.foundations[sourceIndex].count);
+  3:Begin
+     { Supprimer la carte du tableau }
+   For i := cardIndex to Game.tableau[sourceIndex].count-1 do
+    Game.tableau[sourceIndex].cards[i] := Game.tableau[sourceIndex].cards[i + 1];
+   Dec(Game.tableau[sourceIndex].count);
+    { Retourner la carte qui devient visible si elle existe et est face cachée }
+   If (Game.tableau[sourceIndex].count > 0)and(cardIndex <= Game.tableau[sourceIndex].count) and
+      (not Game.tableau[sourceIndex].cards[cardIndex].faceUp)Then
+    Game.tableau[sourceIndex].cards[cardIndex].faceUp := True
+   Else If (Game.tableau[sourceIndex].count > 0) and
+           (cardIndex > Game.tableau[sourceIndex].count) and
+           (not Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp) then
+   Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
   End;
-
-  Inc(Game.moves);
-  NeedRedraw := True;
+ End;
+ Inc(Game.moves);
+ NeedRedraw := True;
 End;
 
 Procedure MoveSequence(sourceIndex, startCard, destIndex: Integer);
@@ -894,17 +845,15 @@ Begin
   End;
 End;
 
-Function CheckWin: Boolean;
+Function CheckWin:Boolean;
 Var
-  i: Integer;
+ i:Integer;
 Begin
-  CheckWin := True;
-  For i := 1 to 4 do
-    If Game.foundations[i].count <> 13 then
-    Begin
-      CheckWin := False;
-      Exit;
-    End;
+ CheckWin:=True;
+ For i:=1 to 4 do If Game.foundations[i].count<>13 Then Begin
+  CheckWin:=False;
+  Exit;
+ End;
 End;
 
 Procedure HandleInput;
