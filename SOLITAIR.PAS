@@ -125,6 +125,60 @@ Begin
   End;
 End;
 
+Function GetSequenceStart(columnIndex, cardIndex: Integer): Integer;
+Var
+  i: Integer;
+Begin
+  GetSequenceStart := cardIndex;
+  
+  { Chercher le début de la séquence déplaçable }
+  For i := cardIndex - 1 downto 1 do
+  Begin
+    { Arrêter si la carte n'est pas face visible }
+    If not Game.tableau[columnIndex].cards[i].faceUp then
+      Break;
+    
+    { Arrêter si la séquence n'est pas valide }
+    If (GetCardValue(Game.tableau[columnIndex].cards[i].rank) <> 
+        GetCardValue(Game.tableau[columnIndex].cards[i + 1].rank) + 1) or
+       (IsRed(Game.tableau[columnIndex].cards[i].suit) = 
+        IsRed(Game.tableau[columnIndex].cards[i + 1].suit)) then
+      Break;
+    
+    GetSequenceStart := i;
+  End;
+End;
+
+Function CanMoveSequence(sourceIndex, startCard: Integer): Boolean;
+Var
+  i: Integer;
+Begin
+  CanMoveSequence := True;
+  
+  { Vérifier que toutes les cartes de la séquence sont face visible }
+  For i := startCard to Game.tableau[sourceIndex].count do
+  Begin
+    If not Game.tableau[sourceIndex].cards[i].faceUp then
+    Begin
+      CanMoveSequence := False;
+      Exit;
+    End;
+  End;
+  
+  { Vérifier que la séquence est bien ordonnée (décroissante et alternée) }
+  For i := startCard to Game.tableau[sourceIndex].count - 1 do
+  Begin
+    If (GetCardValue(Game.tableau[sourceIndex].cards[i].rank) <> 
+        GetCardValue(Game.tableau[sourceIndex].cards[i + 1].rank) + 1) or
+       (IsRed(Game.tableau[sourceIndex].cards[i].suit) = 
+        IsRed(Game.tableau[sourceIndex].cards[i + 1].suit)) then
+    Begin
+      CanMoveSequence := False;
+      Exit;
+    End;
+  End;
+End;
+
 Procedure InitializeGraphics;
 Var
   Driver, Mode: Integer;
@@ -403,8 +457,9 @@ Begin
       For j := 1 to Game.tableau[i].count do
       Begin
         y := TABLEAU_Y + (j - 1) * CARD_OVERLAP;
+        { Mettre en surbrillance toute la séquence si elle est sélectionnée }
         selected := Selection.active and (Selection.sourceType = 3) and
-                   (Selection.sourceIndex = i) and (Selection.cardIndex = j);
+                   (Selection.sourceIndex = i) and (j >= Selection.cardIndex);
         DrawCard(x, y, Game.tableau[i].cards[j], selected);
       End;
   End;
@@ -426,12 +481,13 @@ Begin
   
   { Instructions }
   SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-  OutTextXY(10, SCREEN_HEIGHT - 95, 'Arrow keys: Move cursor');
-  OutTextXY(10, SCREEN_HEIGHT - 80, 'SPACE: Select/Move card');
-  OutTextXY(10, SCREEN_HEIGHT - 65, 'D: Flip deck');
-  OutTextXY(10, SCREEN_HEIGHT - 50, 'F: Flip tableau card');
-  OutTextXY(10, SCREEN_HEIGHT - 35, 'A: Auto-move to Foundation');
-  OutTextXY(10, SCREEN_HEIGHT - 20, 'R: Restart, ESC: Quit');
+  OutTextXY(10, SCREEN_HEIGHT - 110, 'Arrow keys: Move cursor');
+  OutTextXY(10, SCREEN_HEIGHT - 95, 'SPACE: Select/Move card(s)');
+  OutTextXY(10, SCREEN_HEIGHT - 80, 'D: Flip deck');
+  OutTextXY(10, SCREEN_HEIGHT - 65, 'F: Flip tableau card');
+  OutTextXY(10, SCREEN_HEIGHT - 50, 'A: Auto-move to Foundation');
+  OutTextXY(10, SCREEN_HEIGHT - 35, 'R: Restart, ESC: Quit');
+  OutTextXY(10, SCREEN_HEIGHT - 20, 'Sequences auto-selected');
 End;
 
 Procedure DrawWinMessage;
@@ -523,6 +579,37 @@ Begin
               (not Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp) then
         Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
     End;
+  End;
+  
+  Inc(Game.moves);
+  NeedRedraw := True;
+End;
+
+Procedure MoveSequence(sourceIndex, startCard, destIndex: Integer);
+Var
+  i, sequenceLength: Integer;
+  tempCards: array[1..MAX_TABLEAU_CARDS] of TCard;
+Begin
+  { Calculer la longueur de la séquence }
+  sequenceLength := Game.tableau[sourceIndex].count - startCard + 1;
+  
+  { Copier la séquence dans un tableau temporaire }
+  For i := 1 to sequenceLength do
+    tempCards[i] := Game.tableau[sourceIndex].cards[startCard + i - 1];
+  
+  { Supprimer la séquence de la source }
+  Game.tableau[sourceIndex].count := startCard - 1;
+  
+  { Retourner la carte qui devient visible si elle existe et est face cachée }
+  If (Game.tableau[sourceIndex].count > 0) and
+     (not Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp) then
+    Game.tableau[sourceIndex].cards[Game.tableau[sourceIndex].count].faceUp := True;
+  
+  { Ajouter la séquence à la destination }
+  For i := 1 to sequenceLength do
+  Begin
+    Inc(Game.tableau[destIndex].count);
+    Game.tableau[destIndex].cards[Game.tableau[destIndex].count] := tempCards[i];
   End;
   
   Inc(Game.moves);
@@ -632,8 +719,7 @@ Begin
             Cursor.cardIndex := 1;
         End;
         3: Begin { Tableau }
-          If (Cursor.cardIndex < Game.tableau[Cursor.areaIndex].count) and
-             (Game.tableau[Cursor.areaIndex].cards[Cursor.cardIndex + 1].faceUp) then
+          If (Cursor.cardIndex < Game.tableau[Cursor.areaIndex].count) then
             Inc(Cursor.cardIndex);
         End;
       End;
@@ -756,7 +842,8 @@ Begin
            Selection.active := True;
            Selection.sourceType := 3;
            Selection.sourceIndex := areaIndex;
-           Selection.cardIndex := cardIndex;
+           { Sélectionner le début de la séquence déplaçable }
+           Selection.cardIndex := GetSequenceStart(areaIndex, cardIndex);
            NeedRedraw := True;
          End
          Else If (Game.tableau[areaIndex].count > 0) and
@@ -785,7 +872,17 @@ Begin
         Else If Selection.sourceType = 2 then
           canMove := CanPlaceOnTableau(Game.foundations[Selection.sourceIndex].cards[Selection.cardIndex], areaIndex)
         Else If Selection.sourceType = 3 then
+        Begin
+          { Vérifier si on peut placer la carte sélectionnée }
           canMove := CanPlaceOnTableau(Game.tableau[Selection.sourceIndex].cards[Selection.cardIndex], areaIndex);
+          { Vérifier si on peut déplacer toute la séquence }
+          If canMove and CanMoveSequence(Selection.sourceIndex, Selection.cardIndex) then
+          Begin
+            { Déplacer la séquence complète }
+            MoveSequence(Selection.sourceIndex, Selection.cardIndex, areaIndex);
+            canMove := False; { Pour éviter le MoveCard normal }
+          End;
+        End;
     End;
     
     If canMove then
