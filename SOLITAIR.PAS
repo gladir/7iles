@@ -2,6 +2,7 @@
   @created: 2025
   @website(https://www.gladir.com/7iles)
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
+  @description: Jeu de Solitaire Klondike avec controles clavier complets
 }
 
 Program Solitaire;
@@ -67,15 +68,15 @@ Type
   End;
   
   TSelection = Record
-    sourceType: Integer; { 0=none, 1=waste, 2=foundation, 3=tableau }
+    sourceType: Integer; { 0=aucun, 1=defausse, 2=fondation, 3=tableau }
     sourceIndex: Integer;
     cardIndex: Integer;
     active: Boolean;
   End;
   
   TCursor = Record
-    areaType: Integer;    { 0=deck, 1=waste, 2=foundation, 3=tableau }
-    areaIndex: Integer;   { Index dans la zone (1-4 pour foundation, 1-7 pour tableau) }
+    areaType: Integer;    { 0=paquet, 1=defausse, 2=fondation, 3=tableau }
+    areaIndex: Integer;   { Index dans la zone (1-4 pour fondation, 1-7 pour tableau) }
     cardIndex: Integer;   { Index de la carte dans la colonne }
   End;
 
@@ -375,15 +376,15 @@ End;
 Procedure GetCursorPosition(var x, y: Integer);
 Begin
   Case Cursor.areaType of
-    0: Begin { Deck }
+    0: Begin { Paquet }
       x := DECK_X;
       y := DECK_Y;
     End;
-    1: Begin { Waste }
+    1: Begin { Defausse }
       x := WASTE_X;
       y := WASTE_Y;
     End;
-    2: Begin { Foundation }
+    2: Begin { Fondation }
       x := FOUNDATION_START_X + (Cursor.areaIndex - 1) * CARD_SPACING;
       y := FOUNDATION_Y;
     End;
@@ -473,21 +474,21 @@ Begin
   SetColor(15); { White }
   SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
   Str(Game.score, s);
-  OutTextXY(10, 10, 'Score: ' + s);
+  OutTextXY(10, 10, 'Points: ' + s);
   
   { Moves }
   Str(Game.moves, s);
-  OutTextXY(150, 10, 'Moves: ' + s);
+  OutTextXY(150, 10, 'Coups: ' + s);
   
   { Instructions }
   SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-  OutTextXY(10, SCREEN_HEIGHT - 110, 'Arrow keys: Move cursor');
-  OutTextXY(10, SCREEN_HEIGHT - 95, 'SPACE: Select/Move card(s)');
-  OutTextXY(10, SCREEN_HEIGHT - 80, 'D: Flip deck');
-  OutTextXY(10, SCREEN_HEIGHT - 65, 'F: Flip tableau card');
-  OutTextXY(10, SCREEN_HEIGHT - 50, 'A: Auto-move to Foundation');
-  OutTextXY(10, SCREEN_HEIGHT - 35, 'R: Restart, ESC: Quit');
-  OutTextXY(10, SCREEN_HEIGHT - 20, 'Sequences auto-selected');
+  OutTextXY(10, SCREEN_HEIGHT - 110, 'Fleches: Deplacer curseur');
+  OutTextXY(10, SCREEN_HEIGHT - 95, 'ESPACE: Selectionner/Deplacer');
+  OutTextXY(10, SCREEN_HEIGHT - 80, 'D: Retourner paquet');
+  OutTextXY(10, SCREEN_HEIGHT - 65, 'F: Retourner carte tableau');
+  OutTextXY(10, SCREEN_HEIGHT - 50, 'A: Deplacement auto fondations');
+  OutTextXY(10, SCREEN_HEIGHT - 35, 'R: Recommencer, ESC: Quitter');
+  OutTextXY(10, SCREEN_HEIGHT - 20, 'Sequences auto-selectionnees');
 End;
 
 Procedure DrawWinMessage;
@@ -503,10 +504,10 @@ Begin
   
   SetColor(0); { Black }
   SetTextStyle(0, 0, 2); { DefaultFont, HorizDir, size 2 }
-  OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 - 15, 'YOU WIN!');
+  OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 - 15, 'VICTOIRE !');
   
   SetTextStyle(0, 0, 1); { DefaultFont, HorizDir, size 1 }
-  OutTextXY(SCREEN_WIDTH div 2 - 60, SCREEN_HEIGHT div 2 + 5, 'Press R to restart');
+  OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2 + 5, 'Appuyez R pour rejouer');
 End;
 
 Procedure FlipDeckCard;
