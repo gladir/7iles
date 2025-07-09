@@ -31,6 +31,10 @@ Aperçu de Cannonball (sous Free Pascal)
 
 ![image](https://github.com/gladir/7iles/assets/11842176/d996bce9-4aff-4a07-8ae7-3a9ef3941f16)
 
+Aperçu de Domino (sous Free Pascal)
+
+![image](https://github.com/user-attachments/assets/950114ea-2537-4301-92c6-815982c96665)
+
 Aperçu de Peg Leap (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181311079-9a050acd-a403-4812-ad54-30a7b416db63.png)
@@ -202,6 +206,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>CYATHZEE.PAS</b></td>
         <td><b>Coco-Yathzee</b></td>
         <td>Ce fichier de jeu permet de lancer le clone du jeu de dés Coco-Yathzee.</td>
+    </tr>
+    <tr>
+        <td><b>DOMINO.PAS</b></td>
+        <td><b>Domino</b></td>
+        <td>Ce fichier de jeu contient le jeu de Domino.</td>
     <tr>
         <td><b>DRMARIO.PAS</b></td>
         <td><b>Dr. Mario</b></td>
