@@ -2,7 +2,7 @@
   @created: 2025
   @website(https://www.gladir.com/7iles)
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
-  @description: Jeu MasterMind - Devinez la combinaison secr√®te de couleurs
+  @description: Jeu MasterMind - Devinez la combinaison secräte de couleurs
 }
 
 Program MasterMind;
@@ -213,14 +213,13 @@ Procedure DrawPeg(x,y,colorIndex:Integer);Begin
  End;
 End;
 
-Procedure DrawFeedbackPeg(x, y, feedbackType: Integer);
-Begin
+Procedure DrawFeedbackPeg(x,y,feedbackType:Integer);Begin
  Case feedbackType of
   2: Begin { Noir - bonne position }
    SetColor(0);
    SetFillStyle(1, 0);
   End;
-  1: Begin { Blanc - bonne couleur }
+  1:Begin { Blanc - bonne couleur }
    SetColor(15);
    SetFillStyle(1, 15);
   End;
@@ -229,34 +228,29 @@ Begin
    SetFillStyle(1, 8);
   End;
  End;
-
  FillEllipse(x, y, FEEDBACK_SIZE div 2, FEEDBACK_SIZE div 2);
  SetColor(7);
- Circle(x, y, FEEDBACK_SIZE div 2);
+ Circle(x,y,FEEDBACK_SIZE div 2);
 End;
 
-Procedure DrawAttempt(attemptNum: Integer);
+Procedure DrawAttempt(attemptNum:Integer);
 Var
  i: Integer;
  x, y: Integer;
 Begin
  y := 60 + attemptNum * 40;
-
- { Dessiner le num√©ro de tentative }
+  { Dessiner le numÇro de tentative }
  SetColor(15);
  SetTextStyle(0, 0, 1);
- OutTextXY(10, y - 5, Chr(Ord('1') + attemptNum));
+ OutTextXY(10, y-5, Chr(Ord('1')+attemptNum));
 
  { Dessiner les pegs de la tentative }
- For i := 0 to CODE_LENGTH-1 do
- Begin
+ For i:=0 to CODE_LENGTH-1 do Begin
   x := 50 + i * 40;
   DrawPeg(x, y, Game.attempts[attemptNum][i]);
  End;
-
  { Dessiner le feedback }
- For i := 0 to CODE_LENGTH-1 do
- Begin
+ For i := 0 to CODE_LENGTH-1 do Begin
   x := 250 + (i mod 2) * 20;
   y := 55 + attemptNum * 40 + (i div 2) * 20;
   DrawFeedbackPeg(x, y, Game.feedback[attemptNum][i]);
@@ -268,11 +262,9 @@ Var
  i: Integer;
  x, y: Integer;
 Begin
- If Game.gameState = gsPlaying Then
- Begin
+ If Game.gameState = gsPlaying Then Begin
   y := 60 + Game.currentAttempt * 40;
-
-  { Dessiner le num√©ro de tentative }
+  { Dessiner le numÇro de tentative }
   SetColor(14);
   SetTextStyle(0, 0, 1);
   OutTextXY(10, y - 5, Chr(Ord('1') + Game.currentAttempt));
@@ -308,7 +300,7 @@ Begin
   y := 80 + (i div 3) * 50;
   DrawPeg(x, y, i);
 
-  { Afficher le num√©ro }
+  { Afficher le numÇro }
   SetColor(15);
   OutTextXY(x - 5, y + 25, Chr(Ord('1') + i));
  End;
@@ -347,7 +339,7 @@ Begin
  OutTextXY(350, 200, 'Instructions:');
  OutTextXY(350, 220, '1-6: Choisir couleur');
  OutTextXY(350, 240, 'Retour: Effacer');
- OutTextXY(350, 260, 'Entr√©e: Valider');
+ OutTextXY(350, 260, 'EntrÇe: Valider');
  OutTextXY(350, 280, 'ESC: Quitter');
 
  SetColor(12);
@@ -418,12 +410,12 @@ Begin
  OutTextXY(SCREEN_WIDTH div 2 - 100, 100, 'MASTERMIND');
  SetColor(15);
  SetTextStyle(0, 0, 1);
- OutTextXY(50, 200, 'Devinez la combinaison secr√®te de 4 couleurs.');
+ OutTextXY(50, 200, 'Devinez la combinaison secräte de 4 couleurs.');
  OutTextXY(50, 220, 'Vous avez 10 tentatives.');
  OutTextXY(50, 240, 'Utilisez les chiffres 1-6 pour choisir les couleurs.');
- OutTextXY(50, 260, 'Un peg noir indique une couleur √† la bonne position.');
- OutTextXY(50, 280, 'Un peg blanc indique une bonne couleur mal plac√©e.');
- OutTextXY(50, 320, 'Appuyez sur ENTR√âE pour commencer...');
+ OutTextXY(50, 260, 'Un peg noir indique une couleur Ö la bonne position.');
+ OutTextXY(50, 280, 'Un peg blanc indique une bonne couleur mal placÇe.');
+ OutTextXY(50, 320, 'Appuyez sur ENTRêE pour commencer...');
  OutTextXY(50, 340, 'ESC pour quitter');
  Repeat
   If KeyPressed Then Begin
