@@ -107,6 +107,10 @@ Aperçu du jeu Mahjong en Free Pascal :
 
 ![image](https://github.com/user-attachments/assets/0a83a343-42f6-4c3b-bb5b-0f1fec383707)
 
+Aperçu du jeu MasterMind en Free Pascal :
+
+![image](https://github.com/user-attachments/assets/fc975ccb-331c-40fe-bec6-21f8744eb25e)
+
 Aperçu du jeu Pango en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/bcc187ef-3a7b-4747-bb7c-a3d426ee66fb)
@@ -265,6 +269,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>Mahjong</b></td>
         <td>Ce fichier contient le jeu Mahjong.</td>
     </tr>
+    <tr>
+        <td><b>MASTERMD.PAS</b></td>
+        <td><b>MasterMind</b></td>
+        <td>Ce fichier contient un jeu de MasterMind.</td>
      <tr>
         <td><b>MATCHING.PAS</b></td>
         <td><b>Matching Pairs Memory Game</b></td>
