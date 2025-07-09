@@ -22,7 +22,7 @@ Const
  CELL_SIZE = 8;
  PLAYER_WIDTH = 5;
  PLAYER_HEIGHT = 3;
- 
+
  MAX_LEVELS = 5;
  MAX_VELOCITY = 8;
  GRAVITY_FREQ = 2;
@@ -32,31 +32,31 @@ Type
  TDirection = (dirNone, dirUp, dirDown, dirLeft, dirRight);
  TGameState = (gsPlaying, gsDied, gsWon, gsComplete);
  TPlayerState = (psNeutral, psSliding, psSquash);
- 
- TLevel = Array[0..LEVEL_HEIGHT-1, 0..LEVEL_WIDTH-1] of Char;
- 
- TPlayer = Record
-  x, y: Integer;
-  velX, velY: Integer;
-  state: TPlayerState;
-  slideDir: TDirection;
-  squashDir: TDirection;
+
+ TLevel=Array[0..LEVEL_HEIGHT-1,0..LEVEL_WIDTH-1] of Char;
+
+ TPlayer=Record
+  x,y:Integer;
+  velX,velY:Integer;
+  state:TPlayerState;
+  slideDir:TDirection;
+  squashDir:TDirection;
  End;
- 
- TGame = Record
-  level: Integer;
-  currentLevel: TLevel;
-  player: TPlayer;
-  gravity: TDirection;
-  gameState: TGameState;
-  gravityCounter: Integer;
-  slideCounter: Integer;
-  needRedraw: Boolean;
+
+ TGame=Record
+  level:Integer;
+  currentLevel:TLevel;
+  player:TPlayer;
+  gravity:TDirection;
+  gameState:TGameState;
+  gravityCounter:Integer;
+  slideCounter:Integer;
+  needRedraw:Boolean;
  End;
 
 Var
- Game: TGame;
- Levels: Array[0..MAX_LEVELS-1] of TLevel;
+ Game:TGame;
+ Levels:Array[0..MAX_LEVELS-1] of TLevel;
 
 Procedure InitializeLevels;
 Var
@@ -64,18 +64,18 @@ Var
 Begin
  { Niveau 1 - Simple introduction }
  FillChar(Levels[0], SizeOf(TLevel), ' ');
- 
+
  { Bordures }
  FillChar(Levels[0][0], LEVEL_WIDTH, #219);
  FillChar(Levels[0][LEVEL_HEIGHT-1], LEVEL_WIDTH, #219);
- 
+
  { Bordures verticales }
  For i := 0 to LEVEL_HEIGHT-1 do
  Begin
   Levels[0][i][0] := #219;
   Levels[0][i][LEVEL_WIDTH-1] := #219;
  End;
- 
+
  { Position de départ - Niveau 1: En bas à gauche }
  Levels[0][18][6] := '@';
  Levels[0][18][7] := '@';
@@ -92,33 +92,33 @@ Begin
  Levels[0][16][8] := '@';
  Levels[0][16][9] := '@';
  Levels[0][16][10] := '@';
- 
+
  { Objectif }
  Levels[0][5][55] := #7; { • }
- 
+
  { Niveau 2 - Avec obstacles }
  FillChar(Levels[1], SizeOf(TLevel), ' ');
- 
+
  { Bordures }
  FillChar(Levels[1][0], LEVEL_WIDTH, #219);
  FillChar(Levels[1][LEVEL_HEIGHT-1], LEVEL_WIDTH, #219);
- 
+
  For i := 0 to LEVEL_HEIGHT-1 do
  Begin
   Levels[1][i][0] := #219;
   Levels[1][i][LEVEL_WIDTH-1] := #219;
  End;
- 
+
  { Plateforme centrale }
  For i := 20 to 40 do
   Levels[1][10][i] := #219;
- 
+
  { Obstacles supplémentaires }
  For i := 5 to 8 do
   Levels[1][i][15] := #219;
  For i := 14 to 17 do
   Levels[1][i][45] := #219;
- 
+
  { Position de départ - Niveau 2: Au milieu à gauche }
  Levels[1][12][6] := '@';
  Levels[1][12][7] := '@';
@@ -135,35 +135,35 @@ Begin
  Levels[1][10][8] := '@';
  Levels[1][10][9] := '@';
  Levels[1][10][10] := '@';
- 
+
  { Objectif }
  Levels[1][3][55] := #7;
- 
+
  { Niveau 3 - Avec pièges }
  FillChar(Levels[2], SizeOf(TLevel), ' ');
- 
+
  { Bordures }
  FillChar(Levels[2][0], LEVEL_WIDTH, #219);
  FillChar(Levels[2][LEVEL_HEIGHT-1], LEVEL_WIDTH, #219);
- 
+
  For i := 0 to LEVEL_HEIGHT-1 do
  Begin
   Levels[2][i][0] := #219;
   Levels[2][i][LEVEL_WIDTH-1] := #219;
  End;
- 
+
  { Pièges }
  For i := 30 to 35 do
   Levels[2][15][i] := 'X';
  For i := 10 to 15 do
   Levels[2][8][i] := 'X';
- 
+
  { Obstacles pour rendre plus difficile }
  For i := 20 to 30 do
   Levels[2][12][i] := #219;
  For i := 40 to 50 do
   Levels[2][10][i] := #219;
- 
+
  { Position de départ - Niveau 3: En haut à droite }
  Levels[2][5][58] := '@';
  Levels[2][5][59] := '@';
@@ -180,41 +180,41 @@ Begin
  Levels[2][3][60] := '@';
  Levels[2][3][61] := '@';
  Levels[2][3][62] := '@';
- 
+
  { Objectif }
  Levels[2][18][5] := #7;
- 
+
  { Niveau 4 - Avec murs commutables }
  FillChar(Levels[3], SizeOf(TLevel), ' ');
- 
+
  { Bordures }
  FillChar(Levels[3][0], LEVEL_WIDTH, #219);
  FillChar(Levels[3][LEVEL_HEIGHT-1], LEVEL_WIDTH, #219);
- 
+
  For i := 0 to LEVEL_HEIGHT-1 do
  Begin
   Levels[3][i][0] := #219;
   Levels[3][i][LEVEL_WIDTH-1] := #219;
  End;
- 
+
  { Murs commutables }
  For i := 8 to 12 do
   Levels[3][i][30] := '#';
  For i := 14 to 18 do
   Levels[3][i][40] := '#';
- 
+
  { Espaces commutables }
  For i := 25 to 35 do
   Levels[3][10][i] := '~';
  For i := 15 to 25 do
   Levels[3][6][i] := '~';
- 
+
  { Quelques pièges }
  Levels[3][15][20] := 'X';
  Levels[3][15][21] := 'X';
  Levels[3][15][50] := 'X';
  Levels[3][15][51] := 'X';
- 
+
  { Position de départ - Niveau 4: Au centre }
  Levels[3][12][32] := '@';
  Levels[3][12][33] := '@';
@@ -231,23 +231,23 @@ Begin
  Levels[3][10][34] := '@';
  Levels[3][10][35] := '@';
  Levels[3][10][36] := '@';
- 
+
  { Objectif }
  Levels[3][3][45] := #7;
- 
+
  { Niveau 5 - Complexe }
  FillChar(Levels[4], SizeOf(TLevel), ' ');
- 
+
  { Bordures }
  FillChar(Levels[4][0], LEVEL_WIDTH, #219);
  FillChar(Levels[4][LEVEL_HEIGHT-1], LEVEL_WIDTH, #219);
- 
+
  For i := 0 to LEVEL_HEIGHT-1 do
  Begin
   Levels[4][i][0] := #219;
   Levels[4][i][LEVEL_WIDTH-1] := #219;
  End;
- 
+
  { Labyrinthe }
  For i := 15 to 25 do
   Levels[4][8][i] := #219;
@@ -257,19 +257,19 @@ Begin
   Levels[4][i][25] := #219;
  For i := 14 to 18 do
   Levels[4][i][35] := #219;
- 
+
  { Murs commutables dans le labyrinthe }
  For i := 50 to 55 do
   Levels[4][10][i] := '#';
  For i := 12 to 16 do
   Levels[4][i][50] := '~';
- 
+
  { Pièges }
  For i := 28 to 32 do
   Levels[4][15][i] := 'X';
  For i := 40 to 42 do
   Levels[4][6][i] := 'X';
- 
+
  { Position de départ - Niveau 5: En bas au centre }
  Levels[4][19][32] := '@';
  Levels[4][19][33] := '@';
@@ -286,15 +286,14 @@ Begin
  Levels[4][17][34] := '@';
  Levels[4][17][35] := '@';
  Levels[4][17][36] := '@';
- 
+
  { Objectif }
  Levels[4][5][50] := #7;
 End;
 
-Function GetStartingPosition: TPlayer;
+Procedure GetStartingPosition(Var p: TPlayer);
 Var
  i, j: Integer;
- p: TPlayer;
 Begin
  For i := 0 to LEVEL_HEIGHT-1 do
   For j := 0 to LEVEL_WIDTH-1 do
@@ -307,7 +306,6 @@ Begin
     p.state := psNeutral;
     p.slideDir := dirNone;
     p.squashDir := dirNone;
-    GetStartingPosition := p;
     Exit;
    End;
 End;
@@ -321,7 +319,7 @@ Begin
   IsWall := True;
   Exit;
  End;
- 
+
  c := Game.currentLevel[y][x];
  IsWall := (c = #219) or (c = '#');
 End;
@@ -363,13 +361,32 @@ Var
  i, j: Integer;
  c: Char;
 Begin
+ { Vérifier les pièges dans toute la zone du joueur }
  For i := -1 to 1 do
   For j := -2 to 2 do
   Begin
-   c := Game.currentLevel[Game.player.y + i][Game.player.x + j];
-   Case c of
-    'X': Game.gameState := gsDied;
-    #7: Game.gameState := gsWon;
+   { Vérifier que nous sommes dans les limites du niveau }
+   If (Game.player.y + i >= 0) and (Game.player.y + i < LEVEL_HEIGHT) and
+      (Game.player.x + j >= 0) and (Game.player.x + j < LEVEL_WIDTH) Then
+   Begin
+    c := Game.currentLevel[Game.player.y + i][Game.player.x + j];
+    Case c of
+     'X': Game.gameState := gsDied;
+    End;
+   End;
+  End;
+
+ { Vérifier l'objectif dans toute la zone du joueur }
+ For i := -1 to 1 do
+  For j := -2 to 2 do
+  Begin
+   { Vérifier que nous sommes dans les limites du niveau }
+   If (Game.player.y + i >= 0) and (Game.player.y + i < LEVEL_HEIGHT) and
+      (Game.player.x + j >= 0) and (Game.player.x + j < LEVEL_WIDTH) Then
+   Begin
+    c := Game.currentLevel[Game.player.y + i][Game.player.x + j];
+    If c = #7 Then
+     Game.gameState := gsWon;
    End;
   End;
 End;
@@ -394,7 +411,7 @@ Var
 Begin
  oldState := Game.player.state;
  Game.player.state := psNeutral;
- 
+
  { Appliquer la gravité }
  Inc(Game.gravityCounter);
  If Game.gravityCounter >= GRAVITY_FREQ Then
@@ -407,25 +424,28 @@ Begin
   End;
   Game.gravityCounter := 0;
  End;
- 
+
  { Limiter la vélocité }
  If Game.player.velX > MAX_VELOCITY Then Game.player.velX := MAX_VELOCITY;
  If Game.player.velX < -MAX_VELOCITY Then Game.player.velX := -MAX_VELOCITY;
  If Game.player.velY > MAX_VELOCITY Then Game.player.velY := MAX_VELOCITY;
  If Game.player.velY < -MAX_VELOCITY Then Game.player.velY := -MAX_VELOCITY;
- 
+
  { Calculer le mouvement }
  If Game.player.velY < 0 Then u := -Game.player.velY Else u := 0;
  If Game.player.velY > 0 Then d := Game.player.velY Else d := 0;
  If Game.player.velX < 0 Then l := -Game.player.velX Else l := 0;
  If Game.player.velX > 0 Then r := Game.player.velX Else r := 0;
- 
+
  { Précalculer les conditions de glissement }
- canSlideUp := (Game.player.velY < 0) and (((Game.gravity = dirLeft) and WallLeft) or ((Game.gravity = dirRight) and WallRight));
- canSlideDown := (Game.player.velY > 0) and (((Game.gravity = dirLeft) and WallLeft) or ((Game.gravity = dirRight) and WallRight));
- canSlideLeft := (Game.player.velX < 0) and (((Game.gravity = dirUp) and WallUp) or ((Game.gravity = dirDown) and WallDown));
- canSlideRight := (Game.player.velX > 0) and (((Game.gravity = dirUp) and WallUp) or ((Game.gravity = dirDown) and WallDown));
- 
+ canSlideUp := (Game.player.velY < 0) and (((Game.gravity = dirLeft) and WallLeft) or
+               ((Game.gravity = dirRight) and WallRight));
+ canSlideDown := (Game.player.velY > 0) and (((Game.gravity = dirLeft) and WallLeft) or
+                 ((Game.gravity = dirRight) and WallRight));
+ canSlideLeft := (Game.player.velX < 0) and (((Game.gravity = dirUp) and WallUp) or
+                 ((Game.gravity = dirDown) and WallDown));
+ canSlideRight := (Game.player.velX > 0) and (((Game.gravity = dirUp) and WallUp) or
+                  ((Game.gravity = dirDown) and WallDown));
  { Gérer le glissement }
  If canSlideUp Then
  Begin
@@ -473,7 +493,7 @@ Begin
  End
  Else
   Game.slideCounter := 0;
- 
+
  { Appliquer le mouvement }
  While ((u > 0) or (d > 0) or (l > 0) or (r > 0)) and (Game.gameState = gsPlaying) do
  Begin
@@ -495,7 +515,7 @@ Begin
     Dec(u);
    End;
   End;
-  
+
   If d > 0 Then
   Begin
    If WallDown Then
@@ -514,7 +534,7 @@ Begin
     Dec(d);
    End;
   End;
-  
+
   If l > 0 Then
   Begin
    If WallLeft Then
@@ -533,7 +553,7 @@ Begin
     Dec(l);
    End;
   End;
-  
+
   If r > 0 Then
   Begin
    If WallRight Then
@@ -552,7 +572,7 @@ Begin
     Dec(r);
    End;
   End;
-  
+
   CheckCollisions;
  End;
 End;
@@ -623,7 +643,7 @@ Var
 Begin
  px := x * CELL_SIZE + 10;
  py := y * CELL_SIZE + 10;
- 
+
  Case c of
   #219: Begin { Mur }
    SetColor(7);
@@ -665,17 +685,17 @@ Var
 Begin
  px := (Game.player.x - 2) * CELL_SIZE + 10;
  py := (Game.player.y - 1) * CELL_SIZE + 10;
- 
+
  Case Game.player.state of
   psSliding: color := 11;
   psSquash: color := 12;
   Else color := 10;
  End;
- 
+
  SetColor(color);
  SetFillStyle(1, color);
  Bar(px, py, px + PLAYER_WIDTH * CELL_SIZE - 1, py + PLAYER_HEIGHT * CELL_SIZE - 1);
- 
+
  SetColor(0);
  Rectangle(px, py, px + PLAYER_WIDTH * CELL_SIZE - 1, py + PLAYER_HEIGHT * CELL_SIZE - 1);
 End;
@@ -690,7 +710,7 @@ Begin
   Begin
    c := Game.currentLevel[i][j];
    If c = '@' Then c := ' ';
-   
+
    { Ne pas dessiner par-dessus le joueur }
    If not ((Game.player.x - 2 <= j) and (Game.player.x + 2 >= j) and
            (Game.player.y - 1 <= i) and (Game.player.y + 1 >= i)) Then
@@ -705,10 +725,10 @@ Var
 Begin
  SetColor(15);
  SetTextStyle(0, 0, 1);
- 
+
  Str(Game.level + 1, s);
  OutTextXY(10, LEVEL_HEIGHT * CELL_SIZE + 20, 'Niveau: ' + s);
- 
+
  Case Game.gravity of
   dirNone: gravityChar := 'O';
   dirUp: gravityChar := '^';
@@ -716,9 +736,9 @@ Begin
   dirLeft: gravityChar := '<';
   dirRight: gravityChar := '>';
  End;
- 
+
  OutTextXY(150, LEVEL_HEIGHT * CELL_SIZE + 20, 'Gravité: ' + gravityChar);
- 
+
  OutTextXY(10, LEVEL_HEIGHT * CELL_SIZE + 35, 'Flèches/WASD: Changer gravité');
  OutTextXY(10, LEVEL_HEIGHT * CELL_SIZE + 50, 'Espace: Basculer murs');
  OutTextXY(10, LEVEL_HEIGHT * CELL_SIZE + 65, 'ESC: Quitter');
@@ -732,11 +752,11 @@ Begin
   SetColor(0);
   SetFillStyle(1, 0);
   Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  
+
   DrawLevel;
   DrawPlayer;
   DrawUI;
-  
+
   Game.needRedraw := False;
  End;
 End;
@@ -746,21 +766,21 @@ Begin
  SetColor(0);
  SetFillStyle(1, 0);
  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
- 
+
  SetColor(15);
  SetTextStyle(0, 0, 2);
  OutTextXY(SCREEN_WIDTH div 2 - 80, 50, 'GRAVITY');
- 
+
  SetTextStyle(0, 0, 1);
  OutTextXY(50, 120, 'Atteignez l''objectif (●) en contrôlant la gravité.');
  OutTextXY(50, 140, 'Utilisez les flèches ou WASD pour changer la direction.');
  OutTextXY(50, 160, 'Évitez les pièges (X) qui vous tueront.');
  OutTextXY(50, 180, 'Appuyez sur ESPACE pour basculer les murs (#) et espaces (~).');
  OutTextXY(50, 200, 'Le joueur peut glisser le long des murs selon la gravité.');
- 
+
  OutTextXY(50, 250, 'Appuyez sur ENTRÉE pour commencer...');
  OutTextXY(50, 270, 'ESC pour quitter à tout moment.');
- 
+
  Repeat
   If KeyPressed Then
   Begin
@@ -777,7 +797,7 @@ Procedure InitializeGame;
 Begin
  Game.level := 0;
  Game.currentLevel := Levels[Game.level];
- Game.player := GetStartingPosition;
+ GetStartingPosition(Game.player);
  Game.gravity := dirNone;
  Game.gameState := gsPlaying;
  Game.gravityCounter := 0;
@@ -793,7 +813,7 @@ Begin
  Else
  Begin
   Game.currentLevel := Levels[Game.level];
-  Game.player := GetStartingPosition;
+  GetStartingPosition(Game.player);
   Game.gravity := dirNone;
   Game.gameState := gsPlaying;
   Game.gravityCounter := 0;
@@ -805,7 +825,7 @@ End;
 Procedure RestartLevel;
 Begin
  Game.currentLevel := Levels[Game.level];
- Game.player := GetStartingPosition;
+ GetStartingPosition(Game.player);
  Game.gravity := dirNone;
  Game.gameState := gsPlaying;
  Game.gravityCounter := 0;
@@ -825,14 +845,14 @@ Begin
     UpdatePlayer;
     Render;
    End;
-   
+
    gsDied: Begin
     SetColor(12);
     SetTextStyle(0, 0, 2);
     OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2, 'VOUS ÊTES MORT!');
     SetTextStyle(0, 0, 1);
     OutTextXY(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 + 30, 'Appuyez sur ENTRÉE pour recommencer');
-    
+
     Repeat
      If KeyPressed Then
      Begin
@@ -851,14 +871,14 @@ Begin
      Delay(50);
     Until False;
    End;
-   
+
    gsWon: Begin
     SetColor(10);
     SetTextStyle(0, 0, 2);
     OutTextXY(SCREEN_WIDTH div 2 - 80, SCREEN_HEIGHT div 2, 'NIVEAU TERMINÉ!');
     SetTextStyle(0, 0, 1);
     OutTextXY(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 + 30, 'Appuyez sur ENTRÉE pour continuer');
-    
+
     Repeat
      If KeyPressed Then
      Begin
@@ -878,24 +898,23 @@ Begin
     Until False;
    End;
   End;
-  
+
   Delay(50);
  End;
 End;
 
 Procedure InitializeGraphics;
 Var
- Driver, Mode: Integer;
- ErrCode: Integer;
+ Driver,Mode:Integer;
+ ErrCode:Integer;
 Begin
  {$IFDEF FPC}
- Driver := VGA;
- Mode := VGAHi;
+  Driver := VGA;
+  Mode := VGAHi;
  {$ELSE}
- Driver := Detect;
- Mode := VGAHi;
+  Driver := Detect;
+  Mode := VGAHi;
  {$ENDIF}
- 
  InitGraph(Driver, Mode, '');
  ErrCode := GraphResult;
  If ErrCode <> grOk Then
@@ -903,7 +922,6 @@ Begin
   WriteLn('Erreur graphique : ', GraphErrorMsg(ErrCode));
   Halt;
  End;
- 
  SetLineStyle(0, 0, 1);
 End;
 
@@ -912,7 +930,7 @@ BEGIN
  InitializeLevels;
  ShowInstructions;
  InitializeGame;
- 
+
  { Affichage final si tous les niveaux sont terminés }
  If Game.level >= MAX_LEVELS Then
  Begin
@@ -922,11 +940,11 @@ BEGIN
   SetTextStyle(0, 0, 1);
   OutTextXY(SCREEN_WIDTH div 2 - 150, SCREEN_HEIGHT div 2 + 30, 'Vous avez terminé tous les niveaux!');
   OutTextXY(SCREEN_WIDTH div 2 - 100, SCREEN_HEIGHT div 2 + 50, 'Appuyez sur une touche pour quitter');
-  
+
   ReadKey;
  End
  Else
   GameLoop;
- 
+
  CloseGraph;
 END.
