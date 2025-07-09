@@ -91,6 +91,10 @@ Aperçu du jeu Frogger en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/c40f9183-092d-457b-978e-da7c2c10aab7)
 
+Aperçu du jeu GRAVITY en Free Pascal :
+
+![image](https://github.com/user-attachments/assets/14fcfda3-8ffa-48da-b059-595d1ccbef97)
+
 Aperçu du jeu Bouncing Babies en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
@@ -225,6 +229,10 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>GOMOKU.PAS<b/></td>
         <td><b>GOMOKO</b></td>
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
+    </tr>
+    <tr>
+        <td><b>GRAVITY.PAS</b></td>
+        <td>Ce fichier contient le jeu GRAVITY.</td>
     </tr>
     <tr>
         <td><b>HANGMAN.PAS</b></td>
