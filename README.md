@@ -232,6 +232,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     </tr>
     <tr>
         <td><b>GRAVITY.PAS</b></td>
+        <td><b>GRAVITY</b></td>
         <td>Ce fichier contient le jeu GRAVITY.</td>
     </tr>
     <tr>
