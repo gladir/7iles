@@ -113,6 +113,12 @@ Begin
  For i := 20 to 40 do
   Levels[1][10][i] := #219;
  
+ { Obstacles supplémentaires }
+ For i := 5 to 8 do
+  Levels[1][i][15] := #219;
+ For i := 14 to 17 do
+  Levels[1][i][45] := #219;
+ 
  { Position de départ - Niveau 2: Au milieu à gauche }
  Levels[1][12][6] := '@';
  Levels[1][12][7] := '@';
@@ -149,6 +155,14 @@ Begin
  { Pièges }
  For i := 30 to 35 do
   Levels[2][15][i] := 'X';
+ For i := 10 to 15 do
+  Levels[2][8][i] := 'X';
+ 
+ { Obstacles pour rendre plus difficile }
+ For i := 20 to 30 do
+  Levels[2][12][i] := #219;
+ For i := 40 to 50 do
+  Levels[2][10][i] := #219;
  
  { Position de départ - Niveau 3: En haut à droite }
  Levels[2][5][58] := '@';
@@ -186,10 +200,20 @@ Begin
  { Murs commutables }
  For i := 8 to 12 do
   Levels[3][i][30] := '#';
+ For i := 14 to 18 do
+  Levels[3][i][40] := '#';
  
  { Espaces commutables }
  For i := 25 to 35 do
   Levels[3][10][i] := '~';
+ For i := 15 to 25 do
+  Levels[3][6][i] := '~';
+ 
+ { Quelques pièges }
+ Levels[3][15][20] := 'X';
+ Levels[3][15][21] := 'X';
+ Levels[3][15][50] := 'X';
+ Levels[3][15][51] := 'X';
  
  { Position de départ - Niveau 4: Au centre }
  Levels[3][12][32] := '@';
@@ -231,30 +255,40 @@ Begin
   Levels[4][8][i] := #219;
  For i := 8 to 12 do
   Levels[4][i][25] := #219;
+ For i := 14 to 18 do
+  Levels[4][i][35] := #219;
+ 
+ { Murs commutables dans le labyrinthe }
+ For i := 50 to 55 do
+  Levels[4][10][i] := '#';
+ For i := 12 to 16 do
+  Levels[4][i][50] := '~';
  
  { Pièges }
  For i := 28 to 32 do
   Levels[4][15][i] := 'X';
+ For i := 40 to 42 do
+  Levels[4][6][i] := 'X';
  
- { Position de départ }
- Levels[4][18][6] := '@';
- Levels[4][18][7] := '@';
- Levels[4][18][8] := '@';
- Levels[4][18][9] := '@';
- Levels[4][18][10] := '@';
- Levels[4][17][6] := '@';
- Levels[4][17][7] := '@';
- Levels[4][17][8] := '@';
- Levels[4][17][9] := '@';
- Levels[4][17][10] := '@';
- Levels[4][16][6] := '@';
- Levels[4][16][7] := '@';
- Levels[4][16][8] := '@';
- Levels[4][16][9] := '@';
- Levels[4][16][10] := '@';
+ { Position de départ - Niveau 5: En bas au centre }
+ Levels[4][19][32] := '@';
+ Levels[4][19][33] := '@';
+ Levels[4][19][34] := '@';
+ Levels[4][19][35] := '@';
+ Levels[4][19][36] := '@';
+ Levels[4][18][32] := '@';
+ Levels[4][18][33] := '@';
+ Levels[4][18][34] := '@';
+ Levels[4][18][35] := '@';
+ Levels[4][18][36] := '@';
+ Levels[4][17][32] := '@';
+ Levels[4][17][33] := '@';
+ Levels[4][17][34] := '@';
+ Levels[4][17][35] := '@';
+ Levels[4][17][36] := '@';
  
  { Objectif }
- Levels[4][5][55] := #7;
+ Levels[4][5][50] := #7;
 End;
 
 Function GetStartingPosition: TPlayer;
