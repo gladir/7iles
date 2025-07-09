@@ -19,6 +19,10 @@ Aperçu de Backgammon
 
 ![image](https://github.com/user-attachments/assets/43299479-b83b-465c-ad4a-10d7a91d650b)
 
+Aperçu du jeu BlackJack (sous Free Pascal)
+
+![image](https://github.com/user-attachments/assets/3c8019de-ed0f-4f7d-9076-2cdf09e7e2e6)
+
 Apercu de Breakout (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181775528-e7932f33-f995-4eb9-b465-6a38cbc9411f.png)
@@ -171,7 +175,13 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>BERZERK.PAS</b></td>
         <td><b>Berzerk</b></td>
         <td>Ce fichier contient un jeu du style de Berzerk.</td>
+    </tr>
     <tr>
+        <td><b>BLACKJAK.PAS</b></td>
+        <td><b>BlackJack</b></td>
+        <td>Ce fichier contient un jeu de carte BlackJack - Atteindre 21 sans le dépasser</td>
+    </tr>
+    <tr>        
         <td><b>BLOX.PAS</b></td>
         <td><b>Blox</b></td>
         <td>Ce fichier contient le clone du jeu Blox proposé sur les CoCo 3.</td>
