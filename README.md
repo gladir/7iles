@@ -43,6 +43,10 @@ Aperçu d'un jeu de Patience (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/181925570-d5e4692e-dada-4d95-acc1-68f542c69291.png)
 
+Aperçu d'un jeu de Solitaire (sous Free Pascal)
+
+![image](https://github.com/user-attachments/assets/22e904a8-9b0c-4254-9363-015d319e3c8b)
+
 Aperçu du jeu Soko-Ban (sous Turbo Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/182032881-cd2cd40f-3105-4afe-bcbf-28d318f85cdf.png)
@@ -307,6 +311,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>SOKOBAN.PAS</b></td>
         <td><b>Soko-Ban</b></td>
         <td>Ce fichier de jeu contient le jeu Soko-Ban.</td>
+    </tr>
+    <tr>
+        <td><b>SOLITAIR.PAS</b></td>
+        <td><b>Solitaire</b></td>
+        <td>Ce fichier de jeu contient le jeu de cartes Solitaire Klondike.</td>
     </tr>
     <tr>
         <td><b>INVADERS.PAS</b></td>
