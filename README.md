@@ -115,6 +115,10 @@ Aperçu du jeu MasterMind en Free Pascal :
 
 ![image](https://github.com/user-attachments/assets/fc975ccb-331c-40fe-bec6-21f8744eb25e)
 
+Aperçu du jeu Othello en Turbo Pascal :
+
+<img width="637" height="476" alt="image" src="https://github.com/user-attachments/assets/2748ecc4-5ecc-4a9d-9feb-98ed52922d83" />
+
 Aperçu du jeu Pango en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/bcc187ef-3a7b-4747-bb7c-a3d426ee66fb)
