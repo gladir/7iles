@@ -27,14 +27,14 @@ Type
  TPlayer = (pEmpty, pBlack, pWhite);
  TGameState = (gsPlaying, gsBlackWins, gsWhiteWins, gsDraw, gsQuit);
  TDifficulty = (diffEasy, diffMedium, diffHard);
- 
+
  TBoard = Array[0..BOARD_SIZE-1, 0..BOARD_SIZE-1] of TPlayer;
- 
+
  TMove = Record
   row, col: Integer;
   score: Integer;
  End;
- 
+
  TGame = Record
   board: TBoard;
   currentPlayer: TPlayer;
@@ -102,13 +102,13 @@ End;
 Procedure SetupInitialPosition;
 Begin
  ClearBoard;
- 
+
  { Position initiale d'Othello }
  Game.board[3, 3] := pWhite;
  Game.board[3, 4] := pBlack;
  Game.board[4, 3] := pBlack;
  Game.board[4, 4] := pWhite;
- 
+
  Game.moveCount := 0;
  Game.lastMove.row := -1;
  Game.lastMove.col := -1;
@@ -116,7 +116,7 @@ End;
 
 Function IsValidPosition(row, col: Integer): Boolean;
 Begin
- IsValidPosition := (row >= 0) and (row < BOARD_SIZE) and 
+ IsValidPosition := (row >= 0) and (row < BOARD_SIZE) and
                    (col >= 0) and (col < BOARD_SIZE);
 End;
 
@@ -127,11 +127,11 @@ Var
 Begin
  CountFlipsInDirection := 0;
  opponent := OpponentPlayer(player);
- 
+
  r := row + deltaRow;
  c := col + deltaCol;
  count := 0;
- 
+
  { Compter les pions adverses dans cette direction }
  While IsValidPosition(r, c) and (Game.board[r, c] = opponent) do
  Begin
@@ -139,7 +139,7 @@ Begin
   r := r + deltaRow;
   c := c + deltaCol;
  End;
- 
+
  { Vérifier si on trouve un pion de notre couleur à la fin }
  If IsValidPosition(r, c) and (Game.board[r, c] = player) and (count > 0) Then
   CountFlipsInDirection := count;
@@ -150,10 +150,10 @@ Var
  deltaRow, deltaCol: Integer;
 Begin
  IsValidMove := False;
- 
+
  { La case doit être vide }
  If Game.board[row, col] <> pEmpty Then Exit;
- 
+
  { Vérifier toutes les directions }
  For deltaRow := -1 to 1 do
   For deltaCol := -1 to 1 do
@@ -170,12 +170,12 @@ Var
  deltaRow, deltaCol, total: Integer;
 Begin
  total := 0;
- 
+
  For deltaRow := -1 to 1 do
   For deltaCol := -1 to 1 do
    If (deltaRow <> 0) or (deltaCol <> 0) Then
     total := total + CountFlipsInDirection(row, col, deltaRow, deltaCol, player);
- 
+
  CountTotalFlips := total;
 End;
 
@@ -208,7 +208,7 @@ End;
 Function MakeMove(row, col: Integer; player: TPlayer): Boolean;
 Begin
  MakeMove := False;
- 
+
  If IsValidMove(row, col, player) Then
  Begin
   Game.board[row, col] := player;
@@ -225,7 +225,7 @@ Var
  row, col: Integer;
 Begin
  HasValidMoves := False;
- 
+
  For row := 0 to BOARD_SIZE-1 do
   For col := 0 to BOARD_SIZE-1 do
    If IsValidMove(row, col, player) Then
@@ -241,7 +241,7 @@ Var
 Begin
  Game.blackScore := 0;
  Game.whiteScore := 0;
- 
+
  For row := 0 to BOARD_SIZE-1 do
   For col := 0 to BOARD_SIZE-1 do
    Case Game.board[row, col] of
@@ -253,11 +253,11 @@ End;
 Procedure CheckGameEnd;
 Begin
  CountScore;
- 
+
  If not HasValidMoves(Game.currentPlayer) Then
  Begin
   Game.currentPlayer := OpponentPlayer(Game.currentPlayer);
-  
+
   If not HasValidMoves(Game.currentPlayer) Then
   Begin
    { Aucun joueur ne peut jouer - fin de partie }
@@ -281,39 +281,39 @@ Begin
  edges := 0;
  mobility := 0;
  opponent := OpponentPlayer(player);
- 
+
  For row := 0 to BOARD_SIZE-1 do
   For col := 0 to BOARD_SIZE-1 do
   Begin
    If Game.board[row, col] = player Then
    Begin
     Inc(score);
-    
+
     { Bonus énorme pour les coins }
-    If ((row = 0) or (row = BOARD_SIZE-1)) and 
+    If ((row = 0) or (row = BOARD_SIZE-1)) and
        ((col = 0) or (col = BOARD_SIZE-1)) Then
      Inc(corners, 30);
-    
+
     { Bonus pour les bords }
-    If (row = 0) or (row = BOARD_SIZE-1) or 
+    If (row = 0) or (row = BOARD_SIZE-1) or
        (col = 0) or (col = BOARD_SIZE-1) Then
      Inc(edges, 5);
    End
    Else If Game.board[row, col] = opponent Then
    Begin
     Dec(score);
-    
+
     { Malus pour les coins adverses }
-    If ((row = 0) or (row = BOARD_SIZE-1)) and 
+    If ((row = 0) or (row = BOARD_SIZE-1)) and
        ((col = 0) or (col = BOARD_SIZE-1)) Then
      Dec(corners, 30);
    End;
-   
+
    { Compter la mobilité }
    If IsValidMove(row, col, player) Then
     Inc(mobility, 2);
   End;
- 
+
  EvaluateBoard := score + corners + edges + mobility;
 End;
 
@@ -327,12 +327,12 @@ Begin
  bestMove.col := -1;
  bestMove.score := -10000;
  bestScore := -10000;
- 
+
  { Sauvegarder le plateau }
  For i := 0 to BOARD_SIZE-1 do
   For j := 0 to BOARD_SIZE-1 do
    tempBoard[i, j] := Game.board[i, j];
- 
+
  For row := 0 to BOARD_SIZE-1 do
   For col := 0 to BOARD_SIZE-1 do
    If IsValidMove(row, col, player) Then
@@ -340,20 +340,20 @@ Begin
     { Simuler le coup }
     Game.board[row, col] := player;
     FlipDiscs(row, col, player);
-    
+
     score := EvaluateBoard(player);
-    
+
     { Bonus pour le nombre de pions retournés }
     flips := CountTotalFlips(row, col, player);
     score := score + flips * 2;
-    
+
     { Bonus selon la difficulté }
     Case Game.difficulty of
      diffEasy: score := score + Random(10) - 5;
      diffMedium: score := score + Random(6) - 3;
      diffHard: ; { Pas de random pour le niveau difficile }
     End;
-    
+
     If score > bestScore Then
     Begin
      bestScore := score;
@@ -361,7 +361,7 @@ Begin
      bestMove.col := col;
      bestMove.score := score;
     End;
-    
+
     { Restaurer le plateau }
     For i := 0 to BOARD_SIZE-1 do
      For j := 0 to BOARD_SIZE-1 do
@@ -377,9 +377,9 @@ Begin
     (Game.gameState = gsPlaying) Then
  Begin
   Delay(800); { Délai pour la réflexion }
-  
+
   GetBestMove(pWhite, 1, move);
-  
+
   If (move.row >= 0) and (move.col >= 0) Then
   Begin
    MakeMove(move.row, move.col, pWhite);
@@ -432,7 +432,7 @@ Begin
     End;
    End;
    #13, ' ': Begin { Entrée ou Espace }
-    If (Game.gameState = gsPlaying) and 
+    If (Game.gameState = gsPlaying) and
        ((Game.gameMode = 2) or (Game.currentPlayer = pBlack)) Then
     Begin
      If MakeMove(Game.selectedRow, Game.selectedCol, Game.currentPlayer) Then
@@ -490,14 +490,14 @@ Begin
   Circle(x, y, DISC_RADIUS + 4);
   SetLineStyle(0, 0, 1);
  End;
- 
+
  { Marquer le dernier coup }
  If lastMove Then
  Begin
   SetColor(12);
   Circle(x, y, DISC_RADIUS + 2);
  End;
- 
+
  Case player of
   pBlack: Begin
    SetColor(0);
@@ -535,7 +535,7 @@ Begin
  Bar(BOARD_X - 5, BOARD_Y - 5,
      BOARD_X + BOARD_SIZE * CELL_SIZE + 5,
      BOARD_Y + BOARD_SIZE * CELL_SIZE + 5);
- 
+
  { Dessiner le contour }
  SetColor(0);
  SetLineStyle(0, 0, 2);
@@ -543,17 +543,17 @@ Begin
            BOARD_X + BOARD_SIZE * CELL_SIZE + 5,
            BOARD_Y + BOARD_SIZE * CELL_SIZE + 5);
  SetLineStyle(0, 0, 1);
- 
+
  For row := 0 to BOARD_SIZE-1 do
   For col := 0 to BOARD_SIZE-1 do
   Begin
    x := BOARD_X + col * CELL_SIZE;
    y := BOARD_Y + row * CELL_SIZE;
-   
+
    { Dessiner la case }
    SetColor(0);
    Rectangle(x, y, x + CELL_SIZE, y + CELL_SIZE);
-   
+
    { Marquer les coups valides }
    validMove := IsValidMove(row, col, Game.currentPlayer);
    If validMove and (Game.gameState = gsPlaying) Then
@@ -563,7 +563,7 @@ Begin
      SetColor(14);
      SetFillStyle(11, 14);
      Bar(x + 2, y + 2, x + CELL_SIZE - 2, y + CELL_SIZE - 2);
-     
+
      { Afficher le nombre de pions retournés }
      flips := CountTotalFlips(row, col, Game.currentPlayer);
      If flips > 0 Then
@@ -581,13 +581,13 @@ Begin
      FillEllipse(x + CELL_SIZE div 2, y + CELL_SIZE div 2, 3, 3);
     End;
    End;
-   
+
    { Dessiner le pion }
    If Game.board[row, col] <> pEmpty Then
    Begin
     isLastMove := (row = Game.lastMove.row) and (col = Game.lastMove.col);
-    DrawDisc(x + CELL_SIZE div 2, y + CELL_SIZE div 2, 
-             Game.board[row, col], 
+    DrawDisc(x + CELL_SIZE div 2, y + CELL_SIZE div 2,
+             Game.board[row, col],
              (row = Game.selectedRow) and (col = Game.selectedCol),
              isLastMove);
    End
@@ -607,22 +607,22 @@ Var
 Begin
  SetColor(15);
  SetTextStyle(0, 0, 1);
- 
+
  If Game.gameMode = 1 Then
   modeStr := 'vs IA (' + GetDifficultyName(Game.difficulty) + ')'
  Else
   modeStr := '2 Joueurs';
- 
+
  OutTextXY(450, 60, 'OTHELLO');
  OutTextXY(450, 80, 'Mode: ' + modeStr);
- 
+
  Str(Game.blackScore, scoreStr);
  SetColor(0);
  SetFillStyle(1, 0);
  FillEllipse(435, 105, 8, 8);
  SetColor(15);
  OutTextXY(450, 100, 'Noir: ' + scoreStr);
- 
+
  Str(Game.whiteScore, scoreStr);
  SetColor(15);
  SetFillStyle(1, 15);
@@ -631,10 +631,10 @@ Begin
  Circle(435, 125, 8);
  SetColor(15);
  OutTextXY(450, 120, 'Blanc: ' + scoreStr);
- 
+
  Str(Game.moveCount, scoreStr);
  OutTextXY(450, 140, 'Coups: ' + scoreStr);
- 
+
  If Game.gameState = gsPlaying Then
  Begin
   SetColor(GetPlayerColor(Game.currentPlayer));
@@ -655,7 +655,7 @@ Begin
  End
  Else
   OutTextXY(450, 160, 'Partie terminee');
- 
+
  If Game.showHints Then
  Begin
   SetColor(14);
@@ -676,7 +676,7 @@ Begin
  OutTextXY(450, 240, '- Encadrez les pions');
  OutTextXY(450, 255, '  adverses');
  OutTextXY(450, 270, '- Plus de pions = victoire');
- 
+
  OutTextXY(450, 300, 'Commandes:');
  OutTextXY(450, 320, 'Fleches: Curseur');
  OutTextXY(450, 335, 'ENTREE: Jouer');
@@ -692,7 +692,7 @@ Procedure DrawGameStatus;
 Begin
  SetColor(14);
  SetTextStyle(0, 0, 2);
- 
+
  Case Game.gameState of
   gsPlaying: Begin
    If not HasValidMoves(Game.currentPlayer) Then
@@ -731,17 +731,17 @@ Begin
   SetColor(1);
   SetFillStyle(1, 1);
   Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  
+
   { Titre }
   SetColor(15);
   SetTextStyle(0, 0, 3);
   OutTextXY(80, 20, 'OTHELLO');
-  
+
   DrawBoard;
   DrawGameInfo;
   DrawInstructions;
   DrawGameStatus;
-  
+
   Game.needRedraw := False;
  End;
 End;
@@ -751,30 +751,30 @@ Begin
  SetColor(1);
  SetFillStyle(1, 1);
  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
- 
+
  SetColor(15);
  SetTextStyle(0, 0, 3);
  OutTextXY(SCREEN_WIDTH div 2 - 80, 60, 'OTHELLO');
- 
+
  SetColor(15);
  SetTextStyle(0, 0, 1);
  OutTextXY(50, 120, 'Jeu de strategie ou le but est d''avoir le plus de pions');
  OutTextXY(50, 140, 'de votre couleur a la fin de la partie.');
- 
+
  OutTextXY(50, 170, 'Regles:');
  OutTextXY(50, 190, '- Placez un pion pour encadrer des pions adverses');
  OutTextXY(50, 210, '- Tous les pions encadres sont retournes');
  OutTextXY(50, 230, '- Vous devez retourner au moins un pion');
  OutTextXY(50, 250, '- Si aucun coup possible, vous passez votre tour');
- 
+
  OutTextXY(50, 280, 'Commandes:');
  OutTextXY(50, 300, 'Fleches: Deplacer le curseur sur le plateau');
  OutTextXY(50, 320, 'ENTREE/ESPACE: Placer un pion a la position selectionnee');
  OutTextXY(50, 340, 'H: Afficher/masquer les indices de coups');
  OutTextXY(50, 360, 'P: Passer votre tour (si aucun coup possible)');
- 
+
  OutTextXY(50, 390, 'Modes: 1=vs IA, 2=2 joueurs, D=difficulte, ESC=Quitter');
- 
+
  Repeat
   If KeyPressed Then
   Begin
@@ -794,7 +794,7 @@ Begin
       Game.difficulty := diffHard
      Else
       Game.difficulty := diffEasy;
-     
+
      SetColor(14);
      OutTextXY(50, 420, 'Difficulte: ' + GetDifficultyName(Game.difficulty));
     End;
@@ -830,7 +830,7 @@ End;
 
 Procedure InitializeGraphics;
 Var
- Driver, Mode: SmallInt;
+ Driver, Mode: Integer;
  ErrCode: Integer;
 Begin
  {$IFDEF FPC}
@@ -840,7 +840,7 @@ Begin
  Driver := Detect;
  Mode := VGAHi;
  {$ENDIF}
- 
+
  InitGraph(Driver, Mode, '');
  ErrCode := GraphResult;
  If ErrCode <> grOk Then
@@ -848,7 +848,7 @@ Begin
   WriteLn('Erreur graphique : ', GraphErrorMsg(ErrCode));
   Halt;
  End;
- 
+
  SetLineStyle(0, 0, 1);
  Randomize;
 End;
