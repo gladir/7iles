@@ -315,6 +315,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>O'Riley's Mine</b></td>
          <td>Ce fichier contient le jeu O'Riley's Mine. Jeu dans lequel il faut voyager rapidement à travers votre mine pour capturer tous les trésors enfouis et rentrer chez vous en toute sécurité au sommet du puits de mine.</td>
      </tr>
+    <tr>
+        <td><b>OTHELLO.PAS</b></td>
+        <td><b>Othello</b></td>
+        <td>Ce fichier contient le jeu Othello, stratégie de retournement de pions.</td>
+    </tr>
      <tr>
       <td><b>PACMAN.PAS</b></td>
        <td><b>Pac-Man</b></td>
