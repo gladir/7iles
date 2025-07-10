@@ -362,7 +362,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     </tr>            
     <tr>
         <td><b>REVERSI.PAS</b></td>
-        <td>Reversi</td>
+        <td><b>Reversi</b></td>
         <td>Ce fichier contient le jeu Reversi (un genre d'Othello).</td>
     </tr>
     <tr>
