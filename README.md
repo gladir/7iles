@@ -123,6 +123,10 @@ Aperçu du jeu Puissance 4 (Power 4) en Free Pascal :
 
 ![image](https://github.com/user-attachments/assets/4872493e-0b43-46a3-889a-ad05a4dcb1fe)
 
+Aperçu du jeu Reversi en Free Pascal :
+
+![image](https://github.com/user-attachments/assets/8c3e1fe3-30df-4caa-a8c6-b8bae704ca60)
+
 Aperçu du jeu Bubble Shooter en Free Pascal : 
 
 ![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
@@ -352,10 +356,15 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient un clone du jeu QBert.</td>
     </tr>
     <tr>
-        <td><b>RENJU.PAS<b/></td>
+        <td><b>RENJU.PAS</b></td>
         <td><b>Renju</b></td>
         <td>Ce fichier contient le jeu japonais RENJU.</td>
     </tr>            
+    <tr>
+        <td><b>REVERSI.PAS</b></td>
+        <td><b>Reversi</b></td>
+        <td>Ce fichier contient le jeu Reversi (un genre d'Othello).</td>
+    </tr>
     <tr>
         <td><b>SODOKU.PAS</b></td>
         <td><b>Sodoku</b></td>
