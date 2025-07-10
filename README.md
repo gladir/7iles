@@ -256,6 +256,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Frogger, le jeu où il faut traverser une rue et une rivière à une grenouille.</td>
     </tr>
     <tr>
+        <td><b>GINRUMMY.PAS</b></td>
+        <td><b>Gin Rummy</b></td>
+        <td>Ce fichier contient le jeu de carte Gin Rummy.</td>
+    </tr>
+    <tr>
         <td><b>GOMOKU.PAS<b/></td>
         <td><b>GOMOKO</b></td>
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
