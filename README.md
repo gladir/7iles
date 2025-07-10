@@ -135,6 +135,10 @@ Aperçu du jeu Bubble Shooter en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
 
+Aperçu du jeu Xiangqi en Free Pascal :
+
+<img width="639" height="474" alt="image" src="https://github.com/user-attachments/assets/27c3b032-6859-4adb-8d18-60fbe108579d" />
+
 Aperçu du jeu Color Space Invaders en Free Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/8747cc02-f9fc-43f1-9aa7-aac453854007)
@@ -409,6 +413,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
          <td><b>Tic-Tac-Toe</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu Tic-Tac-Toe contre l'ordinateur.</td>
      </tr>
+    <tr>
+        <td><b>XIANGQI.PAS</b></td>
+        <td>Xiangqi</td>
+        <td>Ce fichier contient le jeu d'échec chinois Xiangqi.</td>
+    </tr>
     <tr>
         <td><b>YATHZEE.PAS</b></td>
         <td><b>Yathzee</b></td>
