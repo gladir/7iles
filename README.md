@@ -119,6 +119,10 @@ Aperçu du jeu Pango en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/bcc187ef-3a7b-4747-bb7c-a3d426ee66fb)
 
+Aperçu du jeu Puissance 4 (Power 4) en Free Pascal :
+
+![image](https://github.com/user-attachments/assets/4872493e-0b43-46a3-889a-ad05a4dcb1fe)
+
 Aperçu du jeu Bubble Shooter en Free Pascal : 
 
 ![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
@@ -336,6 +340,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>PONG.PAS</b></td>
         <td><b>Pong</b></td>
         <td>Ce fichier contient une clone du célèbre jeu Pong.</td>
+    </tr>
+    <tr>
+        <td><b>POWER4.PAS</b></td>
+        <td><b>Power 4 (Puissance 4)</b>
+        <td>Ce fichier contient le jeu Puissance 4 ou Power 4 en anglais.</td>
     </tr>
     <tr>
         <td><b>QBERT.PAS</b></td>
