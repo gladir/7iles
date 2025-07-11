@@ -257,6 +257,9 @@ Var
  normalX, normalY: Real;
  dotProduct: Real;
  speed: Real;
+ t: Real;
+ closestX, closestY: Real;
+ ballToClosest: Real;
 Begin
  CheckFlipperCollision := False;
  
@@ -264,41 +267,58 @@ Begin
  flipperEndX := flipper.x + Cos(radians) * FLIPPER_LENGTH;
  flipperEndY := flipper.y + Sin(radians) * FLIPPER_LENGTH;
  
- { Distance du point au segment }
- dx := Game.ball.x - flipper.x;
- dy := Game.ball.y - flipper.y;
- dist := Sqrt(dx*dx + dy*dy);
+ { Trouver le point le plus proche sur le segment du flipper }
+ dx := flipperEndX - flipper.x;
+ dy := flipperEndY - flipper.y;
  
- If dist < BALL_RADIUS + 8 Then
+ { Calculer la projection de la balle sur le segment }
+ t := ((Game.ball.x - flipper.x) * dx + (Game.ball.y - flipper.y) * dy) / (dx * dx + dy * dy);
+ 
+ { Limiter t entre 0 et 1 pour rester sur le segment }
+ If t < 0 Then t := 0;
+ If t > 1 Then t := 1;
+ 
+ { Point le plus proche sur le segment }
+ closestX := flipper.x + t * dx;
+ closestY := flipper.y + t * dy;
+ 
+ { Distance de la balle au point le plus proche }
+ dx := Game.ball.x - closestX;
+ dy := Game.ball.y - closestY;
+ ballToClosest := Sqrt(dx * dx + dy * dy);
+ 
+ { Vérifier la collision }
+ If ballToClosest < BALL_RADIUS + 6 Then
  Begin
   CheckFlipperCollision := True;
   
   { Calculer la normale de collision }
-  If dist > 0 Then
+  If ballToClosest > 0 Then
   Begin
-   normalX := dx / dist;
-   normalY := dy / dist;
+   normalX := dx / ballToClosest;
+   normalY := dy / ballToClosest;
    
    { Séparer la balle du flipper }
-   Game.ball.x := flipper.x + normalX * (BALL_RADIUS + 8);
-   Game.ball.y := flipper.y + normalY * (BALL_RADIUS + 8);
+   Game.ball.x := closestX + normalX * (BALL_RADIUS + 6);
+   Game.ball.y := closestY + normalY * (BALL_RADIUS + 6);
    
    { Calculer le rebond avec la vitesse existante }
    dotProduct := Game.ball.vx * normalX + Game.ball.vy * normalY;
    
-   { Rebond élastique }
-   Game.ball.vx := Game.ball.vx - 2 * dotProduct * normalX;
-   Game.ball.vy := Game.ball.vy - 2 * dotProduct * normalY;
+   { Rebond élastique uniquement si la balle se dirige vers le flipper }
+   If dotProduct < 0 Then
+   Begin
+    Game.ball.vx := Game.ball.vx - 2 * dotProduct * normalX;
+    Game.ball.vy := Game.ball.vy - 2 * dotProduct * normalY;
+   End;
    
    { Appliquer la force du flipper si activé }
    If flipper.active Then
    Begin
     speed := Sqrt(Game.ball.vx * Game.ball.vx + Game.ball.vy * Game.ball.vy);
-    If speed < FLIPPER_SPEED Then
-    Begin
-     Game.ball.vx := Game.ball.vx + normalX * FLIPPER_SPEED;
-     Game.ball.vy := Game.ball.vy + normalY * FLIPPER_SPEED - 3; { Effet vers le haut }
-    End;
+    { Ajouter de la force du flipper }
+    Game.ball.vx := Game.ball.vx + normalX * FLIPPER_SPEED * 2;
+    Game.ball.vy := Game.ball.vy + normalY * FLIPPER_SPEED * 2 - 4; { Effet vers le haut }
    End;
    
    { Limiter la vitesse }
