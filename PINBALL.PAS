@@ -31,6 +31,7 @@ Const
  MAX_BUMPERS = 8;
  MAX_TARGETS = 6;
  MAX_DIAGONAL_BLOCKS = 2;
+ MAX_CURVED_WALLS = 10;
  LAUNCH_POWER = 15;
 
 Type
@@ -70,6 +71,13 @@ Type
   angle: Real; { Angle de la diagonale en degrés }
  End;
  
+ TCurvedWall = Record
+  x, y: Integer;
+  radius: Integer;
+  active: Boolean;
+  isLeft: Boolean; { True pour paroi gauche, False pour paroi droite }
+ End;
+ 
  TGame = Record
   ball: TBall;
   leftFlipper: TFlipper;
@@ -77,6 +85,7 @@ Type
   bumpers: Array[0..MAX_BUMPERS-1] of TBumper;
   targets: Array[0..MAX_TARGETS-1] of TTarget;
   diagonalBlocks: Array[0..MAX_DIAGONAL_BLOCKS-1] of TDiagonalBlock;
+  curvedWalls: Array[0..MAX_CURVED_WALLS-1] of TCurvedWall;
   gameState: TGameState;
   score: LongInt;
   ballsLeft: Integer;
@@ -208,6 +217,31 @@ Begin
  Game.diagonalBlocks[1].angle := -45; { -45 degrés pour rediriger vers la droite }
 End;
 
+Procedure InitializeCurvedWalls;
+Var
+ i: Integer;
+Begin
+ { Paroi courbée gauche - entonnoir vers le flipper gauche }
+ For i := 0 to 4 do
+ Begin
+  Game.curvedWalls[i].x := TABLE_X + 80 + i * 10;
+  Game.curvedWalls[i].y := TABLE_Y + TABLE_HEIGHT - 60 - i * 8;
+  Game.curvedWalls[i].radius := 15;
+  Game.curvedWalls[i].active := True;
+  Game.curvedWalls[i].isLeft := True;
+ End;
+ 
+ { Paroi courbée droite - entonnoir vers le flipper droit }
+ For i := 5 to 9 do
+ Begin
+  Game.curvedWalls[i].x := TABLE_X + TABLE_WIDTH - 80 - (i-5) * 10;
+  Game.curvedWalls[i].y := TABLE_Y + TABLE_HEIGHT - 60 - (i-5) * 8;
+  Game.curvedWalls[i].radius := 15;
+  Game.curvedWalls[i].active := True;
+  Game.curvedWalls[i].isLeft := False;
+ End;
+End;
+
 Function CheckBallBounds: Boolean;
 Begin
  CheckBallBounds := False;
@@ -216,15 +250,29 @@ Begin
  If Game.ball.y > TABLE_Y + TABLE_HEIGHT Then
  Begin
   CheckBallBounds := True;
-  Dec(Game.ballsLeft);
-  If Game.ballsLeft <= 0 Then
-   Game.gameState := gsGameOver
-  Else
+  
+  { Vérifier si la balle est dans la zone de lancement (canal droit) }
+  If Game.ball.x > TABLE_X + TABLE_WIDTH - 50 Then
   Begin
+   { Balle dans la zone de lancement - pas de perte, juste relancement }
    InitializeBall;
    Game.gameState := gsLaunching;
-   Game.launchPower := 1;
-   Game.lastAction := 'Balle perdue! Balles restantes: ' + IntToStr(Game.ballsLeft);
+   Game.launchPower := 8;
+   Game.lastAction := 'Retour au canal de lancement!';
+  End
+  Else
+  Begin
+   { Balle perdue normalement }
+   Dec(Game.ballsLeft);
+   If Game.ballsLeft <= 0 Then
+    Game.gameState := gsGameOver
+   Else
+   Begin
+    InitializeBall;
+    Game.gameState := gsLaunching;
+    Game.launchPower := 8;
+    Game.lastAction := 'Balle perdue! Balles restantes: ' + IntToStr(Game.ballsLeft);
+   End;
   End;
   Exit;
  End;
@@ -474,6 +522,49 @@ Begin
  End;
 End;
 
+Function CheckCurvedWallCollision(var wall: TCurvedWall): Boolean;
+Var
+ dx, dy, dist: Real;
+ normalX, normalY: Real;
+ dotProduct: Real;
+Begin
+ CheckCurvedWallCollision := False;
+ 
+ If not wall.active Then Exit;
+ 
+ { Calculer la distance entre la balle et le centre de la paroi }
+ dx := Game.ball.x - wall.x;
+ dy := Game.ball.y - wall.y;
+ dist := Sqrt(dx * dx + dy * dy);
+ 
+ { Vérifier la collision }
+ If dist < BALL_RADIUS + wall.radius Then
+ Begin
+  CheckCurvedWallCollision := True;
+  
+  { Calculer la normale de collision }
+  If dist > 0 Then
+  Begin
+   normalX := dx / dist;
+   normalY := dy / dist;
+   
+   { Séparer la balle de la paroi }
+   Game.ball.x := wall.x + normalX * (BALL_RADIUS + wall.radius);
+   Game.ball.y := wall.y + normalY * (BALL_RADIUS + wall.radius);
+   
+   { Calculer le rebond avec la vitesse existante }
+   dotProduct := Game.ball.vx * normalX + Game.ball.vy * normalY;
+   
+   { Rebond élastique }
+   Game.ball.vx := Game.ball.vx - 2 * dotProduct * normalX * BOUNCE_FACTOR;
+   Game.ball.vy := Game.ball.vy - 2 * dotProduct * normalY * BOUNCE_FACTOR;
+   
+   { Petite poussée vers le haut pour éviter que la balle reste coincée }
+   Game.ball.vy := Game.ball.vy - 1;
+  End;
+ End;
+End;
+
 Procedure UpdateBall;
 Var
  i: Integer;
@@ -520,6 +611,10 @@ Begin
  { Vérifier les collisions avec les blocs diagonaux }
  For i := 0 to MAX_DIAGONAL_BLOCKS-1 do
   CheckDiagonalBlockCollision(Game.diagonalBlocks[i]);
+ 
+ { Vérifier les collisions avec les parois courbées }
+ For i := 0 to MAX_CURVED_WALLS-1 do
+  CheckCurvedWallCollision(Game.curvedWalls[i]);
 End;
 
 Procedure UpdateFlippers;
@@ -579,14 +674,26 @@ Begin
  { Canal de lancement }
  SetColor(8);
  SetFillStyle(1, 8);
- Bar(TABLE_X + TABLE_WIDTH - 40, TABLE_Y + TABLE_HEIGHT - 100, 
+ Bar(TABLE_X + TABLE_WIDTH - 50, TABLE_Y + TABLE_HEIGHT - 120, 
      TABLE_X + TABLE_WIDTH, TABLE_Y + TABLE_HEIGHT);
+ 
+ { Parois du canal de lancement }
+ SetColor(15);
+ SetLineStyle(0, 0, 3);
+ Line(TABLE_X + TABLE_WIDTH - 50, TABLE_Y + TABLE_HEIGHT - 120, 
+      TABLE_X + TABLE_WIDTH - 50, TABLE_Y + TABLE_HEIGHT);
  
  { Lignes de guidage }
  SetColor(7);
  SetLineStyle(0, 0, 1);
  Line(TABLE_X + 50, TABLE_Y + 50, TABLE_X + TABLE_WIDTH - 50, TABLE_Y + 50);
  Line(TABLE_X + 50, TABLE_Y + 250, TABLE_X + TABLE_WIDTH - 50, TABLE_Y + 250);
+ 
+ { Indication de la zone de lancement }
+ SetColor(10);
+ SetTextStyle(0, 0, 1);
+ OutTextXY(TABLE_X + TABLE_WIDTH - 45, TABLE_Y + TABLE_HEIGHT - 100, 'CANAL');
+ OutTextXY(TABLE_X + TABLE_WIDTH - 45, TABLE_Y + TABLE_HEIGHT - 85, 'LANCE');
 End;
 
 Procedure DrawBall;
@@ -716,6 +823,26 @@ Begin
             Game.diagonalBlocks[i].x + Game.diagonalBlocks[i].width,
             Game.diagonalBlocks[i].y + Game.diagonalBlocks[i].height);
    SetLineStyle(0, 0, 1);
+  End;
+ End;
+End;
+
+Procedure DrawCurvedWalls;
+Var
+ i: Integer;
+Begin
+ For i := 0 to MAX_CURVED_WALLS-1 do
+ Begin
+  If Game.curvedWalls[i].active Then
+  Begin
+   SetColor(11);
+   SetFillStyle(1, 11);
+   Circle(Game.curvedWalls[i].x, Game.curvedWalls[i].y, Game.curvedWalls[i].radius);
+   FloodFill(Game.curvedWalls[i].x, Game.curvedWalls[i].y, 11);
+   
+   { Contour }
+   SetColor(15);
+   Circle(Game.curvedWalls[i].x, Game.curvedWalls[i].y, Game.curvedWalls[i].radius);
   End;
  End;
 End;
@@ -877,6 +1004,7 @@ Begin
   DrawBumpers;
   DrawTargets;
   DrawDiagonalBlocks;
+  DrawCurvedWalls;
   DrawLaunchMeter;
   DrawGameInfo;
   DrawGameStatus;
@@ -924,6 +1052,7 @@ Begin
  InitializeBumpers;
  InitializeTargets;
  InitializeDiagonalBlocks;
+ InitializeCurvedWalls;
  
  Game.gameState := gsLaunching;
  Game.score := 0;
