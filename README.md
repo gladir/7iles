@@ -191,6 +191,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Bouncing Babies originaire d'IBM PC.</td>
     </tr>
     <tr>
+        <td><b>BACCARAT.PAS</b></td>
+        <td><b>Baccarat</b></td>
+        <td>Ce fichier contient le jeu de carte Baccarat.</td>
+    </tr>
+    <tr>
         <td><b>BACKGAM.PAS</b></td>
         <td><b>Backgammon</b></td>
         <td>Ce fichier contient le jeu Backgammon.</td>
