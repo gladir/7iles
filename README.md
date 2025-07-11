@@ -299,6 +299,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>L25</b></td>
         <td>Ce fichier de jeu permet de lancer le jeu L25. Le but du jeu est de remplir 25 cases (5 x 5) en se déplaçant comme un cheval au échec sans jamais touchés deux fois la même case.</td>
     </tr>
+    <tr>
+        <td><b>LIGHTS.PAS</b></td>
+        <td><b>Lights Out</b>b</td>
+        <td>Ce fichier contient Lights Out où il faut éteindre toutes les lumières</td>
+    </tr>
      <tr>
         <td><b>LODERUNN.PAS</b></td>
         <td><b>Lode Runner</b></td>
