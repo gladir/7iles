@@ -103,6 +103,10 @@ Aperçu du jeu Bouncing Babies en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
 
+Aperçu du jeu Bingo :
+
+<img width="634" height="475" alt="image" src="https://github.com/user-attachments/assets/e12ecbf3-5675-4aff-a285-3de5f5e420c0" />
+
 Aperçu du O'Riley's Mine :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/b47b5fd1-d748-4d2a-86b6-f8d1b62955de)
@@ -191,6 +195,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>BERZERK.PAS</b></td>
         <td><b>Berzerk</b></td>
         <td>Ce fichier contient un jeu du style de Berzerk.</td>
+    </tr>
+    <tr>
+        <td><b>BINGO.PAS</b></td>
+        <td><b>Bingo</b></td>
+        <td>Ce fichier contient le jeu Bingo.</td>
     </tr>
     <tr>
         <td><b>BLACKJAK.PAS</b></td>
