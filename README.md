@@ -320,6 +320,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Mahjong.</td>
     </tr>
     <tr>
+        <td><b>MANCALA.PAS</b></td>
+        <td><b>Mancala</b></td>
+        <td>Ce fichier contient le jeu africain Mancala.</td>
+    </tr>
+    <tr>
         <td><b>MASTERMD.PAS</b></td>
         <td><b>MasterMind</b></td>
         <td>Ce fichier contient un jeu de MasterMind.</td>
