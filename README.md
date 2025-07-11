@@ -290,7 +290,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     </tr>
     <tr>
         <td><b>GOMOKU.PAS<b/></td>
-        <td><b>GOMOKO</b></td>
+        <td><b>GOMOKU</b></td>
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
     </tr>
     <tr>
