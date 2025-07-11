@@ -103,7 +103,11 @@ Aperçu du jeu Bouncing Babies en Turbo Pascal :
 
 ![image](https://github.com/gladir/7iles/assets/11842176/90ee9db6-2379-4b3c-a734-8c8403c6f844)
 
-Aperçu du jeu Bingo :
+Aperçu du jeu Billard en Free Pascal :
+
+<img width="641" height="472" alt="image" src="https://github.com/user-attachments/assets/bcbce26c-87b6-428f-b5a3-87d8b8ebebb7" />
+
+Aperçu du jeu Bingo en Free Pascal :
 
 <img width="634" height="475" alt="image" src="https://github.com/user-attachments/assets/e12ecbf3-5675-4aff-a285-3de5f5e420c0" />
 
@@ -200,6 +204,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>BERZERK.PAS</b></td>
         <td><b>Berzerk</b></td>
         <td>Ce fichier contient un jeu du style de Berzerk.</td>
+    </tr>
+    <tr>
+        <td><b>BILLARD.PAS</b></td>
+        <td><b>Billard</b></td>
+        <td>Ce fichier contient un jeu de Billard à 8 boules.</td>
     </tr>
     <tr>
         <td><b>BINGO.PAS</b></td>
