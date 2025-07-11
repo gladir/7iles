@@ -301,7 +301,7 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
     </tr>
     <tr>
         <td><b>LIGHTS.PAS</b></td>
-        <td><b>Lights Out</b>b</td>
+        <td><b>Lights Out</b></td>
         <td>Ce fichier contient Lights Out où il faut éteindre toutes les lumières</td>
     </tr>
      <tr>
