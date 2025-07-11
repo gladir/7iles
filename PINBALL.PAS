@@ -26,7 +26,7 @@ Const
  FRICTION = 0.98;
  BOUNCE_FACTOR = 0.7;
  MAX_SPEED = 60;
- FLIPPER_LENGTH = 40;
+ FLIPPER_LENGTH = 80;
  FLIPPER_SPEED = 8;
  MAX_BUMPERS = 8;
  MAX_TARGETS = 6;
@@ -129,8 +129,8 @@ Begin
  { Flipper droit }
  Game.rightFlipper.x := TABLE_X + 280;
  Game.rightFlipper.y := TABLE_Y + TABLE_HEIGHT - 80;
- Game.rightFlipper.angle := -30;
- Game.rightFlipper.targetAngle := -30;
+ Game.rightFlipper.angle := -60;
+ Game.rightFlipper.targetAngle := -60;
  Game.rightFlipper.active := True;
  Game.rightFlipper.isLeft := False;
 End;
@@ -254,6 +254,9 @@ Var
  dx, dy, dist: Real;
  flipperEndX, flipperEndY: Real;
  radians: Real;
+ normalX, normalY: Real;
+ dotProduct: Real;
+ speed: Real;
 Begin
  CheckFlipperCollision := False;
  
@@ -270,28 +273,39 @@ Begin
  Begin
   CheckFlipperCollision := True;
   
-  { Calculer la direction de rebond }
+  { Calculer la normale de collision }
   If dist > 0 Then
   Begin
-   dx := dx / dist;
-   dy := dy / dist;
+   normalX := dx / dist;
+   normalY := dy / dist;
    
    { Séparer la balle du flipper }
-   Game.ball.x := flipper.x + dx * (BALL_RADIUS + 8);
-   Game.ball.y := flipper.y + dy * (BALL_RADIUS + 8);
+   Game.ball.x := flipper.x + normalX * (BALL_RADIUS + 8);
+   Game.ball.y := flipper.y + normalY * (BALL_RADIUS + 8);
    
-   { Appliquer la force du flipper }
+   { Calculer le rebond avec la vitesse existante }
+   dotProduct := Game.ball.vx * normalX + Game.ball.vy * normalY;
+   
+   { Rebond élastique }
+   Game.ball.vx := Game.ball.vx - 2 * dotProduct * normalX;
+   Game.ball.vy := Game.ball.vy - 2 * dotProduct * normalY;
+   
+   { Appliquer la force du flipper si activé }
    If flipper.active Then
    Begin
-    Game.ball.vx := dx * FLIPPER_SPEED;
-    Game.ball.vy := dy * FLIPPER_SPEED - 2; { Effet vers le haut }
-    
-    { Limiter la vitesse }
-    If Abs(Game.ball.vx) > MAX_SPEED Then
-     Game.ball.vx := Game.ball.vx / Abs(Game.ball.vx) * MAX_SPEED;
-    If Abs(Game.ball.vy) > MAX_SPEED Then
-     Game.ball.vy := Game.ball.vy / Abs(Game.ball.vy) * MAX_SPEED;
+    speed := Sqrt(Game.ball.vx * Game.ball.vx + Game.ball.vy * Game.ball.vy);
+    If speed < FLIPPER_SPEED Then
+    Begin
+     Game.ball.vx := Game.ball.vx + normalX * FLIPPER_SPEED;
+     Game.ball.vy := Game.ball.vy + normalY * FLIPPER_SPEED - 3; { Effet vers le haut }
+    End;
    End;
+   
+   { Limiter la vitesse }
+   If Abs(Game.ball.vx) > MAX_SPEED Then
+    Game.ball.vx := Game.ball.vx / Abs(Game.ball.vx) * MAX_SPEED;
+   If Abs(Game.ball.vy) > MAX_SPEED Then
+    Game.ball.vy := Game.ball.vy / Abs(Game.ball.vy) * MAX_SPEED;
   End;
  End;
 End;
@@ -574,6 +588,7 @@ Procedure DrawFlipper(flipper: TFlipper);
 Var
  endX, endY: Real;
  radians: Real;
+ i: Integer;
 Begin
  If flipper.active Then
  Begin
@@ -583,7 +598,13 @@ Begin
   
   SetColor(15);
   SetLineStyle(0, 0, 4);
-  Line(Round(flipper.x), Round(flipper.y), Round(endX), Round(endY));
+  
+  { Dessiner le flipper avec 3 lignes pour le rendre plus épais }
+  For i := -6 to 6 do
+  Begin
+   Line(Round(flipper.x + i * Sin(radians)), Round(flipper.y - i * Cos(radians)), 
+        Round(endX + i * Sin(radians)), Round(endY - i * Cos(radians)));
+  End;
   
   { Base du flipper }
   SetColor(12);
@@ -764,7 +785,7 @@ Begin
    'p', 'P', 'm', 'M': Begin { Flipper droit }
     If Game.gameState = gsPlaying Then
     Begin
-     Game.rightFlipper.targetAngle := 30;
+     Game.rightFlipper.targetAngle := -30;
      Game.rightFlipper.active := True;
     End;
    End;
@@ -806,7 +827,7 @@ Begin
  If not KeyPressed Then
  Begin
   Game.leftFlipper.targetAngle := 30;
-  Game.rightFlipper.targetAngle := -30;
+  Game.rightFlipper.targetAngle := -60;
  End;
 End;
 
