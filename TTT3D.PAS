@@ -46,6 +46,10 @@ Var
   LastCursorX, LastCursorY: Integer;
   LastCursorWidth, LastCursorHeight: Integer;
   CursorSaved: Boolean;
+  { Variable pour éviter de redessiner le titre }
+  TitleDrawn: Boolean;
+  { Variable pour éviter de redessiner les infos inutilement }
+  LastDisplayedLayer: Integer;
 
 { Déclarations forward pour les procedures d'aide }
 Procedure SaveCursorArea(X, Y, Width, Height: Integer); Forward;
@@ -119,36 +123,47 @@ End;
 Procedure DrawLayer(LayerNum, OffsetX: Integer);
 Var
   I, J, BaseX, BaseY: Integer;
+  NeedRedraw: Boolean;
 Begin
   BaseX := OffsetX;
   BaseY := 315;
+  
+  { Vérifier si on doit redessiner cette couche }
+  NeedRedraw := (LayerNum = CurrentLayer) or (CursorTimer = 0);
+  
+  If NeedRedraw Then Begin
+    { Effacer seulement cette zone de plateau }
+    SetColor(Black);
+    SetFillStyle(1, Black);
+    Bar(BaseX - 5, BaseY - 25, BaseX + GRID_SIZE*CELL_SIZE + 5, BaseY + GRID_SIZE*CELL_SIZE + 5);
 
-  { Titre du niveau }
-  SetColor(White);
-  OutTextXY(BaseX + (GRID_SIZE*CELL_SIZE) div 2 - 20, BaseY - 20, 'Niveau ' + Chr(LayerNum + Ord('1')));
+    { Titre du niveau }
+    SetColor(White);
+    OutTextXY(BaseX + (GRID_SIZE*CELL_SIZE) div 2 - 20, BaseY - 20, 'Niveau ' + Chr(LayerNum + Ord('1')));
 
-  { Grille }
-  SetColor(LightGray);
-  For I := 0 to GRID_SIZE do Begin
-    Line(BaseX, BaseY + I*CELL_SIZE, BaseX + GRID_SIZE*CELL_SIZE, BaseY + I*CELL_SIZE);
-    Line(BaseX + I*CELL_SIZE, BaseY, BaseX + I*CELL_SIZE, BaseY + GRID_SIZE*CELL_SIZE);
-  End;
+    { Grille }
+    SetColor(LightGray);
+    For I := 0 to GRID_SIZE do Begin
+      Line(BaseX, BaseY + I*CELL_SIZE, BaseX + GRID_SIZE*CELL_SIZE, BaseY + I*CELL_SIZE);
+      Line(BaseX + I*CELL_SIZE, BaseY, BaseX + I*CELL_SIZE, BaseY + GRID_SIZE*CELL_SIZE);
+    End;
 
-  { Symboles }
-  For I := 0 to GRID_SIZE-1 do Begin
-    For J := 0 to GRID_SIZE-1 do Begin
-      Case Grid[I,J,LayerNum] of
-        X: Begin
-          SetColor(LightRed);
-          Line(BaseX + I*CELL_SIZE + 5, BaseY + J*CELL_SIZE + 5,
-               BaseX + (I+1)*CELL_SIZE - 5, BaseY + (J+1)*CELL_SIZE - 5);
-          Line(BaseX + (I+1)*CELL_SIZE - 5, BaseY + J*CELL_SIZE + 5,
-               BaseX + I*CELL_SIZE + 5, BaseY + (J+1)*CELL_SIZE - 5);
-        End;
-        O: Begin
-          SetColor(LightBlue);
-          Circle(BaseX + I*CELL_SIZE + CELL_SIZE div 2,
-                BaseY + J*CELL_SIZE + CELL_SIZE div 2, CELL_SIZE div 2 - 5);
+    { Symboles }
+    For I := 0 to GRID_SIZE-1 do Begin
+      For J := 0 to GRID_SIZE-1 do Begin
+        Case Grid[I,J,LayerNum] of
+          X: Begin
+            SetColor(LightRed);
+            Line(BaseX + I*CELL_SIZE + 5, BaseY + J*CELL_SIZE + 5,
+                 BaseX + (I+1)*CELL_SIZE - 5, BaseY + (J+1)*CELL_SIZE - 5);
+            Line(BaseX + (I+1)*CELL_SIZE - 5, BaseY + J*CELL_SIZE + 5,
+                 BaseX + I*CELL_SIZE + 5, BaseY + (J+1)*CELL_SIZE - 5);
+          End;
+          O: Begin
+            SetColor(LightBlue);
+            Circle(BaseX + I*CELL_SIZE + CELL_SIZE div 2,
+                  BaseY + J*CELL_SIZE + CELL_SIZE div 2, CELL_SIZE div 2 - 5);
+          End;
         End;
       End;
     End;
@@ -266,14 +281,43 @@ Var
   CursorX, CursorY: Integer;
   CellSize: Integer;
 Begin
-  { Effacement ciblé au lieu de ClearDevice pour éviter le clignotement }
+  { Effacement minimal et ciblé }
   SetColor(Black);
   SetFillStyle(1, Black);
-  { Effacer seulement les zones nécessaires }
-  Bar(0, 0, 640, 310);     { Zone des contrôles et titre }
-  Bar(0, 310, 640, 460);   { Zone des plateaux 2D }
-  Bar(0, 100, 640, 250);   { Zone du cube 3D aérien }
-    { Dessiner les 4 niveaux côte à côte }
+  
+  { Dessiner le titre une seule fois }
+  If Not TitleDrawn Then Begin
+    { Effacer seulement la zone du titre }
+    Bar(0, 0, 640, 100);
+    
+    { Dessiner le titre }
+    SetColor(Magenta);
+    SetTextStyle(0, 0, 2);
+    OutTextXY(230, 5, 'Tic-Tac-Toe 3D');
+    SetTextStyle(0, 0, 1);
+    TitleDrawn := True;
+    LastDisplayedLayer := -1; { Forcer la mise à jour des infos }
+  End;
+  
+  { Mettre à jour les infos seulement si le niveau a changé }
+  If CurrentLayer <> LastDisplayedLayer Then Begin
+    { Effacer seulement la zone des contrôles (ligne d'info dynamique) }
+    Bar(0, 35, 640, 100);
+    
+    { Légende et contrôles (info dynamique) }
+    SetColor(White);
+    SetTextStyle(0, 0, 1);
+    OutTextXY(20, 40, '(X) Humain, (O) Ordinateur, Niveau: ' + Chr(CurrentLayer + Ord('1')));
+    OutTextXY(20, 60, 'Fleches: deplacer, PgUp/PgDn: changer niveau');
+    OutTextXY(20, 80, 'Entree: placer symbole, Echap: quitter');
+    
+    LastDisplayedLayer := CurrentLayer;
+  End;
+  
+  { Effacer la zone du cube 3D aérien (centre) }
+  Bar(150, 100, 550, 280);
+  
+  { Dessiner les 4 niveaux côte à côte }
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
 
@@ -399,16 +443,6 @@ Begin
   { Préparer le symbole du joueur }
   If CurrentPlayer = 1 Then PlayerSymbol := 'X'
                       Else PlayerSymbol := 'O';
-
-  { Légende et contrôles }
-  SetColor(Magenta);
-  SetTextStyle(0, 0, 2);
-  OutTextXY(230, 5, 'Tic-Tac-Toe 3D');
-  SetTextStyle(0, 0, 1);
-  SetColor(White);
-  OutTextXY(20, 40, '(X) Humain, (O) Ordinateur, Niveau: ' + Chr(CurrentLayer + Ord('1')));
-  OutTextXY(20, 60, 'Fleches: deplacer, PgUp/PgDn: changer niveau');
-  OutTextXY(20, 80, 'Entree: placer symbole, Echap: quitter');
 
   { Mise à jour du timer du curseur }
   Inc(CursorTimer);
@@ -644,6 +678,8 @@ Begin
   LastCursorX := -1;
   LastCursorY := -1;
   CursorSaved := False;
+  TitleDrawn := False;
+  LastDisplayedLayer := -1;
 End;
 
 Procedure ShowGameResult;
