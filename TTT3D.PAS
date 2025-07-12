@@ -535,7 +535,8 @@ Begin
         If S <> Empty Then Begin
           CheckWin := True;
           For Col := 1 to GRID_SIZE-1 do
-            If (Col >= 0) and (Col < GRID_SIZE) and (Row >= 0) and (Row < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[Col,Row,K] <> S) Then Begin
+            If (Col >= 0) and (Col < GRID_SIZE) and (Row >= 0) and
+               (Row < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[Col,Row,K] <> S) Then Begin
               CheckWin := False;
               Break;
             End;
@@ -555,7 +556,8 @@ Begin
         If S <> Empty Then Begin
           CheckWin := True;
           For Row := 1 to GRID_SIZE-1 do
-            If (Col >= 0) and (Col < GRID_SIZE) and (Row >= 0) and (Row < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[Col,Row,K] <> S) Then Begin
+            If (Col >= 0) and (Col < GRID_SIZE) and (Row >= 0) and (Row < GRID_SIZE) and (K >= 0) and
+               (K < GRID_SIZE) and (Grid[Col,Row,K] <> S) Then Begin
               CheckWin := False;
               Break;
             End;
@@ -589,7 +591,8 @@ Begin
         If S <> Empty Then Begin
           CheckWin := True;
           For I := 1 to GRID_SIZE-1 do
-            If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[I,GRID_SIZE-1-I,K] <> S) Then Begin
+            If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (K >= 0) and
+               (K < GRID_SIZE) and (Grid[I,GRID_SIZE-1-I,K] <> S) Then Begin
               CheckWin := False;
               Break;
             End;
@@ -622,7 +625,8 @@ Begin
     If S <> Empty Then Begin
       CheckWin := True;
       For I := 1 to GRID_SIZE-1 do
-        If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (Grid[I,GRID_SIZE-1-I,I] <> S) Then Begin
+        If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and
+           (GRID_SIZE-1-I < GRID_SIZE) and (Grid[I,GRID_SIZE-1-I,I] <> S) Then Begin
           CheckWin := False;
           Break;
         End;
@@ -637,7 +641,8 @@ Begin
     If S <> Empty Then Begin
       CheckWin := True;
       For I := 1 to GRID_SIZE-1 do
-        If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (Grid[I,I,GRID_SIZE-1-I] <> S) Then Begin
+        If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and
+           (GRID_SIZE-1-I < GRID_SIZE) and (Grid[I,I,GRID_SIZE-1-I] <> S) Then Begin
           CheckWin := False;
           Break;
         End;
@@ -652,7 +657,8 @@ Begin
     If S <> Empty Then Begin
       CheckWin := True;
       For I := 1 to GRID_SIZE-1 do
-        If (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (I >= 0) and (I < GRID_SIZE) and (Grid[GRID_SIZE-1-I,I,I] <> S) Then Begin
+        If (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and
+           (I >= 0) and (I < GRID_SIZE) and (Grid[GRID_SIZE-1-I,I,I] <> S) Then Begin
           CheckWin := False;
           Break;
         End;
@@ -750,7 +756,6 @@ Begin
            (SelectedY < 0) or (SelectedY >= GRID_SIZE) or
            (CurrentLayer < 0) or (CurrentLayer >= GRID_SIZE) Then Begin
           { Valeurs invalides - ne rien faire }
-          // Erreur de plage probable ici
         End Else If IsValidMove(SelectedX, SelectedY, CurrentLayer) Then Begin
           If CurrentPlayer = 1 Then Symbol := X
                               Else Symbol := O;
