@@ -292,7 +292,7 @@ Var
  i, x, y, angle: Integer;
  numStr: String;
 Begin
- x := 150;
+ x := 230;  { Déplacé de 80 pixels vers la droite (150 + 80) }
  y := 150;
  
  { Roue principale }
@@ -343,7 +343,7 @@ Var
  i, x, y: Integer;
  numStr: String;
 Begin
- x := 320;
+ x := 400;  { Déplacé de 80 pixels vers la droite (320 + 80) }
  y := 80;
  
  SetColor(15);
