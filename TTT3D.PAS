@@ -50,11 +50,17 @@ Var
   TitleDrawn: Boolean;
   { Variable pour éviter de redessiner les infos inutilement }
   LastDisplayedLayer: Integer;
+  { Variables pour sauvegarder le cube 3D }
+  CubeBackup: Pointer;
+  CubeBackupSize: Word;
+  CubeSaved: Boolean;
 
 { Déclarations forward pour les procedures d'aide }
 Procedure SaveCursorArea(X, Y, Width, Height: Integer); Forward;
 Procedure RestoreCursorArea; Forward;
 Procedure DrawCursor(X, Y, Width, Height: Integer); Forward;
+Procedure SaveCubeArea; Forward;
+Procedure RestoreCubeArea; Forward;
 
 { Implémentations des procedures d'aide }
 Procedure SaveCursorArea(X, Y, Width, Height: Integer);
@@ -85,6 +91,26 @@ Begin
   SaveCursorArea(X, Y, Width, Height);
   SetColor(Yellow);
   Rectangle(X, Y, X + Width, Y + Height);
+End;
+
+Procedure SaveCubeArea;
+Begin
+  If CubeSaved Then RestoreCubeArea;
+  
+  CubeBackupSize := ImageSize(150, 100, 550, 280);
+  If CubeBackup <> Nil Then FreeMem(CubeBackup, CubeBackupSize);
+  
+  GetMem(CubeBackup, CubeBackupSize);
+  GetImage(150, 100, 550, 280, CubeBackup^);
+  CubeSaved := True;
+End;
+
+Procedure RestoreCubeArea;
+Begin
+  If CubeSaved and (CubeBackup <> Nil) Then Begin
+    PutImage(150, 100, CubeBackup^, NormalPut);
+    CubeSaved := False;
+  End;
 End;
 
 Procedure InitScr;
@@ -312,14 +338,17 @@ Begin
     OutTextXY(20, 80, 'Entree: placer symbole, Echap: quitter');
     
     LastDisplayedLayer := CurrentLayer;
+    
+    { Forcer le redessin du cube 3D car le niveau a changé }
+    RestoreCubeArea;
   End;
-  
-  { Effacer la zone du cube 3D aérien (centre) }
-  Bar(150, 100, 550, 280);
   
   { Dessiner les 4 niveaux côte à côte }
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
+
+  { Sauvegarder la zone du cube 3D avant de le dessiner }
+  If Not CubeSaved Then SaveCubeArea;
 
 
   { Paramètres de la vue aérienne }
@@ -680,6 +709,11 @@ Begin
   CursorSaved := False;
   TitleDrawn := False;
   LastDisplayedLayer := -1;
+  
+  { Initialiser les variables du cube 3D }
+  CubeBackup := Nil;
+  CubeBackupSize := 0;
+  CubeSaved := False;
 End;
 
 Procedure ShowGameResult;
@@ -745,6 +779,10 @@ BEGIN
  { Libérer la mémoire du curseur }
  If CursorBackup <> Nil Then
    FreeMem(CursorBackup, CursorBackupSize);
+
+ { Libérer la mémoire du cube 3D }
+ If CubeBackup <> Nil Then
+   FreeMem(CubeBackup, CubeBackupSize);
 
  { Afficher le résultat de la partie }
  ShowGameResult;
