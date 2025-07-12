@@ -201,6 +201,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Backgammon.</td>
     </tr>
     <tr>
+        <td><b>BASEBALL.PAS</b></td>
+        <td><b>Baseball</b></td>
+        <td>Ce fichier contient un jeu de Baseball.</td>
+    </tr>
+    <tr>
         <td><b>BATAILLE.PAS</b></td>
         <td><b>Bataille</b></td>
         <td>Ce fichier contient le jeu de carte Bataille.</td>
