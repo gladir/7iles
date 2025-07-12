@@ -481,6 +481,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier de jeu permet de lancer le jeu Tic-Tac-Toe contre l'ordinateur.</td>
      </tr>
     <tr>
+        <td><b>TTT3D.PAS</b></td>
+        <td><b>Tic-Tac-Toe 3D</b></td>
+        <td>Ce fichier contient le jeu Tic-Tac-Toe 3D.</td>
+    </tr>
+    <tr>
         <td><b>XIANGQI.PAS</b></td>
         <td>Xiangqi</td>
         <td>Ce fichier contient le jeu d'échec chinois Xiangqi.</td>
