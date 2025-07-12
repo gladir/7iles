@@ -197,26 +197,14 @@ Begin
     LayerSaved[LayerNum] := True;
   End;
 
-  { Curseur clignotant avec GetImage/PutImage }
+  { Curseur clignotant pour les niveaux individuels }
   If (LayerNum = CurrentLayer) and (SelectedX >= 0) and (SelectedX < GRID_SIZE) and
      (SelectedY >= 0) and (SelectedY < GRID_SIZE) Then Begin
     If CursorVisible Then Begin
-      { Sauvegarder la zone si pas déjà fait }
-      If Not CursorSaved Then Begin
-        SaveCursorArea(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE,
-                       CELL_SIZE, CELL_SIZE);
-      End;
-      { Dessiner le curseur }
       SetColor(Yellow);
       Rectangle(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE,
                 BaseX + (SelectedX+1)*CELL_SIZE, BaseY + (SelectedY+1)*CELL_SIZE);
-    End Else Begin
-      { Restaurer la zone sauvegardée pour effacer le curseur }
-      RestoreCursorArea;
     End;
-  End Else Begin
-    { Si ce n'est pas le niveau actuel, s'assurer que le curseur est effacé }
-    If CursorSaved Then RestoreCursorArea;
   End;
 End;
 
@@ -355,16 +343,19 @@ Begin
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
 
-  { Sauvegarder la zone du cube 3D avant de le dessiner }
-  { Désactivé pour éviter les Access Violations - le cube sera redessiné à chaque fois }
-  { If Not CubeSaved Then SaveCubeArea; }
-
-
   { Paramètres de la vue aérienne }
   CenterX := 320;  { Centre de l'écran }
   CenterY := 190;
   BackSize := 200;   { Taille du carré arrière }
   FrontSize := 120;  { Taille du carré avant }
+
+  { Effacer la zone du cube 3D avant de le redessiner }
+  If Not CubeSaved Then Begin
+    SetColor(Black);
+    SetFillStyle(1, Black);
+    Bar(CenterX - BackSize div 2 - 10, CenterY - BackSize div 2 - 10, 
+        CenterX + BackSize div 2 + 10, CenterY + BackSize div 2 + 10);
+  End;
 
   { Calculer les positions des carrés }
   BackX1 := CenterX - BackSize div 2;
@@ -459,49 +450,54 @@ Begin
           End;
         End;
 
-  { Dessiner le curseur sur le niveau actuel }
-  If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) and CursorVisible and
+  { Dessiner le curseur sur le niveau actuel dans le cube 3D }
+  If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) and
      (SelectedX >= 0) and (SelectedX < GRID_SIZE) and
      (SelectedY >= 0) and (SelectedY < GRID_SIZE) Then Begin
-    If GRID_SIZE > 1 Then
-      Factor := CurrentLayer / (GRID_SIZE - 1)
-    Else
-      Factor := 0;
-
-    { Position dans le carré arrière }
-    If GRID_SIZE > 0 Then Begin
-      BackCellX := BackX1 + SelectedX * (BackSize div GRID_SIZE);
-      BackCellY := BackY1 + SelectedY * (BackSize div GRID_SIZE);
-
-      { Position dans le carré avant }
-      FrontCellX := FrontX1 + SelectedX * (FrontSize div GRID_SIZE);
-      FrontCellY := FrontY1 + SelectedY * (FrontSize div GRID_SIZE);
-    End Else Begin
-      BackCellX := BackX1;
-      BackCellY := BackY1;
-      FrontCellX := FrontX1;
-      FrontCellY := FrontY1;
-    End;
-
-    { Interpolation }
-    CursorX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
-    CursorY := Round(BackCellY + Factor * (FrontCellY - BackCellY));
-
-    { Dessiner le curseur avec sauvegarde/restauration }
-    SetColor(Yellow);
-    If GRID_SIZE > 0 Then Begin
-      If CurrentLayer = 0 Then
-        CellSize := BackSize div GRID_SIZE
-      Else If CurrentLayer = GRID_SIZE-1 Then
-        CellSize := FrontSize div GRID_SIZE
+    If CursorVisible Then Begin
+      If GRID_SIZE > 1 Then
+        Factor := CurrentLayer / (GRID_SIZE - 1)
       Else
-        CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
-    End Else Begin
-      CellSize := 20; { Taille par défaut }
-    End;
+        Factor := 0;
 
-    DrawCursor(CursorX, CursorY, CellSize, CellSize);
+      { Position dans le carré arrière }
+      If GRID_SIZE > 0 Then Begin
+        BackCellX := BackX1 + SelectedX * (BackSize div GRID_SIZE);
+        BackCellY := BackY1 + SelectedY * (BackSize div GRID_SIZE);
+
+        { Position dans le carré avant }
+        FrontCellX := FrontX1 + SelectedX * (FrontSize div GRID_SIZE);
+        FrontCellY := FrontY1 + SelectedY * (FrontSize div GRID_SIZE);
+      End Else Begin
+        BackCellX := BackX1;
+        BackCellY := BackY1;
+        FrontCellX := FrontX1;
+        FrontCellY := FrontY1;
+      End;
+
+      { Interpolation }
+      CursorX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
+      CursorY := Round(BackCellY + Factor * (FrontCellY - BackCellY));
+
+      { Dessiner le curseur }
+      SetColor(Yellow);
+      If GRID_SIZE > 0 Then Begin
+        If CurrentLayer = 0 Then
+          CellSize := BackSize div GRID_SIZE
+        Else If CurrentLayer = GRID_SIZE-1 Then
+          CellSize := FrontSize div GRID_SIZE
+        Else
+          CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
+      End Else Begin
+        CellSize := 20; { Taille par défaut }
+      End;
+
+      Rectangle(CursorX, CursorY, CursorX + CellSize, CursorY + CellSize);
+    End;
   End;
+
+  { Marquer le cube comme dessiné }
+  CubeSaved := True;
 
   { Préparer le symbole du joueur }
   If CurrentPlayer = 1 Then PlayerSymbol := 'X'
@@ -512,6 +508,11 @@ Begin
   If CursorTimer >= 10 Then Begin
     CursorVisible := Not CursorVisible;
     CursorTimer := 0;
+    { Forcer le redessin du niveau actuel pour faire clignoter le curseur }
+    If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+      LayerSaved[CurrentLayer] := False;
+    { Forcer le redessin du cube 3D pour effacer/afficher le curseur }
+    CubeSaved := False;
   End;
 End;
 
@@ -711,43 +712,43 @@ Begin
     Case Key of
       #0: Case ReadKey of
         #72: If SelectedY > 0 Then Begin { Up }
-          RestoreCursorArea; { Restaurer avant de bouger }
           Dec(SelectedY);
           { Forcer le redessin du niveau actuel pour mettre à jour l'affichage }
           If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
             LayerSaved[CurrentLayer] := False;
         End;
         #80: If SelectedY < GRID_SIZE-1 Then Begin { Down }
-          RestoreCursorArea;
           Inc(SelectedY);
           If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
             LayerSaved[CurrentLayer] := False;
         End;
         #75: If SelectedX > 0 Then Begin { Left }
-          RestoreCursorArea;
           Dec(SelectedX);
           If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
             LayerSaved[CurrentLayer] := False;
         End;
         #77: If SelectedX < GRID_SIZE-1 Then Begin { Right }
-          RestoreCursorArea;
           Inc(SelectedX);
           If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
             LayerSaved[CurrentLayer] := False;
         End;
         #73: If CurrentLayer < GRID_SIZE-1 Then Begin { PgUp }
-          RestoreCursorArea;
           { Forcer le redessin de l'ancien niveau pour effacer le curseur }
           If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
             LayerSaved[CurrentLayer] := False;
           Inc(CurrentLayer);
+          { Forcer le redessin du nouveau niveau pour afficher le curseur }
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
         End;
         #81: If CurrentLayer > 0 Then Begin { PgDn }
-          RestoreCursorArea;
           { Forcer le redessin de l'ancien niveau pour effacer le curseur }
           If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
             LayerSaved[CurrentLayer] := False;
           Dec(CurrentLayer);
+          { Forcer le redessin du nouveau niveau pour afficher le curseur }
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
         End;
       End;
       #13: Begin { Enter }
