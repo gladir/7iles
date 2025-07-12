@@ -97,22 +97,14 @@ End;
 
 Procedure SaveCubeArea;
 Begin
-  If CubeSaved Then RestoreCubeArea;
-
-  CubeBackupSize := ImageSize(150, 100, 550, 280);
-  If CubeBackup <> Nil Then FreeMem(CubeBackup, CubeBackupSize);
-
-  GetMem(CubeBackup, CubeBackupSize);
-  GetImage(150, 100, 550, 280, CubeBackup^);
-  CubeSaved := True;
+  { Procedure désactivée pour éviter les Access Violations }
+  { Le cube 3D sera simplement redessiné à chaque fois }
 End;
 
 Procedure RestoreCubeArea;
 Begin
-  If CubeSaved and (CubeBackup <> Nil) Then Begin
-    PutImage(150, 100, CubeBackup^, NormalPut);
-    CubeSaved := False;
-  End;
+  { Procedure désactivée pour éviter les Access Violations }
+  { Le cube 3D sera simplement redessiné à chaque fois }
 End;
 
 Procedure InitScr;
@@ -149,7 +141,7 @@ Begin
     IsValidMove := False;
     Exit;
   End;
-  
+
   IsValidMove := (Grid[X,Y,Z] = Empty);
 End;
 
@@ -159,7 +151,7 @@ Var
 Begin
   { Vérification de sécurité des indices }
   If (LayerNum < 0) or (LayerNum >= GRID_SIZE) Then Exit;
-  
+
   BaseX := OffsetX;
   BaseY := 315;
 
@@ -200,13 +192,13 @@ Begin
         End;
       End;
     End;
-    
+
     { Marquer comme dessiné }
     LayerSaved[LayerNum] := True;
   End;
 
   { Curseur clignotant avec GetImage/PutImage }
-  If (LayerNum = CurrentLayer) and (SelectedX >= 0) and (SelectedX < GRID_SIZE) and 
+  If (LayerNum = CurrentLayer) and (SelectedX >= 0) and (SelectedX < GRID_SIZE) and
      (SelectedY >= 0) and (SelectedY < GRID_SIZE) Then Begin
     If CursorVisible Then Begin
       { Sauvegarder la zone si pas déjà fait }
@@ -354,7 +346,7 @@ Begin
     LastDisplayedLayer := CurrentLayer;
 
     { Forcer le redessin du cube 3D car le niveau a changé }
-    RestoreCubeArea;
+    CubeSaved := False;
     { Forcer le redessin des niveaux }
     For I := 0 to GRID_SIZE-1 do LayerSaved[I] := False;
   End;
@@ -364,7 +356,8 @@ Begin
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
 
   { Sauvegarder la zone du cube 3D avant de le dessiner }
-  If Not CubeSaved Then SaveCubeArea;
+  { Désactivé pour éviter les Access Violations - le cube sera redessiné à chaque fois }
+  { If Not CubeSaved Then SaveCubeArea; }
 
 
   { Paramètres de la vue aérienne }
@@ -468,7 +461,7 @@ Begin
 
   { Dessiner le curseur sur le niveau actuel }
   If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) and CursorVisible and
-     (SelectedX >= 0) and (SelectedX < GRID_SIZE) and 
+     (SelectedX >= 0) and (SelectedX < GRID_SIZE) and
      (SelectedY >= 0) and (SelectedY < GRID_SIZE) Then Begin
     If GRID_SIZE > 1 Then
       Factor := CurrentLayer / (GRID_SIZE - 1)
@@ -525,37 +518,63 @@ End;
 Function CheckWin: Boolean;
 Var
   I, J, K: Integer;
+  Row, Col: Integer;
   S: TSymbol;
 Begin
   CheckWin := False;
   Winner := 0;
 
+  { Vérification de sécurité des indices }
+  If GRID_SIZE <= 0 Then Exit;
+
   { Vérification horizontale dans chaque niveau }
   For K := 0 to GRID_SIZE-1 do
-    For I := 0 to GRID_SIZE-1 do Begin
-      S := Grid[0,I,K];
-      If S <> Empty Then Begin
-        CheckWin := True;
-        For J := 1 to GRID_SIZE-1 do
-          If Grid[J,I,K] <> S Then Begin
-            CheckWin := False;
-            Break;
+    For Row := 0 to GRID_SIZE-1 do Begin
+      If (Row >= 0) and (Row < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) Then Begin
+        S := Grid[0,Row,K];
+        If S <> Empty Then Begin
+          CheckWin := True;
+          For Col := 1 to GRID_SIZE-1 do
+            If (Col >= 0) and (Col < GRID_SIZE) and (Row >= 0) and (Row < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[Col,Row,K] <> S) Then Begin
+              CheckWin := False;
+              Break;
+            End;
+          If CheckWin Then Begin
+            If S = X Then Winner := 1 Else Winner := 2;
+            Exit;
           End;
-        If CheckWin Then Begin
-          If S = X Then Winner := 1 Else Winner := 2;
-          Exit;
         End;
       End;
     End;
 
   { Vérification verticale dans chaque niveau }
   For K := 0 to GRID_SIZE-1 do
-    For I := 0 to GRID_SIZE-1 do Begin
-      S := Grid[I,0,K];
+    For Col := 0 to GRID_SIZE-1 do Begin
+      If (Col >= 0) and (Col < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) Then Begin
+        S := Grid[Col,0,K];
+        If S <> Empty Then Begin
+          CheckWin := True;
+          For Row := 1 to GRID_SIZE-1 do
+            If (Col >= 0) and (Col < GRID_SIZE) and (Row >= 0) and (Row < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[Col,Row,K] <> S) Then Begin
+              CheckWin := False;
+              Break;
+            End;
+          If CheckWin Then Begin
+            If S = X Then Winner := 1 Else Winner := 2;
+            Exit;
+          End;
+        End;
+      End;
+    End;
+
+  { Vérification des diagonales dans chaque niveau }
+  For K := 0 to GRID_SIZE-1 do Begin
+    If (K >= 0) and (K < GRID_SIZE) Then Begin
+      S := Grid[0,0,K];
       If S <> Empty Then Begin
         CheckWin := True;
-        For J := 1 to GRID_SIZE-1 do
-          If Grid[I,J,K] <> S Then Begin
+        For I := 1 to GRID_SIZE-1 do
+          If (I >= 0) and (I < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[I,I,K] <> S) Then Begin
             CheckWin := False;
             Break;
           End;
@@ -564,35 +583,21 @@ Begin
           Exit;
         End;
       End;
-    End;
 
-  { Vérification des diagonales dans chaque niveau }
-  For K := 0 to GRID_SIZE-1 do Begin
-    S := Grid[0,0,K];
-    If S <> Empty Then Begin
-      CheckWin := True;
-      For I := 1 to GRID_SIZE-1 do
-        If Grid[I,I,K] <> S Then Begin
-          CheckWin := False;
-          Break;
+      If (GRID_SIZE > 1) and (GRID_SIZE-1 >= 0) and (GRID_SIZE-1 < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) Then Begin
+        S := Grid[0,GRID_SIZE-1,K];
+        If S <> Empty Then Begin
+          CheckWin := True;
+          For I := 1 to GRID_SIZE-1 do
+            If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (K >= 0) and (K < GRID_SIZE) and (Grid[I,GRID_SIZE-1-I,K] <> S) Then Begin
+              CheckWin := False;
+              Break;
+            End;
+          If CheckWin Then Begin
+            If S = X Then Winner := 1 Else Winner := 2;
+            Exit;
+          End;
         End;
-      If CheckWin Then Begin
-        If S = X Then Winner := 1 Else Winner := 2;
-        Exit;
-      End;
-    End;
-
-    S := Grid[0,GRID_SIZE-1,K];
-    If S <> Empty Then Begin
-      CheckWin := True;
-      For I := 1 to GRID_SIZE-1 do
-        If Grid[I,GRID_SIZE-1-I,K] <> S Then Begin
-          CheckWin := False;
-          Break;
-        End;
-      If CheckWin Then Begin
-        If S = X Then Winner := 1 Else Winner := 2;
-        Exit;
       End;
     End;
   End;
@@ -602,7 +607,7 @@ Begin
   If S <> Empty Then Begin
     CheckWin := True;
     For I := 1 to GRID_SIZE-1 do
-      If Grid[I,I,I] <> S Then Begin
+      If (I >= 0) and (I < GRID_SIZE) and (Grid[I,I,I] <> S) Then Begin
         CheckWin := False;
         Break;
       End;
@@ -612,17 +617,49 @@ Begin
     End;
   End;
 
-  S := Grid[0,GRID_SIZE-1,0];
-  If S <> Empty Then Begin
-    CheckWin := True;
-    For I := 1 to GRID_SIZE-1 do
-      If Grid[I,GRID_SIZE-1-I,I] <> S Then Begin
-        CheckWin := False;
-        Break;
+  If (GRID_SIZE > 1) and (GRID_SIZE-1 >= 0) and (GRID_SIZE-1 < GRID_SIZE) Then Begin
+    S := Grid[0,GRID_SIZE-1,0];
+    If S <> Empty Then Begin
+      CheckWin := True;
+      For I := 1 to GRID_SIZE-1 do
+        If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (Grid[I,GRID_SIZE-1-I,I] <> S) Then Begin
+          CheckWin := False;
+          Break;
+        End;
+      If CheckWin Then Begin
+        If S = X Then Winner := 1 Else Winner := 2;
+        Exit;
       End;
-    If CheckWin Then Begin
-      If S = X Then Winner := 1 Else Winner := 2;
-      Exit;
+    End;
+
+    { Diagonale 3D: Grid[0,0,GRID_SIZE-1] vers Grid[GRID_SIZE-1,GRID_SIZE-1,0] }
+    S := Grid[0,0,GRID_SIZE-1];
+    If S <> Empty Then Begin
+      CheckWin := True;
+      For I := 1 to GRID_SIZE-1 do
+        If (I >= 0) and (I < GRID_SIZE) and (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (Grid[I,I,GRID_SIZE-1-I] <> S) Then Begin
+          CheckWin := False;
+          Break;
+        End;
+      If CheckWin Then Begin
+        If S = X Then Winner := 1 Else Winner := 2;
+        Exit;
+      End;
+    End;
+
+    { Diagonale 3D: Grid[GRID_SIZE-1,0,0] vers Grid[0,GRID_SIZE-1,GRID_SIZE-1] }
+    S := Grid[GRID_SIZE-1,0,0];
+    If S <> Empty Then Begin
+      CheckWin := True;
+      For I := 1 to GRID_SIZE-1 do
+        If (GRID_SIZE-1-I >= 0) and (GRID_SIZE-1-I < GRID_SIZE) and (I >= 0) and (I < GRID_SIZE) and (Grid[GRID_SIZE-1-I,I,I] <> S) Then Begin
+          CheckWin := False;
+          Break;
+        End;
+      If CheckWin Then Begin
+        If S = X Then Winner := 1 Else Winner := 2;
+        Exit;
+      End;
     End;
   End;
 End;
@@ -720,7 +757,7 @@ Begin
           Grid[SelectedX, SelectedY, CurrentLayer] := Symbol;
           { Forcer le redessin du niveau modifié }
           LayerSaved[CurrentLayer] := False;
-          RestoreCubeArea;
+          CubeSaved := False;
           If CheckWin Then
             GameOver := True
           Else If IsBoardFull Then Begin
@@ -742,7 +779,7 @@ Begin
     { Forcer le redessin du niveau modifié }
     If (ComputerMove.Z >= 0) and (ComputerMove.Z < GRID_SIZE) Then
       LayerSaved[ComputerMove.Z] := False;
-    RestoreCubeArea;
+    CubeSaved := False;
     If CheckWin Then
       GameOver := True
     Else If IsBoardFull Then Begin
@@ -783,7 +820,7 @@ Begin
   CubeBackup := Nil;
   CubeBackupSize := 0;
   CubeSaved := False;
-  
+
   { Initialiser les variables des niveaux (juste le flag) }
   For I := 0 to GRID_SIZE-1 do Begin
     LayerSaved[I] := False;
