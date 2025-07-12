@@ -139,6 +139,10 @@ Aperçu du jeu Reversi en Free Pascal :
 
 ![image](https://github.com/user-attachments/assets/8c3e1fe3-30df-4caa-a8c6-b8bae704ca60)
 
+Aperçu du jeu Roulette de Casino en Free Pascal :
+
+<img width="641" height="476" alt="image" src="https://github.com/user-attachments/assets/61a29837-f67c-4bcd-9aea-f567f3b4c2c2" />
+
 Aperçu du jeu Bubble Shooter en Free Pascal : 
 
 ![image](https://github.com/gladir/7iles/assets/11842176/a90cc151-026a-4d60-be4b-ad2a2e86e693)
@@ -430,6 +434,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>REVERSI.PAS</b></td>
         <td><b>Reversi</b></td>
         <td>Ce fichier contient le jeu Reversi (un genre d'Othello).</td>
+    </tr>
+    <tr>
+        <td><b>ROULETTE.PAS</b></td>
+        <td><b>Roulette de Casino</b></td>
+        <td>Ce fichier contient le jeu Roulette de Casino.</td>
     </tr>
     <tr>
         <td><b>SODOKU.PAS</b></td>
