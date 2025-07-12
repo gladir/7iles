@@ -287,6 +287,32 @@ Begin
  End;
 End;
 
+Function HasBetOnNumber(number: Integer): Boolean;
+Var
+ i: Integer;
+Begin
+ HasBetOnNumber := False;
+ For i := 0 to Game.betCount-1 do
+  If Game.bets[i].active and (Game.bets[i].betType = btNumber) and (Game.bets[i].number = number) Then
+  Begin
+   HasBetOnNumber := True;
+   Exit;
+  End;
+End;
+
+Function HasBetOnType(betType: TBetType): Boolean;
+Var
+ i: Integer;
+Begin
+ HasBetOnType := False;
+ For i := 0 to Game.betCount-1 do
+  If Game.bets[i].active and (Game.bets[i].betType = betType) Then
+  Begin
+   HasBetOnType := True;
+   Exit;
+  End;
+End;
+
 Procedure DrawRouletteWheel;
 Var
  i, x, y, angle: Integer;
@@ -356,24 +382,49 @@ Begin
   If i = 0 Then
   Begin
    { Case 0 spéciale }
-   SetColor(2);
-   SetFillStyle(1, 2);
+   If HasBetOnNumber(0) Then
+   Begin
+    SetColor(14);  { Jaune si mise placée }
+    SetFillStyle(1, 14);
+   End
+   Else
+   Begin
+    SetColor(2);   { Vert normal }
+    SetFillStyle(1, 2);
+   End;
    Bar(x, y, x + 30, y + 60);
    SetColor(15);
    Rectangle(x, y, x + 30, y + 60);
+   SetColor(0);  { Texte noir pour lisibilité }
    OutTextXY(x + 12, y + 25, '0');
   End
   Else
   Begin
    { Cases 1-36 }
-   SetColor(GetNumberColor(i));
-   SetFillStyle(1, GetNumberColor(i));
+   If HasBetOnNumber(i) Then
+   Begin
+    SetColor(14);  { Jaune si mise placée }
+    SetFillStyle(1, 14);
+   End
+   Else
+   Begin
+    SetColor(GetNumberColor(i));  { Couleur normale (rouge/noir) }
+    SetFillStyle(1, GetNumberColor(i));
+   End;
    Bar(x + 35 + ((i-1) mod 3) * 25, y + ((i-1) div 3) * 15, 
        x + 35 + ((i-1) mod 3) * 25 + 25, y + ((i-1) div 3) * 15 + 15);
    
    SetColor(15);
    Rectangle(x + 35 + ((i-1) mod 3) * 25, y + ((i-1) div 3) * 15,
             x + 35 + ((i-1) mod 3) * 25 + 25, y + ((i-1) div 3) * 15 + 15);
+   
+   { Couleur du texte selon le fond }
+   If HasBetOnNumber(i) Then
+    SetColor(0)  { Texte noir sur fond jaune }
+   Else If GetNumberColor(i) = 0 Then
+    SetColor(15) { Texte blanc sur fond noir }
+   Else
+    SetColor(15); { Texte blanc sur fond rouge }
    
    Str(i, numStr);
    OutTextXY(x + 35 + ((i-1) mod 3) * 25 + 8, y + ((i-1) div 3) * 15 + 5, numStr);
@@ -382,28 +433,76 @@ Begin
  
  { Cases des mises extérieures }
  y := y + 200;
- SetColor(4);
- SetFillStyle(1, 4);
+ 
+ { Case ROUGE }
+ If HasBetOnType(btRed) Then
+ Begin
+  SetColor(14);  { Jaune si mise placée }
+  SetFillStyle(1, 14);
+ End
+ Else
+ Begin
+  SetColor(4);   { Rouge normal }
+  SetFillStyle(1, 4);
+ End;
  Bar(x, y, x + 40, y + 20);
  SetColor(15);
  Rectangle(x, y, x + 40, y + 20);
+ If HasBetOnType(btRed) Then
+  SetColor(0)   { Texte noir sur fond jaune }
+ Else
+  SetColor(15); { Texte blanc sur fond rouge }
  OutTextXY(x + 8, y + 8, 'ROUGE');
  
- SetColor(0);
- SetFillStyle(1, 0);
+ { Case NOIR }
+ If HasBetOnType(btBlack) Then
+ Begin
+  SetColor(14);  { Jaune si mise placée }
+  SetFillStyle(1, 14);
+ End
+ Else
+ Begin
+  SetColor(0);   { Noir normal }
+  SetFillStyle(1, 0);
+ End;
  Bar(x + 45, y, x + 85, y + 20);
  SetColor(15);
  Rectangle(x + 45, y, x + 85, y + 20);
+ If HasBetOnType(btBlack) Then
+  SetColor(0)   { Texte noir sur fond jaune }
+ Else
+  SetColor(15); { Texte blanc sur fond noir }
  OutTextXY(x + 53, y + 8, 'NOIR');
  
- SetColor(7);
- SetFillStyle(1, 7);
+ { Case PAIR }
+ If HasBetOnType(btEven) Then
+ Begin
+  SetColor(14);  { Jaune si mise placée }
+  SetFillStyle(1, 14);
+ End
+ Else
+ Begin
+  SetColor(7);   { Gris normal }
+  SetFillStyle(1, 7);
+ End;
  Bar(x + 90, y, x + 130, y + 20);
  SetColor(0);
  Rectangle(x + 90, y, x + 130, y + 20);
  OutTextXY(x + 98, y + 8, 'PAIR');
  
+ { Case IMPAIR }
+ If HasBetOnType(btOdd) Then
+ Begin
+  SetColor(14);  { Jaune si mise placée }
+  SetFillStyle(1, 14);
+ End
+ Else
+ Begin
+  SetColor(7);   { Gris normal }
+  SetFillStyle(1, 7);
+ End;
  Bar(x + 135, y, x + 175, y + 20);
+ SetColor(0);
  Rectangle(x + 135, y, x + 175, y + 20);
  OutTextXY(x + 140, y + 8, 'IMPAIR');
 End;
