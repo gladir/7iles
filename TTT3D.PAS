@@ -79,7 +79,7 @@ Var
   I, J, BaseX, BaseY: Integer;
 Begin
   BaseX := OffsetX;
-  BaseY := 100;
+  BaseY := 315;
 
   { Titre du niveau }
   SetColor(White);
@@ -200,17 +200,143 @@ End;
 
 Procedure Draw3DGrid;
 Var
-  I: Integer;
+  I, J, K: Integer;
   PlayerSymbol: String[1];
+  CenterX, CenterY: Integer;
+  BackSize, FrontSize: Integer;
+  BackX1, BackY1, BackX2, BackY2: Integer;
+  FrontX1, FrontY1, FrontX2, FrontY2: Integer;
+  GridStep: Integer;
+  InterpX, InterpY: Integer;
+  BackCellX, BackCellY: Integer;
+  FrontCellX, FrontCellY: Integer;
+  Factor: Real;
+  CursorX, CursorY: Integer;
+  CellSize: Integer;
 Begin
   ClearDevice;
-
-  { Dessiner les 4 niveaux côte à côte }
+   { Dessiner les 4 niveaux c�te � c�te }
   For I := 0 to GRID_SIZE-1 do
-    DrawLayer(I, 20 + I*(GRID_SIZE*CELL_SIZE + 20));
+    DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
 
-  { Dessiner le cube 3D }
-  Draw3DCube;
+
+  { Paramètres de la vue aérienne }
+  CenterX := 320;  { Centre de l'écran }
+  CenterY := 190;
+  BackSize := 200;   { Taille du carré arrière }
+  FrontSize := 120;  { Taille du carré avant }
+
+  { Calculer les positions des carrés }
+  BackX1 := CenterX - BackSize div 2;
+  BackY1 := CenterY - BackSize div 2;
+  BackX2 := CenterX + BackSize div 2;
+  BackY2 := CenterY + BackSize div 2;
+
+  FrontX1 := CenterX - FrontSize div 2;
+  FrontY1 := CenterY - FrontSize div 2;
+  FrontX2 := CenterX + FrontSize div 2;
+  FrontY2 := CenterY + FrontSize div 2;
+
+  { Dessiner le carré arrière (fond) }
+  SetColor(LightGray);
+  Rectangle(BackX1, BackY1, BackX2, BackY2);
+
+  { Dessiner la grille du carré arrière }
+  GridStep := BackSize div GRID_SIZE;
+  For I := 1 to GRID_SIZE-1 do Begin
+    Line(BackX1 + I*GridStep, BackY1, BackX1 + I*GridStep, BackY2);
+    Line(BackX1, BackY1 + I*GridStep, BackX2, BackY1 + I*GridStep);
+  End;
+
+  { Dessiner le carré avant (premier plan) }
+  SetColor(White);
+  Rectangle(FrontX1, FrontY1, FrontX2, FrontY2);
+
+  { Dessiner la grille du carré avant }
+  GridStep := FrontSize div GRID_SIZE;
+  For I := 1 to GRID_SIZE-1 do Begin
+    Line(FrontX1 + I*GridStep, FrontY1, FrontX1 + I*GridStep, FrontY2);
+    Line(FrontX1, FrontY1 + I*GridStep, FrontX2, FrontY1 + I*GridStep);
+  End;
+
+  { Dessiner les lignes diagonales de connexion entre les carrés }
+  SetColor(DarkGray);
+  Line(BackX1, BackY1, FrontX1, FrontY1);  { Coin supérieur gauche }
+  Line(BackX2, BackY1, FrontX2, FrontY1);  { Coin supérieur droit }
+  Line(BackX1, BackY2, FrontX1, FrontY2);  { Coin inférieur gauche }
+  Line(BackX2, BackY2, FrontX2, FrontY2);  { Coin inférieur droit }
+
+  { Dessiner les lignes de grille diagonales }
+  GridStep := BackSize div GRID_SIZE;
+  For I := 1 to GRID_SIZE-1 do Begin
+    { Lignes verticales }
+    Line(BackX1 + I*GridStep, BackY1, FrontX1 + I*(FrontSize div GRID_SIZE), FrontY1);
+    Line(BackX1 + I*GridStep, BackY2, FrontX1 + I*(FrontSize div GRID_SIZE), FrontY2);
+    { Lignes horizontales }
+    Line(BackX1, BackY1 + I*GridStep, FrontX1, FrontY1 + I*(FrontSize div GRID_SIZE));
+    Line(BackX2, BackY1 + I*GridStep, FrontX2, FrontY1 + I*(FrontSize div GRID_SIZE));
+  End;
+
+  { Dessiner les symboles dans le cube 3D }
+  For K := 0 to GRID_SIZE-1 do
+    For I := 0 to GRID_SIZE-1 do
+      For J := 0 to GRID_SIZE-1 do
+        If Grid[I,J,K] <> Empty Then Begin
+          { Calculer la position interpolée entre arrière et avant }
+          { K=0 = arrière, K=3 = avant }
+          Factor := K / (GRID_SIZE - 1);
+
+          { Position dans le carré arrière }
+          BackCellX := BackX1 + I * (BackSize div GRID_SIZE) + (BackSize div GRID_SIZE) div 2;
+          BackCellY := BackY1 + J * (BackSize div GRID_SIZE) + (BackSize div GRID_SIZE) div 2;
+
+          { Position dans le carré avant }
+          FrontCellX := FrontX1 + I * (FrontSize div GRID_SIZE) + (FrontSize div GRID_SIZE) div 2;
+          FrontCellY := FrontY1 + J * (FrontSize div GRID_SIZE) + (FrontSize div GRID_SIZE) div 2;
+
+          { Interpolation }
+          InterpX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
+          InterpY := Round(BackCellY + Factor * (FrontCellY - BackCellY));
+
+          { Dessiner le symbole }
+          If Grid[I,J,K] = X Then Begin
+            SetColor(LightRed);
+            Line(InterpX-8, InterpY-8, InterpX+8, InterpY+8);
+            Line(InterpX-8, InterpY+8, InterpX+8, InterpY-8);
+          End Else Begin
+            SetColor(LightBlue);
+            Circle(InterpX, InterpY, 8);
+          End;
+        End;
+
+  { Dessiner le curseur sur le niveau actuel }
+  If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) and CursorVisible and
+     (SelectedX >= 0) and (SelectedY >= 0) Then Begin
+    Factor := CurrentLayer / (GRID_SIZE - 1);
+
+    { Position dans le carré arrière }
+    BackCellX := BackX1 + SelectedX * (BackSize div GRID_SIZE);
+    BackCellY := BackY1 + SelectedY * (BackSize div GRID_SIZE);
+
+    { Position dans le carré avant }
+    FrontCellX := FrontX1 + SelectedX * (FrontSize div GRID_SIZE);
+    FrontCellY := FrontY1 + SelectedY * (FrontSize div GRID_SIZE);
+
+    { Interpolation }
+    CursorX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
+    CursorY := Round(BackCellY + Factor * (FrontCellY - BackCellY));
+
+    { Dessiner le rectangle du curseur }
+    SetColor(Yellow);
+    If CurrentLayer = 0 Then
+      Rectangle(CursorX, CursorY, CursorX + (BackSize div GRID_SIZE), CursorY + (BackSize div GRID_SIZE))
+    Else If CurrentLayer = GRID_SIZE-1 Then
+      Rectangle(CursorX, CursorY, CursorX + (FrontSize div GRID_SIZE), CursorY + (FrontSize div GRID_SIZE))
+    Else Begin
+      CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
+      Rectangle(CursorX, CursorY, CursorX + CellSize, CursorY + CellSize);
+    End;
+  End;
 
   { Préparer le symbole du joueur }
   If CurrentPlayer = 1 Then PlayerSymbol := 'X'
@@ -220,6 +346,9 @@ Begin
   SetColor(White);
   OutTextXY(20, 20, 'Joueur ' + Chr(CurrentPlayer + Ord('0')) +
             ' (' + PlayerSymbol + ')');
+  OutTextXY(20, 40, 'Niveau: ' + Chr(CurrentLayer + Ord('1')));
+  OutTextXY(20, 60, 'Fleches: deplacer, PgUp/PgDn: changer niveau');
+  OutTextXY(20, 80, 'Entree: placer symbole, Echap: quitter');
 
   { Mise à jour du timer du curseur }
   Inc(CursorTimer);
@@ -392,16 +521,14 @@ Begin
 End;
 
 BEGIN
-  InitScr;
-  InitializeGame;
-  PlayerType[1] := Human;
-  PlayerType[2] := Computer;
-
-  Repeat
-    Draw3DGrid;
-    HandleInput;
-    Delay(50);
-  Until GameOver;
-
-  CloseGraph;
+ InitScr;
+ InitializeGame;
+ PlayerType[1] := Human;
+ PlayerType[2] := Computer;
+ Repeat
+  Draw3DGrid;
+  HandleInput;
+  Delay(50);
+ Until GameOver;
+ CloseGraph;
 END.
