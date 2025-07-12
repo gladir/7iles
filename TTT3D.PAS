@@ -4,11 +4,11 @@
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
 }
 
-Program TTR3D;
+Program TTT3D;
 
 Uses {$IFDEF FPC}
       Windows,PtcMouse,PtcGraph,PtcCrt
-     {$ELSE}
+       {$ELSE}
       Crt,Graph
      {$ENDIF};
 
@@ -40,6 +40,48 @@ Var
   SelectedX, SelectedY: Integer;
   CursorVisible: Boolean;
   CursorTimer: Integer;
+  { Variables pour GetImage/PutImage }
+  CursorBackup: Pointer;
+  CursorBackupSize: Word;
+  LastCursorX, LastCursorY: Integer;
+  LastCursorWidth, LastCursorHeight: Integer;
+  CursorSaved: Boolean;
+
+{ Déclarations forward pour les procedures d'aide }
+Procedure SaveCursorArea(X, Y, Width, Height: Integer); Forward;
+Procedure RestoreCursorArea; Forward;
+Procedure DrawCursor(X, Y, Width, Height: Integer); Forward;
+
+{ Implémentations des procedures d'aide }
+Procedure SaveCursorArea(X, Y, Width, Height: Integer);
+Begin
+  If CursorSaved Then RestoreCursorArea;
+  
+  CursorBackupSize := ImageSize(X, Y, X + Width, Y + Height);
+  If CursorBackup <> Nil Then FreeMem(CursorBackup, CursorBackupSize);
+  
+  GetMem(CursorBackup, CursorBackupSize);
+  GetImage(X, Y, X + Width, Y + Height, CursorBackup^);
+  
+  LastCursorX := X;
+  LastCursorY := Y;
+  CursorSaved := True;
+End;
+
+Procedure RestoreCursorArea;
+Begin
+  If CursorSaved and (CursorBackup <> Nil) Then Begin
+    PutImage(LastCursorX, LastCursorY, CursorBackup^, NormalPut);
+    CursorSaved := False;
+  End;
+End;
+
+Procedure DrawCursor(X, Y, Width, Height: Integer);
+Begin
+  SaveCursorArea(X, Y, Width, Height);
+  SetColor(Yellow);
+  Rectangle(X, Y, X + Width, Y + Height);
+End;
 
 Procedure InitScr;
 Var
@@ -112,12 +154,22 @@ Begin
     End;
   End;
 
-  { Curseur clignotant }
-  If (LayerNum = CurrentLayer) and CursorVisible and
-     (SelectedX >= 0) and (SelectedY >= 0) Then Begin
-    SetColor(Yellow);
-    Rectangle(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE,
-             BaseX + (SelectedX+1)*CELL_SIZE, BaseY + (SelectedY+1)*CELL_SIZE);
+  { Curseur clignotant avec GetImage/PutImage }
+  If (LayerNum = CurrentLayer) and (SelectedX >= 0) and (SelectedY >= 0) Then Begin
+    If CursorVisible Then Begin
+      { Sauvegarder la zone si pas déjà fait }
+      If Not CursorSaved Then Begin
+        SaveCursorArea(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE, 
+                       CELL_SIZE, CELL_SIZE);
+      End;
+      { Dessiner le curseur }
+      SetColor(Yellow);
+      Rectangle(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE,
+                BaseX + (SelectedX+1)*CELL_SIZE, BaseY + (SelectedY+1)*CELL_SIZE);
+    End Else Begin
+      { Restaurer la zone sauvegardée pour effacer le curseur }
+      RestoreCursorArea;
+    End;
   End;
 End;
 
@@ -214,8 +266,14 @@ Var
   CursorX, CursorY: Integer;
   CellSize: Integer;
 Begin
-  ClearDevice;
-   { Dessiner les 4 niveaux c�te � c�te }
+  { Effacement ciblé au lieu de ClearDevice pour éviter le clignotement }
+  SetColor(Black);
+  SetFillStyle(1, Black);
+  { Effacer seulement les zones nécessaires }
+  Bar(0, 0, 640, 310);     { Zone des contrôles et titre }
+  Bar(0, 310, 640, 460);   { Zone des plateaux 2D }
+  Bar(0, 100, 640, 250);   { Zone du cube 3D aérien }
+    { Dessiner les 4 niveaux côte à côte }
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
 
@@ -326,16 +384,16 @@ Begin
     CursorX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
     CursorY := Round(BackCellY + Factor * (FrontCellY - BackCellY));
 
-    { Dessiner le rectangle du curseur }
+    { Dessiner le curseur avec sauvegarde/restauration }
     SetColor(Yellow);
     If CurrentLayer = 0 Then
-      Rectangle(CursorX, CursorY, CursorX + (BackSize div GRID_SIZE), CursorY + (BackSize div GRID_SIZE))
+      CellSize := BackSize div GRID_SIZE
     Else If CurrentLayer = GRID_SIZE-1 Then
-      Rectangle(CursorX, CursorY, CursorX + (FrontSize div GRID_SIZE), CursorY + (FrontSize div GRID_SIZE))
-    Else Begin
+      CellSize := FrontSize div GRID_SIZE
+    Else
       CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
-      Rectangle(CursorX, CursorY, CursorX + CellSize, CursorY + CellSize);
-    End;
+    
+    DrawCursor(CursorX, CursorY, CellSize, CellSize);
   End;
 
   { Préparer le symbole du joueur }
@@ -505,12 +563,30 @@ Begin
     Key := ReadKey;
     Case Key of
       #0: Case ReadKey of
-        #72: If SelectedY > 0 Then Dec(SelectedY);           { Up }
-        #80: If SelectedY < GRID_SIZE-1 Then Inc(SelectedY); { Down }
-        #75: If SelectedX > 0 Then Dec(SelectedX);           { Left }
-        #77: If SelectedX < GRID_SIZE-1 Then Inc(SelectedX); { Right }
-        #73: If CurrentLayer < GRID_SIZE-1 Then Inc(CurrentLayer); { PgUp }
-        #81: If CurrentLayer > 0 Then Dec(CurrentLayer);          { PgDn }
+        #72: If SelectedY > 0 Then Begin { Up }
+          RestoreCursorArea; { Restaurer avant de bouger }
+          Dec(SelectedY);
+        End;
+        #80: If SelectedY < GRID_SIZE-1 Then Begin { Down }
+          RestoreCursorArea;
+          Inc(SelectedY);
+        End;
+        #75: If SelectedX > 0 Then Begin { Left }
+          RestoreCursorArea;
+          Dec(SelectedX);
+        End;
+        #77: If SelectedX < GRID_SIZE-1 Then Begin { Right }
+          RestoreCursorArea;
+          Inc(SelectedX);
+        End;
+        #73: If CurrentLayer < GRID_SIZE-1 Then Begin { PgUp }
+          RestoreCursorArea;
+          Inc(CurrentLayer);
+        End;
+        #81: If CurrentLayer > 0 Then Begin { PgDn }
+          RestoreCursorArea;
+          Dec(CurrentLayer);
+        End;
       End;
       #13: Begin { Enter }
         If IsValidMove(SelectedX, SelectedY, CurrentLayer) Then Begin
@@ -561,6 +637,13 @@ Begin
   CursorTimer := 0;
   SelectedX := 0;
   SelectedY := 0;
+  
+  { Initialiser les variables de sauvegarde du curseur }
+  CursorBackup := Nil;
+  CursorBackupSize := 0;
+  LastCursorX := -1;
+  LastCursorY := -1;
+  CursorSaved := False;
 End;
 
 Procedure ShowGameResult;
@@ -622,6 +705,10 @@ BEGIN
   HandleInput;
   Delay(50);
  Until GameOver;
+
+ { Libérer la mémoire du curseur }
+ If CursorBackup <> Nil Then
+   FreeMem(CursorBackup, CursorBackupSize);
 
  { Afficher le résultat de la partie }
  ShowGameResult;
