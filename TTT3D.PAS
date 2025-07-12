@@ -343,10 +343,12 @@ Begin
                       Else PlayerSymbol := 'O';
 
   { Légende et contrôles }
+  SetColor(Magenta);
+  SetTextStyle(0, 0, 2);
+  OutTextXY(230, 5, 'Tic-Tac-Toe 3D');
+  SetTextStyle(0, 0, 1);
   SetColor(White);
-  OutTextXY(20, 20, 'Joueur ' + Chr(CurrentPlayer + Ord('0')) +
-            ' (' + PlayerSymbol + ')');
-  OutTextXY(20, 40, 'Niveau: ' + Chr(CurrentLayer + Ord('1')));
+  OutTextXY(20, 40, '(X) Humain, (O) Ordinateur, Niveau: ' + Chr(CurrentLayer + Ord('1')));
   OutTextXY(20, 60, 'Fleches: deplacer, PgUp/PgDn: changer niveau');
   OutTextXY(20, 80, 'Entree: placer symbole, Echap: quitter');
 
