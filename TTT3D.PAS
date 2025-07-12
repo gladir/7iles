@@ -14,7 +14,7 @@ Uses {$IFDEF FPC}
 
 Const
   GRID_SIZE = 4;
-  CELL_SIZE = 40;
+  CELL_SIZE = 35;
   LAYER_OFFSET = 100;
   MAX_PLAYERS = 2;
   CUBE_OFFSET_X = 300;  { Position X du cube 3D }
@@ -215,7 +215,7 @@ Var
   CellSize: Integer;
 Begin
   ClearDevice;
-   { Dessiner les 4 niveaux c“te … c“te }
+   { Dessiner les 4 niveaux cï¿½te ï¿½ cï¿½te }
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
 
