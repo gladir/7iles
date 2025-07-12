@@ -11,7 +11,7 @@ Uses
 {$IFDEF FPC}
   PtcCrt, PtcGraph, PtcMouse
 {$ELSE}
-  Crt, Graph
+  DOS,Crt, Graph
 {$ENDIF};
 
 Const
@@ -19,19 +19,19 @@ Const
  SCREEN_HEIGHT = 480;
  MAX_BETS = 10;
  STARTING_MONEY = 1000;
- 
+
 Type
  TBetType = (btNumber, btRed, btBlack, btEven, btOdd, btLow, btHigh, btDozen1, btDozen2, btDozen3);
- 
+
  TBet = Record
   betType: TBetType;
   number: Integer;     { Pour les mises sur numéro }
   amount: Integer;
   active: Boolean;
  End;
- 
+
  TGameState = (gsPlacing, gsSpinning, gsResult, gsQuit);
- 
+
  TGame = Record
   playerMoney: Integer;
   currentBet: Integer;
@@ -53,6 +53,77 @@ Var
 { Déclarations forward }
 Procedure InitializeRedNumbers; Forward;
 Procedure InitializeGame; Forward;
+
+{$IFNDEF FPC}
+ Function MouseDriverFound: Boolean;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX := 0;
+  Intr($33, Regs);
+  MouseDriverFound := Regs.AX = $FFFF;
+ End;
+
+ Procedure ShowMouse;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX:=$0001;
+  Intr($33,Regs);
+ End;
+
+ Procedure HideMouse;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX:=$0002;
+  Intr($33, Regs);
+ End;
+
+ Procedure GetMouseState(Var X,Y,Button:LongInt);
+ Var
+  Regs: Registers;
+ Begin
+  Regs.AX := $0003;
+  Intr($33, Regs);
+  Button := Regs.BX;
+  X := Regs.CX;
+  Y := Regs.DX;
+ End;
+
+ Function GetMouseButton:Word;
+ Var
+  X,Y,Button:LongInt;
+ Begin
+  GetMouseState(X,Y,Button);
+  GetMouseButton:=Button;
+ End;
+
+ Procedure SetMousePosition(X,Y:Integer);
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX:=$0004;
+  Regs.CX:=X;
+  Regs.DX:=Y;
+  Intr($33,Regs);
+ End;
+
+{$ELSE}
+ Function MouseDriverFound:Boolean;
+ Begin
+  MouseDriverFound := True; { Pas de support souris direct en Free Pascal }
+ End;
+
+ Procedure ShowMouse;Begin
+  { Pas d'impl�mentation pour Free Pascal }
+ End;
+
+ Procedure HideMouse;Begin
+  { Pas d'impl�mentation pour Free Pascal }
+ End;
+
+{$ENDIF}
 
 Procedure InitializeRedNumbers;
 Begin
@@ -114,7 +185,7 @@ End;
 Function IsBetWinning(var bet: TBet; winningNum: Integer): Boolean;
 Begin
  IsBetWinning := False;
- 
+
  Case bet.betType of
   btNumber: IsBetWinning := (bet.number = winningNum);
   btRed: IsBetWinning := (winningNum > 0) and IsRedNumber(winningNum);
@@ -150,7 +221,7 @@ Begin
  For i := 0 to Game.betCount-1 do
   If Game.bets[i].active Then
    Game.playerMoney := Game.playerMoney + Game.bets[i].amount;
- 
+
  Game.betCount := 0;
  Game.needRedraw := True;
 End;
@@ -169,21 +240,104 @@ Var
  i, winnings: Integer;
 Begin
  winnings := 0;
- 
+
  For i := 0 to Game.betCount-1 do
   If Game.bets[i].active and IsBetWinning(Game.bets[i], Game.winningNumber) Then
    winnings := winnings + Game.bets[i].amount * (GetBetMultiplier(Game.bets[i].betType) + 1);
- 
+
  Game.playerMoney := Game.playerMoney + winnings;
  Game.gameState := gsResult;
  Game.resultTimer := 100; { Afficher résultat pendant 10 secondes }
  Game.needRedraw := True;
 End;
 
+Function HandleMouseClick: Boolean;
+Var
+ mouseX, mouseY, button: LongInt;
+ x, y: Integer;
+ i: Integer;
+ clickedNumber: Integer;
+Begin
+ HandleMouseClick := False;
+ GetMouseState(mouseX, mouseY, button);
+
+ If button and 1 = 1 Then { Clic gauche }
+ Begin
+  x := 400;  { Position du plateau de mises }
+  y := 80;
+
+  { Vérifier clic sur case 0 }
+  If (mouseX >= x) and (mouseX <= x + 30) and
+     (mouseY >= y) and (mouseY <= y + 60) Then
+  Begin
+   PlaceBet(btNumber, 0, Game.currentBet);
+   HandleMouseClick := True;
+   Exit;
+  End;
+
+  { Vérifier clic sur cases 1-36 }
+  For i := 1 to 36 do
+  Begin
+   If (mouseX >= x + 35 + ((i-1) mod 3) * 25) and
+      (mouseX <= x + 35 + ((i-1) mod 3) * 25 + 25) and
+      (mouseY >= y + ((i-1) div 3) * 15) and
+      (mouseY <= y + ((i-1) div 3) * 15 + 15) Then
+   Begin
+    PlaceBet(btNumber, i, Game.currentBet);
+    HandleMouseClick := True;
+    Exit;
+   End;
+  End;
+
+  { Vérifier clic sur cases des mises extérieures }
+  y := y + 200;
+
+  { Case ROUGE }
+  If (mouseX >= x) and (mouseX <= x + 40) and
+     (mouseY >= y) and (mouseY <= y + 20) Then
+  Begin
+   PlaceBet(btRed, 0, Game.currentBet);
+   HandleMouseClick := True;
+   Exit;
+  End;
+
+  { Case NOIR }
+  If (mouseX >= x + 45) and (mouseX <= x + 85) and
+     (mouseY >= y) and (mouseY <= y + 20) Then
+  Begin
+   PlaceBet(btBlack, 0, Game.currentBet);
+   HandleMouseClick := True;
+   Exit;
+  End;
+
+  { Case PAIR }
+  If (mouseX >= x + 90) and (mouseX <= x + 130) and
+     (mouseY >= y) and (mouseY <= y + 20) Then
+  Begin
+   PlaceBet(btEven, 0, Game.currentBet);
+   HandleMouseClick := True;
+   Exit;
+  End;
+
+  { Case IMPAIR }
+  If (mouseX >= x + 135) and (mouseX <= x + 175) and
+     (mouseY >= y) and (mouseY <= y + 20) Then
+  Begin
+   PlaceBet(btOdd, 0, Game.currentBet);
+   HandleMouseClick := True;
+   Exit;
+  End;
+ End;
+End;
+
 Procedure HandleInput;
 Var
  key: Char;
 Begin
+ { Gérer les clics de souris }
+ If (Game.gameState = gsPlacing) and HandleMouseClick Then
+  Exit; { Un clic a été traité, pas besoin de vérifier le clavier }
+
  If KeyPressed Then
  Begin
   key := ReadKey;
@@ -320,17 +474,17 @@ Var
 Begin
  x := 230;  { Déplacé de 80 pixels vers la droite (150 + 80) }
  y := 150;
- 
+
  { Roue principale }
  SetColor(8);
  SetFillStyle(1, 8);
  FillEllipse(x, y, 80, 80);
- 
+
  { Cercle intérieur }
  SetColor(0);
  SetFillStyle(1, 0);
  FillEllipse(x, y, 60, 60);
- 
+
  { Numéros sur la roue }
  For i := 0 to 36 do
  Begin
@@ -338,13 +492,13 @@ Begin
   SetColor(GetNumberColor(i));
   If GetNumberColor(i) = 0 Then
    SetColor(15); { Blanc pour lisibilité sur noir }
-  
+
   Str(i, numStr);
   SetTextStyle(0, 0, 1);
-  OutTextXY(x + Round(40 * Cos(angle * Pi / 180)) - 4, 
+  OutTextXY(x + Round(40 * Cos(angle * Pi / 180)) - 4,
            y + Round(40 * Sin(angle * Pi / 180)) - 4, numStr);
  End;
- 
+
  { Animation de rotation pendant le spin }
  If Game.gameState = gsSpinning Then
  Begin
@@ -352,14 +506,14 @@ Begin
   SetFillStyle(1, 14);
   FillEllipse(x + Random(6) - 3, y + Random(6) - 3, 5, 5);
  End;
- 
+
  { Bille sur numéro gagnant }
  If Game.gameState = gsResult Then
  Begin
   angle := (Game.winningNumber * 360) div 37;
   SetColor(15);
   SetFillStyle(1, 15);
-  FillEllipse(x + Round(40 * Cos(angle * Pi / 180)), 
+  FillEllipse(x + Round(40 * Cos(angle * Pi / 180)),
              y + Round(40 * Sin(angle * Pi / 180)), 3, 3);
  End;
 End;
@@ -371,11 +525,11 @@ Var
 Begin
  x := 400;  { Déplacé de 80 pixels vers la droite (320 + 80) }
  y := 80;
- 
+
  SetColor(15);
  SetTextStyle(0, 0, 1);
  OutTextXY(x, y - 20, 'PLATEAU DE MISES');
- 
+
  { Cases des numéros 1-36 + 0 }
  For i := 0 to 36 do
  Begin
@@ -411,13 +565,13 @@ Begin
     SetColor(GetNumberColor(i));  { Couleur normale (rouge/noir) }
     SetFillStyle(1, GetNumberColor(i));
    End;
-   Bar(x + 35 + ((i-1) mod 3) * 25, y + ((i-1) div 3) * 15, 
+   Bar(x + 35 + ((i-1) mod 3) * 25, y + ((i-1) div 3) * 15,
        x + 35 + ((i-1) mod 3) * 25 + 25, y + ((i-1) div 3) * 15 + 15);
-   
+
    SetColor(15);
    Rectangle(x + 35 + ((i-1) mod 3) * 25, y + ((i-1) div 3) * 15,
             x + 35 + ((i-1) mod 3) * 25 + 25, y + ((i-1) div 3) * 15 + 15);
-   
+
    { Couleur du texte selon le fond }
    If HasBetOnNumber(i) Then
     SetColor(0)  { Texte noir sur fond jaune }
@@ -425,15 +579,15 @@ Begin
     SetColor(15) { Texte blanc sur fond noir }
    Else
     SetColor(15); { Texte blanc sur fond rouge }
-   
+
    Str(i, numStr);
    OutTextXY(x + 35 + ((i-1) mod 3) * 25 + 8, y + ((i-1) div 3) * 15 + 5, numStr);
   End;
  End;
- 
+
  { Cases des mises extérieures }
  y := y + 200;
- 
+
  { Case ROUGE }
  If HasBetOnType(btRed) Then
  Begin
@@ -453,7 +607,7 @@ Begin
  Else
   SetColor(15); { Texte blanc sur fond rouge }
  OutTextXY(x + 8, y + 8, 'ROUGE');
- 
+
  { Case NOIR }
  If HasBetOnType(btBlack) Then
  Begin
@@ -473,7 +627,7 @@ Begin
  Else
   SetColor(15); { Texte blanc sur fond noir }
  OutTextXY(x + 53, y + 8, 'NOIR');
- 
+
  { Case PAIR }
  If HasBetOnType(btEven) Then
  Begin
@@ -489,7 +643,7 @@ Begin
  SetColor(0);
  Rectangle(x + 90, y, x + 130, y + 20);
  OutTextXY(x + 98, y + 8, 'PAIR');
- 
+
  { Case IMPAIR }
  If HasBetOnType(btOdd) Then
  Begin
@@ -513,15 +667,15 @@ Var
 Begin
  SetColor(15);
  SetTextStyle(0, 0, 1);
- 
+
  Str(Game.playerMoney, moneyStr);
  OutTextXY(50, 50, 'Argent: ' + moneyStr + ' euros');
- 
+
  Str(Game.currentBet, betStr);
  OutTextXY(50, 70, 'Mise: ' + betStr + ' euros');
- 
+
  OutTextXY(50, 90, 'Type: ' + GetBetTypeName(Game.selectedBetType));
- 
+
  If Game.selectedBetType = btNumber Then
  Begin
   Str(Game.selectedNumber, betStr);
@@ -539,7 +693,7 @@ Begin
   SetColor(14);
   SetTextStyle(0, 0, 1);
   OutTextXY(50, 280, 'VOS MISES:');
-  
+
   y := 300;
   For i := 0 to Game.betCount-1 do
    If Game.bets[i].active Then
@@ -550,16 +704,16 @@ Begin
      Str(Game.bets[i].number, amountStr);
      betStr := betStr + ' ' + amountStr;
     End;
-    
+
     Str(Game.bets[i].amount, amountStr);
     betStr := betStr + ': ' + amountStr + ' euros';
-    
+
     { Mettre en évidence les mises gagnantes }
     If (Game.gameState = gsResult) and IsBetWinning(Game.bets[i], Game.winningNumber) Then
      SetColor(10)
     Else
      SetColor(15);
-    
+
     OutTextXY(50, y, betStr);
     y := y + 15;
    End;
@@ -579,6 +733,10 @@ Begin
  OutTextXY(320, 415, 'C: Effacer mises');
  OutTextXY(320, 430, 'N: Nouvelle partie');
  OutTextXY(320, 445, 'ESC: Quitter');
+ {$IFNDEF FPC}
+ SetColor(10);
+ OutTextXY(320, 460, 'SOURIS: Cliquer sur cases');
+ {$ENDIF}
 End;
 
 Procedure DrawGameStatus;
@@ -587,7 +745,7 @@ Var
 Begin
  SetColor(14);
  SetTextStyle(0, 0, 2);
- 
+
  Case Game.gameState of
   gsPlacing: Begin
    OutTextXY(50, 250, 'Placez vos mises!');
@@ -598,11 +756,11 @@ Begin
   gsResult: Begin
    Str(Game.winningNumber, numStr);
    OutTextXY(50, 250, 'Numero gagnant: ' + numStr);
-   
+
    SetColor(GetNumberColor(Game.winningNumber));
    If GetNumberColor(Game.winningNumber) = 0 Then
     SetColor(15);
-   
+
    If Game.winningNumber = 0 Then
     OutTextXY(50, 270, '(ZERO - Vert)')
    Else If IsRedNumber(Game.winningNumber) Then
@@ -638,24 +796,32 @@ Procedure Render;
 Begin
  If Game.needRedraw Then
  Begin
+  {$IFNDEF FPC}
+  HideMouse; { Masquer la souris pendant le rendu }
+  {$ENDIF}
+
   { Fond }
   SetColor(2);
   SetFillStyle(1, 2);
   Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  
+
   { Titre }
   SetColor(14);
   SetTextStyle(0, 0, 2);
   OutTextXY(50, 20, 'ROULETTE CASINO');
-  
+
   DrawRouletteWheel;
   DrawBettingGrid;
   DrawGameInfo;
   DrawBets;
   DrawInstructions;
   DrawGameStatus;
-  
+
   Game.needRedraw := False;
+
+  {$IFNDEF FPC}
+  ShowMouse; { Réafficher la souris après le rendu }
+  {$ENDIF}
  End;
 End;
 
@@ -664,30 +830,30 @@ Begin
  SetColor(2);
  SetFillStyle(1, 2);
  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
- 
+
  SetColor(14);
  SetTextStyle(0, 0, 3);
  OutTextXY(SCREEN_WIDTH div 2 - 150, 80, 'ROULETTE CASINO');
- 
+
  SetColor(15);
  SetTextStyle(0, 0, 1);
  OutTextXY(50, 160, 'Bienvenue au casino! Placez vos mises et tentez votre chance.');
- 
+
  OutTextXY(50, 200, 'Types de mises:');
  OutTextXY(50, 220, '- Numero (0-36): Paye 35 contre 1');
  OutTextXY(50, 240, '- Rouge/Noir: Paye 1 contre 1');
  OutTextXY(50, 260, '- Pair/Impair: Paye 1 contre 1');
  OutTextXY(50, 280, '- 1-18/19-36: Paye 1 contre 1');
  OutTextXY(50, 300, '- Douzaines (1-12, 13-24, 25-36): Paye 2 contre 1');
- 
+
  SetColor(11);
  OutTextXY(50, 340, 'Vous commencez avec 1000 euros.');
  OutTextXY(50, 360, 'Utilisez les fleches pour naviguer dans les options.');
  OutTextXY(50, 380, 'Placez vos mises puis appuyez sur S pour lancer!');
- 
+
  OutTextXY(50, 420, 'Appuyez sur ENTREE pour commencer...');
  OutTextXY(50, 440, 'ESC pour quitter');
- 
+
  Repeat
   If KeyPressed Then
   Begin
@@ -722,7 +888,7 @@ Begin
   Update;
   Render;
   Delay(100);
-  
+
   { Vérifier si le joueur a perdu tout son argent }
   If (Game.playerMoney <= 0) and (Game.betCount = 0) Then
   Begin
@@ -733,7 +899,7 @@ Begin
    SetTextStyle(0, 0, 1);
    OutTextXY(150, 230, 'Vous avez perdu tout votre argent!');
    OutTextXY(150, 250, 'Appuyez sur N pour rejouer...');
-   
+
    Repeat
     If KeyPressed Then
     Begin
@@ -756,7 +922,7 @@ End;
 
 Procedure InitializeGraphics;
 Var
- Driver, Mode: SmallInt;
+ Driver, Mode: Integer;
  ErrCode: Integer;
 Begin
  {$IFDEF FPC}
@@ -766,7 +932,7 @@ Begin
  Driver := Detect;
  Mode := VGAHi;
  {$ENDIF}
- 
+
  InitGraph(Driver, Mode, '');
  ErrCode := GraphResult;
  If ErrCode <> grOk Then
@@ -774,8 +940,14 @@ Begin
   WriteLn('Erreur graphique : ', GraphErrorMsg(ErrCode));
   Halt;
  End;
- 
+
  SetLineStyle(0, 0, 1);
+
+ {$IFNDEF FPC}
+ { Initialiser la souris si disponible }
+ If MouseDriverFound Then
+  ShowMouse;
+ {$ENDIF}
 End;
 
 BEGIN
