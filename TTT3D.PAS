@@ -142,16 +142,24 @@ End;
 
 Function IsValidMove(X, Y, Z: Integer): Boolean;
 Begin
-  IsValidMove := (X >= 0) and (X < GRID_SIZE) and
-                 (Y >= 0) and (Y < GRID_SIZE) and
-                 (Z >= 0) and (Z < GRID_SIZE) and
-                 (Grid[X,Y,Z] = Empty);
+  { Vérification de sécurité des indices }
+  If (X < 0) or (X >= GRID_SIZE) or
+     (Y < 0) or (Y >= GRID_SIZE) or
+     (Z < 0) or (Z >= GRID_SIZE) Then Begin
+    IsValidMove := False;
+    Exit;
+  End;
+  
+  IsValidMove := (Grid[X,Y,Z] = Empty);
 End;
 
 Procedure DrawLayer(LayerNum, OffsetX: Integer);
 Var
   I, J, BaseX, BaseY: Integer;
 Begin
+  { Vérification de sécurité des indices }
+  If (LayerNum < 0) or (LayerNum >= GRID_SIZE) Then Exit;
+  
   BaseX := OffsetX;
   BaseY := 315;
 
@@ -198,7 +206,8 @@ Begin
   End;
 
   { Curseur clignotant avec GetImage/PutImage }
-  If (LayerNum = CurrentLayer) and (SelectedX >= 0) and (SelectedY >= 0) Then Begin
+  If (LayerNum = CurrentLayer) and (SelectedX >= 0) and (SelectedX < GRID_SIZE) and 
+     (SelectedY >= 0) and (SelectedY < GRID_SIZE) Then Begin
     If CursorVisible Then Begin
       { Sauvegarder la zone si pas déjà fait }
       If Not CursorSaved Then Begin
@@ -213,6 +222,9 @@ Begin
       { Restaurer la zone sauvegardée pour effacer le curseur }
       RestoreCursorArea;
     End;
+  End Else Begin
+    { Si ce n'est pas le niveau actuel, s'assurer que le curseur est effacé }
+    If CursorSaved Then RestoreCursorArea;
   End;
 End;
 
@@ -419,15 +431,25 @@ Begin
         If Grid[I,J,K] <> Empty Then Begin
           { Calculer la position interpolée entre arrière et avant }
           { K=0 = arrière, K=3 = avant }
-          Factor := K / (GRID_SIZE - 1);
+          If GRID_SIZE > 1 Then
+            Factor := K / (GRID_SIZE - 1)
+          Else
+            Factor := 0;
 
           { Position dans le carré arrière }
-          BackCellX := BackX1 + I * (BackSize div GRID_SIZE) + (BackSize div GRID_SIZE) div 2;
-          BackCellY := BackY1 + J * (BackSize div GRID_SIZE) + (BackSize div GRID_SIZE) div 2;
+          If GRID_SIZE > 0 Then Begin
+            BackCellX := BackX1 + I * (BackSize div GRID_SIZE) + (BackSize div GRID_SIZE) div 2;
+            BackCellY := BackY1 + J * (BackSize div GRID_SIZE) + (BackSize div GRID_SIZE) div 2;
 
-          { Position dans le carré avant }
-          FrontCellX := FrontX1 + I * (FrontSize div GRID_SIZE) + (FrontSize div GRID_SIZE) div 2;
-          FrontCellY := FrontY1 + J * (FrontSize div GRID_SIZE) + (FrontSize div GRID_SIZE) div 2;
+            { Position dans le carré avant }
+            FrontCellX := FrontX1 + I * (FrontSize div GRID_SIZE) + (FrontSize div GRID_SIZE) div 2;
+            FrontCellY := FrontY1 + J * (FrontSize div GRID_SIZE) + (FrontSize div GRID_SIZE) div 2;
+          End Else Begin
+            BackCellX := BackX1;
+            BackCellY := BackY1;
+            FrontCellX := FrontX1;
+            FrontCellY := FrontY1;
+          End;
 
           { Interpolation }
           InterpX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
@@ -446,16 +468,27 @@ Begin
 
   { Dessiner le curseur sur le niveau actuel }
   If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) and CursorVisible and
-     (SelectedX >= 0) and (SelectedY >= 0) Then Begin
-    Factor := CurrentLayer / (GRID_SIZE - 1);
+     (SelectedX >= 0) and (SelectedX < GRID_SIZE) and 
+     (SelectedY >= 0) and (SelectedY < GRID_SIZE) Then Begin
+    If GRID_SIZE > 1 Then
+      Factor := CurrentLayer / (GRID_SIZE - 1)
+    Else
+      Factor := 0;
 
     { Position dans le carré arrière }
-    BackCellX := BackX1 + SelectedX * (BackSize div GRID_SIZE);
-    BackCellY := BackY1 + SelectedY * (BackSize div GRID_SIZE);
+    If GRID_SIZE > 0 Then Begin
+      BackCellX := BackX1 + SelectedX * (BackSize div GRID_SIZE);
+      BackCellY := BackY1 + SelectedY * (BackSize div GRID_SIZE);
 
-    { Position dans le carré avant }
-    FrontCellX := FrontX1 + SelectedX * (FrontSize div GRID_SIZE);
-    FrontCellY := FrontY1 + SelectedY * (FrontSize div GRID_SIZE);
+      { Position dans le carré avant }
+      FrontCellX := FrontX1 + SelectedX * (FrontSize div GRID_SIZE);
+      FrontCellY := FrontY1 + SelectedY * (FrontSize div GRID_SIZE);
+    End Else Begin
+      BackCellX := BackX1;
+      BackCellY := BackY1;
+      FrontCellX := FrontX1;
+      FrontCellY := FrontY1;
+    End;
 
     { Interpolation }
     CursorX := Round(BackCellX + Factor * (FrontCellX - BackCellX));
@@ -463,12 +496,16 @@ Begin
 
     { Dessiner le curseur avec sauvegarde/restauration }
     SetColor(Yellow);
-    If CurrentLayer = 0 Then
-      CellSize := BackSize div GRID_SIZE
-    Else If CurrentLayer = GRID_SIZE-1 Then
-      CellSize := FrontSize div GRID_SIZE
-    Else
-      CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
+    If GRID_SIZE > 0 Then Begin
+      If CurrentLayer = 0 Then
+        CellSize := BackSize div GRID_SIZE
+      Else If CurrentLayer = GRID_SIZE-1 Then
+        CellSize := FrontSize div GRID_SIZE
+      Else
+        CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
+    End Else Begin
+      CellSize := 20; { Taille par défaut }
+    End;
 
     DrawCursor(CursorX, CursorY, CellSize, CellSize);
   End;
@@ -633,30 +670,51 @@ Begin
         #72: If SelectedY > 0 Then Begin { Up }
           RestoreCursorArea; { Restaurer avant de bouger }
           Dec(SelectedY);
+          { Forcer le redessin du niveau actuel pour mettre à jour l'affichage }
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
         End;
         #80: If SelectedY < GRID_SIZE-1 Then Begin { Down }
           RestoreCursorArea;
           Inc(SelectedY);
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
         End;
         #75: If SelectedX > 0 Then Begin { Left }
           RestoreCursorArea;
           Dec(SelectedX);
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
         End;
         #77: If SelectedX < GRID_SIZE-1 Then Begin { Right }
           RestoreCursorArea;
           Inc(SelectedX);
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
         End;
         #73: If CurrentLayer < GRID_SIZE-1 Then Begin { PgUp }
           RestoreCursorArea;
+          { Forcer le redessin de l'ancien niveau pour effacer le curseur }
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
           Inc(CurrentLayer);
         End;
         #81: If CurrentLayer > 0 Then Begin { PgDn }
           RestoreCursorArea;
+          { Forcer le redessin de l'ancien niveau pour effacer le curseur }
+          If (CurrentLayer >= 0) and (CurrentLayer < GRID_SIZE) Then
+            LayerSaved[CurrentLayer] := False;
           Dec(CurrentLayer);
         End;
       End;
       #13: Begin { Enter }
-        If IsValidMove(SelectedX, SelectedY, CurrentLayer) Then Begin
+        { Déboguer les valeurs }
+        If (SelectedX < 0) or (SelectedX >= GRID_SIZE) or
+           (SelectedY < 0) or (SelectedY >= GRID_SIZE) or
+           (CurrentLayer < 0) or (CurrentLayer >= GRID_SIZE) Then Begin
+          { Valeurs invalides - ne rien faire }
+          // Erreur de plage probable ici
+        End Else If IsValidMove(SelectedX, SelectedY, CurrentLayer) Then Begin
           If CurrentPlayer = 1 Then Symbol := X
                               Else Symbol := O;
           Grid[SelectedX, SelectedY, CurrentLayer] := Symbol;
@@ -682,7 +740,8 @@ Begin
                         Else Symbol := O;
     Grid[ComputerMove.X, ComputerMove.Y, ComputerMove.Z] := Symbol;
     { Forcer le redessin du niveau modifié }
-    LayerSaved[ComputerMove.Z] := False;
+    If (ComputerMove.Z >= 0) and (ComputerMove.Z < GRID_SIZE) Then
+      LayerSaved[ComputerMove.Z] := False;
     RestoreCubeArea;
     If CheckWin Then
       GameOver := True
