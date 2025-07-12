@@ -465,9 +465,8 @@ Begin
   End;
 End;
 
-Function MakeComputerMove: TPosition;
+Procedure MakeComputerMove(Var Pos: TPosition);
 Var
-  Pos: TPosition;
   X, Y, Z: Integer;
 Begin
   { Implémentation simple : choisir la première case vide }
@@ -478,7 +477,6 @@ Begin
           Pos.X := X;
           Pos.Y := Y;
           Pos.Z := Z;
-          MakeComputerMove := Pos;
           Exit;
         End;
 End;
@@ -533,7 +531,7 @@ Begin
   End;
 
   If Not GameOver And (PlayerType[CurrentPlayer] = Computer) Then Begin
-    ComputerMove := MakeComputerMove;
+    MakeComputerMove(ComputerMove);
     If CurrentPlayer = 1 Then Symbol := X
                         Else Symbol := O;
     Grid[ComputerMove.X, ComputerMove.Y, ComputerMove.Z] := Symbol;
