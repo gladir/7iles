@@ -54,6 +54,8 @@ Var
   CubeBackup: Pointer;
   CubeBackupSize: Word;
   CubeSaved: Boolean;
+  { Variables pour les 4 niveaux (juste les flags) }
+  LayerSaved: Array[0..GRID_SIZE-1] of Boolean;
 
 { Déclarations forward pour les procedures d'aide }
 Procedure SaveCursorArea(X, Y, Width, Height: Integer); Forward;
@@ -66,13 +68,13 @@ Procedure RestoreCubeArea; Forward;
 Procedure SaveCursorArea(X, Y, Width, Height: Integer);
 Begin
   If CursorSaved Then RestoreCursorArea;
-  
+
   CursorBackupSize := ImageSize(X, Y, X + Width, Y + Height);
   If CursorBackup <> Nil Then FreeMem(CursorBackup, CursorBackupSize);
-  
+
   GetMem(CursorBackup, CursorBackupSize);
   GetImage(X, Y, X + Width, Y + Height, CursorBackup^);
-  
+
   LastCursorX := X;
   LastCursorY := Y;
   CursorSaved := True;
@@ -96,10 +98,10 @@ End;
 Procedure SaveCubeArea;
 Begin
   If CubeSaved Then RestoreCubeArea;
-  
+
   CubeBackupSize := ImageSize(150, 100, 550, 280);
   If CubeBackup <> Nil Then FreeMem(CubeBackup, CubeBackupSize);
-  
+
   GetMem(CubeBackup, CubeBackupSize);
   GetImage(150, 100, 550, 280, CubeBackup^);
   CubeSaved := True;
@@ -149,15 +151,12 @@ End;
 Procedure DrawLayer(LayerNum, OffsetX: Integer);
 Var
   I, J, BaseX, BaseY: Integer;
-  NeedRedraw: Boolean;
 Begin
   BaseX := OffsetX;
   BaseY := 315;
-  
-  { Vérifier si on doit redessiner cette couche }
-  NeedRedraw := (LayerNum = CurrentLayer) or (CursorTimer = 0);
-  
-  If NeedRedraw Then Begin
+
+  { Dessiner le plateau seulement si nécessaire }
+  If Not LayerSaved[LayerNum] Then Begin
     { Effacer seulement cette zone de plateau }
     SetColor(Black);
     SetFillStyle(1, Black);
@@ -193,6 +192,9 @@ Begin
         End;
       End;
     End;
+    
+    { Marquer comme dessiné }
+    LayerSaved[LayerNum] := True;
   End;
 
   { Curseur clignotant avec GetImage/PutImage }
@@ -200,7 +202,7 @@ Begin
     If CursorVisible Then Begin
       { Sauvegarder la zone si pas déjà fait }
       If Not CursorSaved Then Begin
-        SaveCursorArea(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE, 
+        SaveCursorArea(BaseX + SelectedX*CELL_SIZE, BaseY + SelectedY*CELL_SIZE,
                        CELL_SIZE, CELL_SIZE);
       End;
       { Dessiner le curseur }
@@ -310,12 +312,12 @@ Begin
   { Effacement minimal et ciblé }
   SetColor(Black);
   SetFillStyle(1, Black);
-  
+
   { Dessiner le titre une seule fois }
   If Not TitleDrawn Then Begin
     { Effacer seulement la zone du titre }
     Bar(0, 0, 640, 100);
-    
+
     { Dessiner le titre }
     SetColor(Magenta);
     SetTextStyle(0, 0, 2);
@@ -324,25 +326,27 @@ Begin
     TitleDrawn := True;
     LastDisplayedLayer := -1; { Forcer la mise à jour des infos }
   End;
-  
+
   { Mettre à jour les infos seulement si le niveau a changé }
   If CurrentLayer <> LastDisplayedLayer Then Begin
     { Effacer seulement la zone des contrôles (ligne d'info dynamique) }
     Bar(0, 35, 640, 100);
-    
+
     { Légende et contrôles (info dynamique) }
     SetColor(White);
     SetTextStyle(0, 0, 1);
     OutTextXY(20, 40, '(X) Humain, (O) Ordinateur, Niveau: ' + Chr(CurrentLayer + Ord('1')));
     OutTextXY(20, 60, 'Fleches: deplacer, PgUp/PgDn: changer niveau');
     OutTextXY(20, 80, 'Entree: placer symbole, Echap: quitter');
-    
+
     LastDisplayedLayer := CurrentLayer;
-    
+
     { Forcer le redessin du cube 3D car le niveau a changé }
     RestoreCubeArea;
+    { Forcer le redessin des niveaux }
+    For I := 0 to GRID_SIZE-1 do LayerSaved[I] := False;
   End;
-  
+
   { Dessiner les 4 niveaux côte à côte }
   For I := 0 to GRID_SIZE-1 do
     DrawLayer(I, 5 + I*(GRID_SIZE*CELL_SIZE + 20));
@@ -465,7 +469,7 @@ Begin
       CellSize := FrontSize div GRID_SIZE
     Else
       CellSize := Round((BackSize div GRID_SIZE) + Factor * ((FrontSize div GRID_SIZE) - (BackSize div GRID_SIZE)));
-    
+
     DrawCursor(CursorX, CursorY, CellSize, CellSize);
   End;
 
@@ -656,6 +660,9 @@ Begin
           If CurrentPlayer = 1 Then Symbol := X
                               Else Symbol := O;
           Grid[SelectedX, SelectedY, CurrentLayer] := Symbol;
+          { Forcer le redessin du niveau modifié }
+          LayerSaved[CurrentLayer] := False;
+          RestoreCubeArea;
           If CheckWin Then
             GameOver := True
           Else If IsBoardFull Then Begin
@@ -674,6 +681,9 @@ Begin
     If CurrentPlayer = 1 Then Symbol := X
                         Else Symbol := O;
     Grid[ComputerMove.X, ComputerMove.Y, ComputerMove.Z] := Symbol;
+    { Forcer le redessin du niveau modifié }
+    LayerSaved[ComputerMove.Z] := False;
+    RestoreCubeArea;
     If CheckWin Then
       GameOver := True
     Else If IsBoardFull Then Begin
@@ -700,7 +710,7 @@ Begin
   CursorTimer := 0;
   SelectedX := 0;
   SelectedY := 0;
-  
+
   { Initialiser les variables de sauvegarde du curseur }
   CursorBackup := Nil;
   CursorBackupSize := 0;
@@ -709,11 +719,16 @@ Begin
   CursorSaved := False;
   TitleDrawn := False;
   LastDisplayedLayer := -1;
-  
+
   { Initialiser les variables du cube 3D }
   CubeBackup := Nil;
   CubeBackupSize := 0;
   CubeSaved := False;
+  
+  { Initialiser les variables des niveaux (juste le flag) }
+  For I := 0 to GRID_SIZE-1 do Begin
+    LayerSaved[I] := False;
+  End;
 End;
 
 Procedure ShowGameResult;
@@ -759,7 +774,7 @@ Begin
     If KeyPressed Then Begin
       Key := ReadKey;
       If Key = #0 Then ReadKey; { Ignorer les touches spéciales }
-      Break;
+      Exit;
     End;
     Delay(50);
   Until False;
