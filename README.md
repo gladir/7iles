@@ -461,6 +461,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
        <td><b>Tetris</b></td>
       <td>Ce fichier de jeu permet d'indiquer le jeu d'origine soviétique offrant la possibilité de placer des blocs dans un tableau afin de faire disparaitre le maximum de ligne complete. </td>
      </tr>
+    <tr>
+        <td><b>TILEMAN.PAS</b></td>
+        <td><b>TileMan</b></td>
+        <td>Ce fichier contient le jeu TileMan, lequel est un genre Nibble capturant des régions.</td>
+    </tr>
      <tr>
         <td><b>TTT.PAS</b></td>
          <td><b>Tic-Tac-Toe</b></td>
