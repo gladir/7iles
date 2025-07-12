@@ -364,6 +364,7 @@ Var
   S: TSymbol;
 Begin
   CheckWin := False;
+  Winner := 0;
 
   { Vérification horizontale dans chaque niveau }
   For K := 0 to GRID_SIZE-1 do
@@ -376,7 +377,10 @@ Begin
             CheckWin := False;
             Break;
           End;
-        If CheckWin Then Exit;
+        If CheckWin Then Begin
+          If S = X Then Winner := 1 Else Winner := 2;
+          Exit;
+        End;
       End;
     End;
 
@@ -391,7 +395,10 @@ Begin
             CheckWin := False;
             Break;
           End;
-        If CheckWin Then Exit;
+        If CheckWin Then Begin
+          If S = X Then Winner := 1 Else Winner := 2;
+          Exit;
+        End;
       End;
     End;
 
@@ -405,7 +412,10 @@ Begin
           CheckWin := False;
           Break;
         End;
-      If CheckWin Then Exit;
+      If CheckWin Then Begin
+        If S = X Then Winner := 1 Else Winner := 2;
+        Exit;
+      End;
     End;
 
     S := Grid[0,GRID_SIZE-1,K];
@@ -416,7 +426,10 @@ Begin
           CheckWin := False;
           Break;
         End;
-      If CheckWin Then Exit;
+      If CheckWin Then Begin
+        If S = X Then Winner := 1 Else Winner := 2;
+        Exit;
+      End;
     End;
   End;
 
@@ -429,7 +442,10 @@ Begin
         CheckWin := False;
         Break;
       End;
-    If CheckWin Then Exit;
+    If CheckWin Then Begin
+      If S = X Then Winner := 1 Else Winner := 2;
+      Exit;
+    End;
   End;
 
   S := Grid[0,GRID_SIZE-1,0];
@@ -440,7 +456,10 @@ Begin
         CheckWin := False;
         Break;
       End;
-    If CheckWin Then Exit;
+    If CheckWin Then Begin
+      If S = X Then Winner := 1 Else Winner := 2;
+      Exit;
+    End;
   End;
 End;
 
@@ -458,6 +477,20 @@ Begin
           Pos.Y := Y;
           Pos.Z := Z;
           MakeComputerMove := Pos;
+          Exit;
+        End;
+End;
+
+Function IsBoardFull: Boolean;
+Var
+  I, J, K: Integer;
+Begin
+  IsBoardFull := True;
+  For K := 0 to GRID_SIZE-1 do
+    For I := 0 to GRID_SIZE-1 do
+      For J := 0 to GRID_SIZE-1 do
+        If Grid[I,J,K] = Empty Then Begin
+          IsBoardFull := False;
           Exit;
         End;
 End;
@@ -484,8 +517,13 @@ Begin
           If CurrentPlayer = 1 Then Symbol := X
                               Else Symbol := O;
           Grid[SelectedX, SelectedY, CurrentLayer] := Symbol;
-          If CheckWin Then GameOver := True
-                     Else CurrentPlayer := 3 - CurrentPlayer;
+          If CheckWin Then
+            GameOver := True
+          Else If IsBoardFull Then Begin
+            Winner := 0; { Match nul }
+            GameOver := True;
+          End Else
+            CurrentPlayer := 3 - CurrentPlayer;
         End;
       End;
       #27: GameOver := True; { Escape }
@@ -497,8 +535,13 @@ Begin
     If CurrentPlayer = 1 Then Symbol := X
                         Else Symbol := O;
     Grid[ComputerMove.X, ComputerMove.Y, ComputerMove.Z] := Symbol;
-    If CheckWin Then GameOver := True
-                Else CurrentPlayer := 3 - CurrentPlayer;
+    If CheckWin Then
+      GameOver := True
+    Else If IsBoardFull Then Begin
+      Winner := 0; { Match nul }
+      GameOver := True;
+    End Else
+      CurrentPlayer := 3 - CurrentPlayer;
   End;
 End;
 
@@ -520,6 +563,55 @@ Begin
   SelectedY := 0;
 End;
 
+Procedure ShowGameResult;
+Var
+  ResultMessage: String;
+  Key: Char;
+  MessageColor: Integer;
+Begin
+  { Déterminer le message et la couleur }
+  If Winner = 1 Then Begin
+    If PlayerType[1] = Human Then Begin
+      ResultMessage := 'FELICITATIONS ! VOUS AVEZ GAGNE !';
+      MessageColor := LightGreen;
+    End Else Begin
+      ResultMessage := 'L''ORDINATEUR A GAGNE !';
+      MessageColor := LightRed;
+    End;
+  End Else If Winner = 2 Then Begin
+    If PlayerType[2] = Human Then Begin
+      ResultMessage := 'FELICITATIONS ! VOUS AVEZ GAGNE !';
+      MessageColor := LightGreen;
+    End Else Begin
+      ResultMessage := 'L''ORDINATEUR A GAGNE !';
+      MessageColor := LightRed;
+    End;
+  End Else Begin
+    ResultMessage := 'MATCH NUL !';
+    MessageColor := Yellow;
+  End;
+
+  { Afficher le message de résultat }
+  SetColor(MessageColor);
+  SetTextStyle(0, 0, 2);
+  OutTextXY((640 - TextWidth(ResultMessage))shr 1, 240, ResultMessage);
+
+  { Instructions }
+  SetColor(White);
+  SetTextStyle(0, 0, 1);
+  OutTextXY(320 - 80, 270, 'Appuyez sur une touche pour quitter...');
+
+  { Attendre une pression de touche }
+  Repeat
+    If KeyPressed Then Begin
+      Key := ReadKey;
+      If Key = #0 Then ReadKey; { Ignorer les touches spéciales }
+      Break;
+    End;
+    Delay(50);
+  Until False;
+End;
+
 BEGIN
  InitScr;
  InitializeGame;
@@ -530,5 +622,9 @@ BEGIN
   HandleInput;
   Delay(50);
  Until GameOver;
+
+ { Afficher le résultat de la partie }
+ ShowGameResult;
+
  CloseGraph;
 END.
