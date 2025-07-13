@@ -18,13 +18,22 @@ Uses {$IFDEF FPC}
 Const
   SCREEN_WIDTH = 640;
   SCREEN_HEIGHT = 480;
-  GRID_SIZE = 4;
-  HEX_RADIUS = 30;
+  HEX_RADIUS = 35;
   CENTER_X = 320;
   CENTER_Y = 240;
+  
+  { Disposition hexagonale : 3 rangées avec 3, 4, 3 hexagones }
+  MAX_HEXAGONS = 19;
 
 Type
-  THexGrid = Array[0..GRID_SIZE-1, 0..GRID_SIZE-1] of Integer;
+  THexCell = Record
+    X, Y: Integer;        { Position à l'écran }
+    Value: Integer;       { Valeur de la tuile }
+    Active: Boolean;      { Si cette cellule est utilisée }
+  End;
+  
+  THexGrid = Array[0..MAX_HEXAGONS-1] of THexCell;
+  
   THexPoint = Record
     X, Y: Integer;
   End;
@@ -35,6 +44,77 @@ Var
   BestScore: LongInt;
   GameOver: Boolean;
   Won: Boolean;
+
+Procedure InitHexGrid;
+Var
+  I: Integer;
+  Row, Col: Integer;
+  StartX, StartY: Integer;
+  HexWidth, HexHeight: Integer;
+Begin
+  { Initialiser toutes les cellules comme inactives }
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    Grid[I].Active := False;
+    Grid[I].Value := 0;
+  End;
+  
+  { Calcul de l'espacement hexagonal correct }
+  HexWidth := Round(HEX_RADIUS * 1.732);  { √3 * rayon }
+  HexHeight := Round(HEX_RADIUS * 1.5);   { 3/2 * rayon }
+  
+  { Disposition hexagonale : 3-4-5-4-3 hexagones par rangée }
+  I := 0;
+  
+  { Rangée 1 : 3 hexagones }
+  StartX := CENTER_X - HexWidth;
+  StartY := CENTER_Y - HexHeight * 2;
+  For Col := 0 to 2 Do Begin
+    Grid[I].X := StartX + Col * HexWidth;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+  
+  { Rangée 2 : 4 hexagones }
+  StartX := CENTER_X - HexWidth * 3 div 2;
+  StartY := CENTER_Y - HexHeight;
+  For Col := 0 to 3 Do Begin
+    Grid[I].X := StartX + Col * HexWidth;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+  
+  { Rangée 3 : 5 hexagones (centre) }
+  StartX := CENTER_X - HexWidth * 2;
+  StartY := CENTER_Y;
+  For Col := 0 to 4 Do Begin
+    Grid[I].X := StartX + Col * HexWidth;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+  
+  { Rangée 4 : 4 hexagones }
+  StartX := CENTER_X - HexWidth * 3 div 2;
+  StartY := CENTER_Y + HexHeight;
+  For Col := 0 to 3 Do Begin
+    Grid[I].X := StartX + Col * HexWidth;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+  
+  { Rangée 5 : 3 hexagones }
+  StartX := CENTER_X - HexWidth;
+  StartY := CENTER_Y + HexHeight * 2;
+  For Col := 0 to 2 Do Begin
+    Grid[I].X := StartX + Col * HexWidth;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+End;
 
 Procedure InitScreen;
 Var
@@ -56,22 +136,17 @@ Begin
   End;
 End;
 
-Function GetHexCenter(Row, Col: Integer): THexPoint;
+Function GetHexCenter(Index: Integer): THexPoint;
 Var
   Point: THexPoint;
-  OffsetX, OffsetY: Integer;
 Begin
-  { Calcul des positions hexagonales }
-  OffsetX := Col * (HEX_RADIUS * 3 div 2);
-  OffsetY := Row * (HEX_RADIUS * 2);
-  
-  { Décalage pour les rangées impaires }
-  If Col Mod 2 = 1 Then
-    OffsetY := OffsetY + HEX_RADIUS;
-    
-  Point.X := CENTER_X - ((GRID_SIZE-1) * HEX_RADIUS * 3 div 4) + OffsetX;
-  Point.Y := CENTER_Y - ((GRID_SIZE-1) * HEX_RADIUS) + OffsetY;
-  
+  If (Index >= 0) And (Index < MAX_HEXAGONS) And Grid[Index].Active Then Begin
+    Point.X := Grid[Index].X;
+    Point.Y := Grid[Index].Y;
+  End Else Begin
+    Point.X := 0;
+    Point.Y := 0;
+  End;
   GetHexCenter := Point;
 End;
 
@@ -128,18 +203,20 @@ Begin
     GetTextColor := White;
 End;
 
-Procedure DrawTile(Row, Col: Integer);
+Procedure DrawTile(Index: Integer);
 Var
   Point: THexPoint;
   Value: Integer;
   ValueStr: String;
   TextW, TextH: Integer;
 Begin
-  Point := GetHexCenter(Row, Col);
-  Value := Grid[Row, Col];
+  If Not Grid[Index].Active Then Exit;
+  
+  Point := GetHexCenter(Index);
+  Value := Grid[Index].Value;
   
   { Dessiner l'hexagone }
-  DrawHexagon(Point.X, Point.Y, HEX_RADIUS-2, GetTileColor(Value), Black);
+  DrawHexagon(Point.X, Point.Y, HEX_RADIUS-2, GetTileColor(Value), White);
   
   { Afficher la valeur si elle n'est pas zéro }
   If Value > 0 Then Begin
@@ -191,19 +268,18 @@ Begin
   SetTextStyle(DefaultFont, HorizDir, 1);
   
   OutTextXY(50, 400, 'Touches:');
-  OutTextXY(50, 415, 'Q/W/E - Haut gauche/Haut/Haut droit');
-  OutTextXY(50, 430, 'A/S/D - Bas gauche/Bas/Bas droit');
+  OutTextXY(50, 415, 'Q - Haut gauche    W - Haut    E - Haut droite');
+  OutTextXY(50, 430, 'A - Bas gauche     S - Bas     D - Bas droite');
   OutTextXY(50, 445, 'R - Nouveau jeu, ESC - Quitter');
 End;
 
 Procedure DrawGrid;
 Var
-  Row, Col: Integer;
+  I: Integer;
 Begin
-  For Row := 0 to GRID_SIZE-1 Do Begin
-    For Col := 0 to GRID_SIZE-1 Do Begin
-      DrawTile(Row, Col);
-    End;
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    If Grid[I].Active Then
+      DrawTile(I);
   End;
 End;
 
@@ -252,39 +328,42 @@ End;
 
 Procedure AddRandomTile;
 Var
-  Row, Col: Integer;
+  I: Integer;
   EmptyFound: Boolean;
   Attempts: Integer;
+  EmptySlots: Array[0..MAX_HEXAGONS-1] of Integer;
+  EmptyCount: Integer;
 Begin
-  EmptyFound := False;
-  Attempts := 0;
-  
-  { Chercher une case vide }
-  Repeat
-    Row := Random(GRID_SIZE);
-    Col := Random(GRID_SIZE);
-    Inc(Attempts);
-    
-    If Grid[Row, Col] = 0 Then Begin
-      { 90% chance d'avoir un 2, 10% chance d'avoir un 4 }
-      If Random(10) = 0 Then
-        Grid[Row, Col] := 4
-      Else
-        Grid[Row, Col] := 2;
-      EmptyFound := True;
+  { Trouver toutes les cases vides }
+  EmptyCount := 0;
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    If Grid[I].Active And (Grid[I].Value = 0) Then Begin
+      EmptySlots[EmptyCount] := I;
+      Inc(EmptyCount);
     End;
-  Until EmptyFound Or (Attempts > 100);
+  End;
+  
+  { Ajouter une tuile dans une case vide aléatoire }
+  If EmptyCount > 0 Then Begin
+    I := EmptySlots[Random(EmptyCount)];
+    { 90% chance d'avoir un 2, 10% chance d'avoir un 4 }
+    If Random(10) = 0 Then
+      Grid[I].Value := 4
+    Else
+      Grid[I].Value := 2;
+  End;
 End;
 
 Procedure InitGrid;
 Var
-  Row, Col: Integer;
+  I: Integer;
 Begin
-  { Vider la grille }
-  For Row := 0 to GRID_SIZE-1 Do Begin
-    For Col := 0 to GRID_SIZE-1 Do Begin
-      Grid[Row, Col] := 0;
-    End;
+  { Initialiser la grille hexagonale }
+  InitHexGrid;
+  
+  { Vider toutes les valeurs }
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    Grid[I].Value := 0;
   End;
   
   { Ajouter deux tuiles initiales }
@@ -294,22 +373,168 @@ End;
 
 Function HasEmptyTiles: Boolean;
 Var
-  Row, Col: Integer;
+  I: Integer;
 Begin
   HasEmptyTiles := False;
-  For Row := 0 to GRID_SIZE-1 Do Begin
-    For Col := 0 to GRID_SIZE-1 Do Begin
-      If Grid[Row, Col] = 0 Then Begin
-        HasEmptyTiles := True;
-        Exit;
-      End;
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    If Grid[I].Active And (Grid[I].Value = 0) Then Begin
+      HasEmptyTiles := True;
+      Exit;
     End;
+  End;
+End;
+
+{ Mapping des voisins hexagonaux pour chaque direction }
+{ Direction 0=Q (haut-gauche), 1=W (haut), 2=E (haut-droite) }
+{ Direction 3=A (bas-gauche), 4=S (bas), 5=D (bas-droite) }
+Function GetNeighbor(Index: Integer; Direction: Integer): Integer;
+Begin
+  GetNeighbor := -1; { -1 = pas de voisin }
+  
+  Case Index of
+    { Rangée 1 (0-2) }
+    0: Case Direction of
+         1: GetNeighbor := 3;      { W -> haut }
+         2: GetNeighbor := 4;      { E -> haut-droite }
+         4: GetNeighbor := 3;      { S -> bas }
+         5: GetNeighbor := 4;      { D -> bas-droite }
+       End;
+    1: Case Direction of
+         0: GetNeighbor := 3;      { Q -> haut-gauche }
+         1: GetNeighbor := 4;      { W -> haut }
+         2: GetNeighbor := 5;      { E -> haut-droite }
+         3: GetNeighbor := 3;      { A -> bas-gauche }
+         4: GetNeighbor := 4;      { S -> bas }
+         5: GetNeighbor := 5;      { D -> bas-droite }
+       End;
+    2: Case Direction of
+         0: GetNeighbor := 4;      { Q -> haut-gauche }
+         1: GetNeighbor := 5;      { W -> haut }
+         3: GetNeighbor := 4;      { A -> bas-gauche }
+         4: GetNeighbor := 5;      { S -> bas }
+       End;
+    
+    { Rangée 2 (3-6) }
+    3: Case Direction of
+         1: GetNeighbor := 0;      { W -> haut }
+         2: GetNeighbor := 1;      { E -> haut-droite }
+         4: GetNeighbor := 7;      { S -> bas }
+         5: GetNeighbor := 8;      { D -> bas-droite }
+       End;
+    4: Case Direction of
+         0: GetNeighbor := 0;      { Q -> haut-gauche }
+         1: GetNeighbor := 1;      { W -> haut }
+         2: GetNeighbor := 2;      { E -> haut-droite }
+         3: GetNeighbor := 7;      { A -> bas-gauche }
+         4: GetNeighbor := 8;      { S -> bas }
+         5: GetNeighbor := 9;      { D -> bas-droite }
+       End;
+    5: Case Direction of
+         0: GetNeighbor := 1;      { Q -> haut-gauche }
+         1: GetNeighbor := 2;      { W -> haut }
+         3: GetNeighbor := 8;      { A -> bas-gauche }
+         4: GetNeighbor := 9;      { S -> bas }
+         5: GetNeighbor := 10;     { D -> bas-droite }
+       End;
+    6: Case Direction of
+         0: GetNeighbor := 2;      { Q -> haut-gauche }
+         3: GetNeighbor := 9;      { A -> bas-gauche }
+         4: GetNeighbor := 10;     { S -> bas }
+         5: GetNeighbor := 11;     { D -> bas-droite }
+       End;
+    
+    { Rangée 3 - Centre (7-11) }
+    7: Case Direction of
+         1: GetNeighbor := 3;      { W -> haut }
+         2: GetNeighbor := 4;      { E -> haut-droite }
+         4: GetNeighbor := 12;     { S -> bas }
+         5: GetNeighbor := 13;     { D -> bas-droite }
+       End;
+    8: Case Direction of
+         0: GetNeighbor := 3;      { Q -> haut-gauche }
+         1: GetNeighbor := 4;      { W -> haut }
+         2: GetNeighbor := 5;      { E -> haut-droite }
+         3: GetNeighbor := 12;     { A -> bas-gauche }
+         4: GetNeighbor := 13;     { S -> bas }
+         5: GetNeighbor := 14;     { D -> bas-droite }
+       End;
+    9: Case Direction of
+         0: GetNeighbor := 4;      { Q -> haut-gauche }
+         1: GetNeighbor := 5;      { W -> haut }
+         2: GetNeighbor := 6;      { E -> haut-droite }
+         3: GetNeighbor := 13;     { A -> bas-gauche }
+         4: GetNeighbor := 14;     { S -> bas }
+         5: GetNeighbor := 15;     { D -> bas-droite }
+       End;
+    10: Case Direction of
+         0: GetNeighbor := 5;      { Q -> haut-gauche }
+         1: GetNeighbor := 6;      { W -> haut }
+         3: GetNeighbor := 14;     { A -> bas-gauche }
+         4: GetNeighbor := 15;     { S -> bas }
+         5: GetNeighbor := 16;     { D -> bas-droite }
+       End;
+    11: Case Direction of
+         0: GetNeighbor := 6;      { Q -> haut-gauche }
+         3: GetNeighbor := 15;     { A -> bas-gauche }
+         4: GetNeighbor := 16;     { S -> bas }
+       End;
+    
+    { Rangée 4 (12-15) }
+    12: Case Direction of
+         1: GetNeighbor := 7;      { W -> haut }
+         2: GetNeighbor := 8;      { E -> haut-droite }
+         4: GetNeighbor := 17;     { S -> bas }
+         5: GetNeighbor := 18;     { D -> bas-droite }
+       End;
+    13: Case Direction of
+         0: GetNeighbor := 7;      { Q -> haut-gauche }
+         1: GetNeighbor := 8;      { W -> haut }
+         2: GetNeighbor := 9;      { E -> haut-droite }
+         3: GetNeighbor := 17;     { A -> bas-gauche }
+         4: GetNeighbor := 18;     { S -> bas }
+         5: GetNeighbor := 19;     { D -> bas-droite }
+       End;
+    14: Case Direction of
+         0: GetNeighbor := 8;      { Q -> haut-gauche }
+         1: GetNeighbor := 9;      { W -> haut }
+         2: GetNeighbor := 10;     { E -> haut-droite }
+         3: GetNeighbor := 18;     { A -> bas-gauche }
+         4: GetNeighbor := 19;     { S -> bas }
+       End;
+    15: Case Direction of
+         0: GetNeighbor := 9;      { Q -> haut-gauche }
+         1: GetNeighbor := 10;     { W -> haut }
+         2: GetNeighbor := 11;     { E -> haut-droite }
+         3: GetNeighbor := 18;     { A -> bas-gauche }
+         4: GetNeighbor := 19;     { S -> bas }
+       End;
+    16: Case Direction of
+         0: GetNeighbor := 10;     { Q -> haut-gauche }
+         1: GetNeighbor := 11;     { W -> haut }
+         3: GetNeighbor := 19;     { A -> bas-gauche }
+       End;
+    
+    { Rangée 5 (17-19) }
+    17: Case Direction of
+         1: GetNeighbor := 12;     { W -> haut }
+         2: GetNeighbor := 13;     { E -> haut-droite }
+       End;
+    18: Case Direction of
+         0: GetNeighbor := 12;     { Q -> haut-gauche }
+         1: GetNeighbor := 13;     { W -> haut }
+         2: GetNeighbor := 14;     { E -> haut-droite }
+       End;
+    19: Case Direction of
+         0: GetNeighbor := 13;     { Q -> haut-gauche }
+         1: GetNeighbor := 14;     { W -> haut }
+         2: GetNeighbor := 15;     { E -> haut-droite }
+       End;
   End;
 End;
 
 Function CanMove: Boolean;
 Var
-  Row, Col: Integer;
+  I, J, Neighbor: Integer;
 Begin
   CanMove := False;
   
@@ -320,224 +545,61 @@ Begin
   End;
   
   { Vérifier s'il y a des mouvements possibles }
-  For Row := 0 to GRID_SIZE-1 Do Begin
-    For Col := 0 to GRID_SIZE-1 Do Begin
-      { Vérifier les directions adjacentes }
-      If (Col > 0) And (Grid[Row, Col] = Grid[Row, Col-1]) Then Begin
-        CanMove := True;
-        Exit;
-      End;
-      If (Col < GRID_SIZE-1) And (Grid[Row, Col] = Grid[Row, Col+1]) Then Begin
-        CanMove := True;
-        Exit;
-      End;
-      If (Row > 0) And (Grid[Row, Col] = Grid[Row-1, Col]) Then Begin
-        CanMove := True;
-        Exit;
-      End;
-      If (Row < GRID_SIZE-1) And (Grid[Row, Col] = Grid[Row+1, Col]) Then Begin
-        CanMove := True;
-        Exit;
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    If Grid[I].Active And (Grid[I].Value > 0) Then Begin
+      For J := 0 to 5 Do Begin
+        Neighbor := GetNeighbor(I, J);
+        If (Neighbor >= 0) And Grid[Neighbor].Active Then Begin
+          If Grid[Neighbor].Value = Grid[I].Value Then Begin
+            CanMove := True;
+            Exit;
+          End;
+        End;
       End;
     End;
   End;
 End;
 
-Function MoveLeft: Boolean;
+Function MoveInDirection(Direction: Integer): Boolean;
 Var
-  Row, Col, Target: Integer;
+  I, Neighbor: Integer;
   Moved: Boolean;
+  TempGrid: THexGrid;
 Begin
   Moved := False;
   
-  For Row := 0 to GRID_SIZE-1 Do Begin
-    Target := 0;
-    For Col := 0 to GRID_SIZE-1 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Col Then Begin
-          Grid[Row, Target] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
+  { Copier la grille actuelle }
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    TempGrid[I] := Grid[I];
+  End;
+  
+  { Déplacer et fusionner les tuiles dans la direction donnée }
+  For I := 0 to MAX_HEXAGONS-1 Do Begin
+    If Grid[I].Active And (Grid[I].Value > 0) Then Begin
+      Neighbor := GetNeighbor(I, Direction);
+      If (Neighbor >= 0) And Grid[Neighbor].Active Then Begin
+        If Grid[Neighbor].Value = 0 Then Begin
+          { Case vide : déplacer }
+          Grid[Neighbor].Value := Grid[I].Value;
+          Grid[I].Value := 0;
           Moved := True;
+        End
+        Else If Grid[Neighbor].Value = Grid[I].Value Then Begin
+          { Même valeur : fusionner }
+          Grid[Neighbor].Value := Grid[Neighbor].Value * 2;
+          Grid[I].Value := 0;
+          Score := Score + Grid[Neighbor].Value;
+          Moved := True;
+          
+          { Vérifier la victoire }
+          If Grid[Neighbor].Value = 2048 Then
+            Won := True;
         End;
-        Inc(Target);
-      End;
-    End;
-    
-    { Fusion des tuiles }
-    For Col := 0 to GRID_SIZE-2 Do Begin
-      If (Grid[Row, Col] <> 0) And (Grid[Row, Col] = Grid[Row, Col+1]) Then Begin
-        Grid[Row, Col] := Grid[Row, Col] * 2;
-        Grid[Row, Col+1] := 0;
-        Score := Score + Grid[Row, Col];
-        Moved := True;
-        
-        { Vérifier la victoire }
-        If Grid[Row, Col] = 2048 Then
-          Won := True;
-      End;
-    End;
-    
-    { Compacter après fusion }
-    Target := 0;
-    For Col := 0 to GRID_SIZE-1 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Col Then Begin
-          Grid[Row, Target] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-        End;
-        Inc(Target);
       End;
     End;
   End;
   
-  MoveLeft := Moved;
-End;
-
-Function MoveRight: Boolean;
-Var
-  Row, Col, Target: Integer;
-  Moved: Boolean;
-Begin
-  Moved := False;
-  
-  For Row := 0 to GRID_SIZE-1 Do Begin
-    Target := GRID_SIZE-1;
-    For Col := GRID_SIZE-1 Downto 0 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Col Then Begin
-          Grid[Row, Target] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-          Moved := True;
-        End;
-        Dec(Target);
-      End;
-    End;
-    
-    { Fusion des tuiles }
-    For Col := GRID_SIZE-1 Downto 1 Do Begin
-      If (Grid[Row, Col] <> 0) And (Grid[Row, Col] = Grid[Row, Col-1]) Then Begin
-        Grid[Row, Col] := Grid[Row, Col] * 2;
-        Grid[Row, Col-1] := 0;
-        Score := Score + Grid[Row, Col];
-        Moved := True;
-        
-        If Grid[Row, Col] = 2048 Then
-          Won := True;
-      End;
-    End;
-    
-    { Compacter après fusion }
-    Target := GRID_SIZE-1;
-    For Col := GRID_SIZE-1 Downto 0 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Col Then Begin
-          Grid[Row, Target] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-        End;
-        Dec(Target);
-      End;
-    End;
-  End;
-  
-  MoveRight := Moved;
-End;
-
-Function MoveUp: Boolean;
-Var
-  Row, Col, Target: Integer;
-  Moved: Boolean;
-Begin
-  Moved := False;
-  
-  For Col := 0 to GRID_SIZE-1 Do Begin
-    Target := 0;
-    For Row := 0 to GRID_SIZE-1 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Row Then Begin
-          Grid[Target, Col] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-          Moved := True;
-        End;
-        Inc(Target);
-      End;
-    End;
-    
-    { Fusion des tuiles }
-    For Row := 0 to GRID_SIZE-2 Do Begin
-      If (Grid[Row, Col] <> 0) And (Grid[Row, Col] = Grid[Row+1, Col]) Then Begin
-        Grid[Row, Col] := Grid[Row, Col] * 2;
-        Grid[Row+1, Col] := 0;
-        Score := Score + Grid[Row, Col];
-        Moved := True;
-        
-        If Grid[Row, Col] = 2048 Then
-          Won := True;
-      End;
-    End;
-    
-    { Compacter après fusion }
-    Target := 0;
-    For Row := 0 to GRID_SIZE-1 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Row Then Begin
-          Grid[Target, Col] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-        End;
-        Inc(Target);
-      End;
-    End;
-  End;
-  
-  MoveUp := Moved;
-End;
-
-Function MoveDown: Boolean;
-Var
-  Row, Col, Target: Integer;
-  Moved: Boolean;
-Begin
-  Moved := False;
-  
-  For Col := 0 to GRID_SIZE-1 Do Begin
-    Target := GRID_SIZE-1;
-    For Row := GRID_SIZE-1 Downto 0 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Row Then Begin
-          Grid[Target, Col] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-          Moved := True;
-        End;
-        Dec(Target);
-      End;
-    End;
-    
-    { Fusion des tuiles }
-    For Row := GRID_SIZE-1 Downto 1 Do Begin
-      If (Grid[Row, Col] <> 0) And (Grid[Row, Col] = Grid[Row-1, Col]) Then Begin
-        Grid[Row, Col] := Grid[Row, Col] * 2;
-        Grid[Row-1, Col] := 0;
-        Score := Score + Grid[Row, Col];
-        Moved := True;
-        
-        If Grid[Row, Col] = 2048 Then
-          Won := True;
-      End;
-    End;
-    
-    { Compacter après fusion }
-    Target := GRID_SIZE-1;
-    For Row := GRID_SIZE-1 Downto 0 Do Begin
-      If Grid[Row, Col] <> 0 Then Begin
-        If Target <> Row Then Begin
-          Grid[Target, Col] := Grid[Row, Col];
-          Grid[Row, Col] := 0;
-        End;
-        Dec(Target);
-      End;
-    End;
-  End;
-  
-  MoveDown := Moved;
+  MoveInDirection := Moved;
 End;
 
 Procedure NewGame;
@@ -560,17 +622,17 @@ Begin
     Moved := False;
     
     Case Key of
-      'Q': Moved := MoveUp;          { Haut-gauche simulé }
-      'W': Moved := MoveUp;          { Haut }
-      'E': Moved := MoveUp;          { Haut-droite simulé }
-      'A': Moved := MoveLeft;        { Gauche }
-      'S': Moved := MoveDown;        { Bas }
-      'D': Moved := MoveRight;       { Droite }
-      'R': Begin                     { Nouveau jeu }
+      'Q': Moved := MoveInDirection(0);  { Haut-gauche }
+      'W': Moved := MoveInDirection(1);  { Haut }
+      'E': Moved := MoveInDirection(2);  { Haut-droite }
+      'A': Moved := MoveInDirection(3);  { Bas-gauche }
+      'S': Moved := MoveInDirection(4);  { Bas }
+      'D': Moved := MoveInDirection(5);  { Bas-droite }
+      'R': Begin                         { Nouveau jeu }
         NewGame;
         Exit;
       End;
-      #27: Begin                     { Échap }
+      #27: Begin                         { Échap }
         CloseGraph;
         Halt;
       End;
