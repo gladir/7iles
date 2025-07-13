@@ -136,7 +136,7 @@ Begin
  Bar(20, 450, 500, 470);
  SetColor(Yellow);
  OutTextXY(20, 450, 'Entrez un numero (1-49) puis ENTREE: ');
-  { Zone de saisie sÃ©parÃ©e }
+  { Zone de saisie s‚par‚e }
  SetColor(White);
  SetFillStyle(SolidFill, White);
  Bar(320, 448, 370, 465);
@@ -150,7 +150,7 @@ Begin
       SetColor(White);
       SetFillStyle(SolidFill, White);
       Bar(321, 449, 369, 464);
-      { Afficher le numÃ©ro centrÃ© dans la zone }
+      { Afficher le num‚ro centr‚ dans la zone }
       SetColor(Black);
       SetTextStyle(DefaultFont, HorizDir, 1);
       If Length(NumStr) = 1 Then
@@ -324,14 +324,14 @@ Begin
   { D‚terminer quel billet v‚rifier }
  If(CurrentTicket<=NumTickets)Then TicketToCheck:=CurrentTicket
                               Else TicketToCheck := NumTickets;
-  { Grille de numÃ©ros 1-49 }
+  { Grille de num‚ros 1-49 }
  For I:=0 to 6 do Begin
   For J:=0 to 6 do Begin
    Num:=I * 7 + J + 1;
    If Num <= MAX_NUMBER Then Begin
     X:=350+J*35;
     Y:=120+I*35;
-     { V‚rifier si le num‚ro est dÃ©jÃ  sÃ©lectionnÃ© dans le billet actuel }
+     { V‚rifier si le num‚ro est d‚j… s‚lectionn‚ dans le billet actuel }
     If (TicketToCheck >= 1) And (TicketToCheck <= NumTickets) And
        NumberExists(Tickets[TicketToCheck], Num, MAX_NUMBERS) Then
      SetColor(Red)
@@ -449,7 +449,7 @@ Begin
  FillEllipse(Ball.X, Ball.Y, 12, 12);
  SetColor(Black);
  Circle(Ball.X, Ball.Y, 12);
-  { Afficher le num‚ro }
+  { Afficher le numï¿½ro }
  SetTextStyle(DefaultFont, HorizDir, 1);
  Str(Ball.Number, NumStr);
  If Ball.Number<10 Then OutTextXY(Ball.X - 4, Ball.Y - 4, NumStr)
@@ -470,10 +470,10 @@ Begin
   SetColor(Blue);
   SetFillStyle(SolidFill, Blue);
   FillEllipse(Balls[I].X, Balls[I].Y, 13, 13);
-   { Mettre … jour la position }
+   { Mettre ï¿½ jour la position }
   Balls[I].X := Balls[I].X + Balls[I].VelX;
   Balls[I].Y := Balls[I].Y + Balls[I].VelY;
-   { V‚rifier si la boule sort du cercle }
+   { Vï¿½rifier si la boule sort du cercle }
   DistanceFromCenter := Sqrt(Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY));
   If DistanceFromCenter >= (Radius - 12) Then Begin
     { Rebond sur le bord du cercle }
@@ -530,7 +530,7 @@ Begin
   If TimeLeft < 0 Then TimeLeft := 0;
   SetColor(Blue);
   SetFillStyle(SolidFill, Blue);
-  Bar(250, 410, 390, 430);
+  Bar(250, 410, 450, 430);
   SetColor(White);
   SetTextStyle(DefaultFont, HorizDir, 1);
   Str(TimeLeft, TimeStr);
@@ -562,16 +562,16 @@ Var
  StatStr:String;
 Begin
  DrawBackground;
-  { Titre des r‚sultats }
+  { Titre des rï¿½sultats }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 2);
  OutTextXY(SCREEN_WIDTH div 2 - 100, 90, 'RESULTATS DU TIRAGE');
-  { Num‚ros gagnants }
+  { Numï¿½ros gagnants }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(20, 130, 'Numeros gagnants:');
  DrawTicket(20, 145, WinningNumbers, MAX_NUMBERS, False);
-  { Vos billets et rÃ©sultats }
+  { Vos billets et r‚sultats }
  OutTextXY(20, 200, 'Vos billets:');
  For I := 1 to NumTickets do Begin
   DrawTicket(20, 220 + (I - 1) * 50, Tickets[I], MAX_NUMBERS, False);
@@ -629,9 +629,9 @@ Begin
        CurrentNumber := MAX_NUMBERS + 1;
       End;
      End;
-      { Redessiner immÃ©diatement pour voir le changement }
+      { Redessiner imm‚diatement pour voir le changement }
      DrawSelectionScreen;
-      { Attendre que le bouton soit relÃ¢chÃ© }
+      { Attendre que le bouton soit relƒch‚ }
      While GetMouseButton > 0 Do Delay(10);
     End;
    End;
@@ -650,7 +650,7 @@ Begin
    Exit;
   End;
   Case UpCase(Key) of
-   '1'..'9': Begin { SÃ©lection directe d'un numÃ©ro 1-9 }
+   '1'..'9': Begin { S‚lection directe d'un num‚ro 1-9 }
         If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
           Num := Ord(Key) - Ord('0');
           If Not NumberExists(Tickets[CurrentTicket], Num, CurrentNumber - 1) Then Begin
@@ -670,7 +670,7 @@ Begin
           End;
         End;
       End;
-      'N': Begin { Saisie manuelle d'un numÃ©ro 1-49 }
+      'N': Begin { Saisie manuelle d'un num‚ro 1-49 }
         If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
           Num := ReadNumber;
           If (Num >= MIN_NUMBER) And (Num <= MAX_NUMBER) Then Begin
@@ -686,16 +686,16 @@ Begin
                   CurrentNumber := MAX_NUMBERS + 1;
                 End;
               End;
-              { Redessiner immÃ©diatement pour voir le changement }
+              { Redessiner imm‚diatement pour voir le changement }
               DrawSelectionScreen;
             End;
           End;
         End;
       End;
-      'A': Begin { Auto-sÃ©lection }
+      'A': Begin { Auto-s‚lection }
         If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
           GenerateRandomTicket(Tickets[CurrentTicket]);
-          { Passer au billet suivant ou indiquer que tous sont terminÃ©s }
+          { Passer au billet suivant ou indiquer que tous sont termin‚s }
           If CurrentTicket < NumTickets Then Begin
             Inc(CurrentTicket);
             CurrentNumber := 1;
@@ -703,7 +703,7 @@ Begin
             { Tous les billets sont maintenant complets }
             Inc(CurrentTicket); { CurrentTicket devient > NumTickets }
           End;
-          { Redessiner immÃ©diatement pour voir le changement }
+          { Redessiner imm‚diatement pour voir le changement }
           DrawSelectionScreen;
         End;
       End;
@@ -713,7 +713,7 @@ Begin
           DrawBallotScreen;
           GenerateRandomTicket(WinningNumbers);
           GameState := 2;
-          ResultsDrawn := False; { Marquer que les rÃ©sultats doivent Ãªtre redessinÃ©s }
+          ResultsDrawn := False; { Marquer que les r‚sultats doivent ˆtre redessin‚s }
         End;
       End;
       '+': Begin { Ajouter un billet }
@@ -725,7 +725,7 @@ Begin
           { Se positionner sur le nouveau billet }
           CurrentTicket := NumTickets;
           CurrentNumber := 1;
-          { Redessiner immÃ©diatement pour voir le changement }
+          { Redessiner imm‚diatement pour voir le changement }
           DrawSelectionScreen;
         End;
       End;
@@ -736,7 +736,7 @@ Begin
             CurrentTicket := NumTickets;
             CurrentNumber := 1;
           End;
-          { Redessiner immÃ©diatement pour voir le changement }
+          { Redessiner imm‚diatement pour voir le changement }
           DrawSelectionScreen;
         End;
       End;
@@ -745,11 +745,11 @@ Begin
           For I := 1 to MAX_NUMBERS do
             Tickets[CurrentTicket][I] := 0;
           CurrentNumber := 1;
-          { Redessiner immÃ©diatement pour voir le changement }
+          { Redessiner imm‚diatement pour voir le changement }
           DrawSelectionScreen;
         End;
       End;
-      #13: Begin { EntrÃ©e - Nouvelle partie }
+      #13: Begin { Entr‚e - Nouvelle partie }
         GameState := 0;
         CurrentTicket := 1;
         CurrentNumber := 1;
