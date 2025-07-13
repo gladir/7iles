@@ -311,8 +311,8 @@ Begin
     OutTextXY(20, 410, 'Chances de gagner le gros lot: ' + StatStr + '%');
     
     { Autres prix }
-    OutTextXY(250, 395, 'Chances 5/6: ' + Chr(126) + ' 1 sur 55,492');
-    OutTextXY(250, 410, 'Chances 4/6: ' + Chr(126) + ' 1 sur 1,033');
+    OutTextXY(370, 395, 'Chances 5/6: ' + Chr(126) + ' 1 sur 55,492');
+    OutTextXY(370, 410, 'Chances 4/6: ' + Chr(126) + ' 1 sur 1,033');
   End;
 End;
 
@@ -342,11 +342,14 @@ Begin
   End Else Begin
     { Afficher un message quand tous les billets sont complets }
     SetColor(LightGreen);
-    OutTextXY(350, 100, 'Tous les billets sont complets!');
-    OutTextXY(350, 120, 'Appuyez sur T pour le tirage');
+    OutTextXY(130, 360, 'Tous les billets sont complets!');
+    OutTextXY(130, 375, 'Appuyez sur T pour le tirage');
     { Afficher quand même la grille du dernier billet pour référence }
-    If NumTickets > 0 Then
+    If NumTickets > 0 Then Begin
+      SetColor(Yellow);
+      OutTextXY(350, 100, 'Grille de reference (dernier billet):');
       DrawNumberPad;
+    End;
   End;
   
   { Statistiques }
@@ -417,7 +420,7 @@ Begin
       3: OutTextXY(450, 235 + (I - 1) * 50, 'Lot de consolation');
       Else Begin
         SetColor(Red);
-        OutTextXY(450, 235 + (I - 1) * 50, 'Aucun gain');
+        OutTextXY(450, 250 + (I - 1) * 50, 'Aucun gain');
       End;
     End;
   End;
@@ -435,6 +438,17 @@ Var
 Begin
   If KeyPressed Then Begin
     Key := ReadKey;
+    
+    { Si on est dans l'écran des résultats, toute touche retourne à l'écran principal }
+    If GameState = 2 Then Begin
+      GameState := 0;
+      CurrentTicket := 1;
+      CurrentNumber := 1;
+      NumTickets := 1;
+      FillChar(Tickets, SizeOf(Tickets), 0);
+      Exit;
+    End;
+    
     Case UpCase(Key) of
       '1'..'9': Begin { Sélection directe d'un numéro 1-9 }
         If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
