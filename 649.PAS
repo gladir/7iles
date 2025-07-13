@@ -40,6 +40,7 @@ Var
   WinningNumbers: TTicket;
   GameState: Integer; { 0=Selection, 1=Playing, 2=Results }
   Balls: TBallArray;
+  ResultsDrawn: Boolean;
   
 Function ReadNumber: Integer;
 Var
@@ -573,10 +574,10 @@ Begin
     { Prix }
     SetColor(LightGreen);
     Case Matches of
-      6: OutTextXY(450, 235 + (I - 1) * 50, 'GROS LOT!');
-      5: OutTextXY(450, 235 + (I - 1) * 50, '2e prix');
-      4: OutTextXY(450, 235 + (I - 1) * 50, '3e prix');
-      3: OutTextXY(450, 235 + (I - 1) * 50, 'Lot de consolation');
+      6: OutTextXY(450, 250 + (I - 1) * 50, 'GROS LOT!');
+      5: OutTextXY(450, 250 + (I - 1) * 50, '2e prix');
+      4: OutTextXY(450, 250 + (I - 1) * 50, '3e prix');
+      3: OutTextXY(450, 250 + (I - 1) * 50, 'Lot de consolation');
       Else Begin
         SetColor(Red);
         OutTextXY(450, 250 + (I - 1) * 50, 'Aucun gain');
@@ -605,6 +606,7 @@ Begin
       CurrentNumber := 1;
       NumTickets := 1;
       FillChar(Tickets, SizeOf(Tickets), 0);
+      ResultsDrawn := False;
       Exit;
     End;
     
@@ -672,6 +674,7 @@ Begin
           DrawBallotScreen;
           GenerateRandomTicket(WinningNumbers);
           GameState := 2;
+          ResultsDrawn := False; { Marquer que les résultats doivent être redessinés }
         End;
       End;
       '+': Begin { Ajouter un billet }
@@ -713,6 +716,7 @@ Begin
         CurrentNumber := 1;
         NumTickets := 1;
         FillChar(Tickets, SizeOf(Tickets), 0);
+        ResultsDrawn := False;
       End;
       #27: Begin { Échap }
         CloseGraph;
@@ -731,13 +735,19 @@ BEGIN
   CurrentTicket := 1;
   CurrentNumber := 1;
   GameState := 0;
+  ResultsDrawn := False;
   FillChar(Tickets, SizeOf(Tickets), 0);
   
   { Boucle principale }
   Repeat
     Case GameState of
       0, 1: DrawSelectionScreen;
-      2: DrawResults;
+      2: Begin
+        If Not ResultsDrawn Then Begin
+          DrawResults;
+          ResultsDrawn := True;
+        End;
+      End;
     End;
     
     HandleInput;
