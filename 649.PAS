@@ -13,12 +13,12 @@ Uses {$IFDEF FPC}
      {$ENDIF};
 
 Const
-  SCREEN_WIDTH = 640;
-  SCREEN_HEIGHT = 480;
-  MAX_TICKETS = 5;
-  MAX_NUMBERS = 6;
-  MIN_NUMBER = 1;
-  MAX_NUMBER = 49;
+ SCREEN_WIDTH = 640;
+ SCREEN_HEIGHT = 480;
+ MAX_TICKETS = 5;
+ MAX_NUMBERS = 6;
+ MIN_NUMBER = 1;
+ MAX_NUMBER = 49;
 
 Type
  TTicket = Array[1..MAX_NUMBERS] of Integer;
@@ -143,8 +143,8 @@ Begin
  SetColor(Black);
  Rectangle(320, 448, 370, 465);
  Repeat
-    Key := ReadKey;
-    If (Key >= '0') And (Key <= '9') And (Length(NumStr) < 2) Then Begin
+  Key:=ReadKey;
+  If (Key >= '0') And (Key <= '9') And (Length(NumStr) < 2) Then Begin
       NumStr := NumStr + Key;
       { Effacer d'abord la zone de saisie }
       SetColor(White);
@@ -211,411 +211,349 @@ Begin
  End;
 End;
 
-Procedure DrawBackground;
-Begin
-  { Fond dégradé bleu }
-  SetColor(Blue);
-  SetFillStyle(SolidFill, Blue);
-  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-  { Bordure principale }
-  SetColor(White);
-  SetLineStyle(SolidLn, 0, ThickWidth);
-  Rectangle(10, 10, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10);
-
+Procedure DrawBackground;Begin
+  { Fond d�grad� bleu }
+ SetColor(Blue);
+ SetFillStyle(SolidFill, Blue);
+ Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+   { Bordure principale }
+ SetColor(White);
+ SetLineStyle(SolidLn, 0, ThickWidth);
+ Rectangle(10, 10, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10);
   { Titre }
-  SetColor(Yellow);
-  SetTextStyle(DefaultFont, HorizDir, 4);
-  OutTextXY(SCREEN_WIDTH div 2 - 100, 20, 'LOTTO 6/49');
-
+ SetColor(Yellow);
+ SetTextStyle(DefaultFont, HorizDir, 4);
+ OutTextXY(SCREEN_WIDTH div 2 - 100, 20, 'LOTTO 6/49');
   { Ligne décorative }
-  SetColor(White);
-  Line(50, 70, SCREEN_WIDTH - 50, 70);
+ SetColor(White);
+ Line(50, 70, SCREEN_WIDTH - 50, 70);
 End;
 
-Function NumberExists(Var Ticket: TTicket; Num: Integer; Count: Integer): Boolean;
+Function NumberExists(Var Ticket:TTicket;Num:Integer;Count:Integer):Boolean;
 Var
-  I: Integer;
+ I:Integer;
 Begin
-  NumberExists := False;
-  For I := 1 to Count do Begin
-    If Ticket[I] = Num Then Begin
-      NumberExists := True;
-      Exit;
-    End;
+ NumberExists:=False;
+ For I := 1 to Count do Begin
+  If Ticket[I] = Num Then Begin
+   NumberExists := True;
+   Exit;
   End;
+ End;
 End;
 
 Procedure SortTicket(Var Ticket: TTicket);
 Var
-  I, J, Temp: Integer;
+ I,J,Temp:Integer;
 Begin
-  For I := 1 to MAX_NUMBERS - 1 do Begin
-    For J := I + 1 to MAX_NUMBERS do Begin
-      If Ticket[I] > Ticket[J] Then Begin
-        Temp := Ticket[I];
-        Ticket[I] := Ticket[J];
-        Ticket[J] := Temp;
-      End;
-    End;
+ For I := 1 to MAX_NUMBERS - 1 do Begin
+  For J := I + 1 to MAX_NUMBERS do Begin
+   If Ticket[I] > Ticket[J] Then Begin
+    Temp := Ticket[I];
+    Ticket[I] := Ticket[J];
+    Ticket[J] := Temp;
+   End;
   End;
+ End;
 End;
 
-Procedure GenerateRandomTicket(Var Ticket: TTicket);
+Procedure GenerateRandomTicket(Var Ticket:TTicket);
 Var
-  I, Num: Integer;
+ I,Num:Integer;
 Begin
-  For I := 1 to MAX_NUMBERS do Begin
-    Repeat
-      Num := Random(MAX_NUMBER) + 1;
-    Until Not NumberExists(Ticket, Num, I - 1);
-    Ticket[I] := Num;
-  End;
-  SortTicket(Ticket);
+ For I := 1 to MAX_NUMBERS do Begin
+  Repeat
+   Num:=Random(MAX_NUMBER)+1;
+  Until Not NumberExists(Ticket, Num, I - 1);
+  Ticket[I] := Num;
+ End;
+ SortTicket(Ticket);
 End;
 
-Procedure DrawTicket(X, Y: Integer; Var Ticket: TTicket; Count: Integer; IsSelected: Boolean);
+Procedure DrawTicket(X,Y:Integer;Var Ticket:TTicket;Count:Integer;IsSelected:Boolean);
 Var
-  I, NumX, NumY: Integer;
-  NumStr: String;
+ I,NumX,NumY:Integer;
+ NumStr:String;
 Begin
   { Fond du billet }
-  If IsSelected Then
-    SetColor(Yellow)
-  Else
-    SetColor(LightGray);
-  SetFillStyle(SolidFill, LightGray);
-  Bar(X, Y, X + 280, Y + 40);
-
+ If IsSelected Then SetColor(Yellow)
+               Else SetColor(LightGray);
+ SetFillStyle(SolidFill, LightGray);
+ Bar(X, Y, X + 280, Y + 40);
   { Bordure du billet }
-  If IsSelected Then
-    SetColor(Red)
-  Else
-    SetColor(Black);
-  SetLineStyle(SolidLn, 0, NormWidth);
-  Rectangle(X, Y, X + 280, Y + 40);
-
-  { Numéros }
-  SetTextStyle(DefaultFont, HorizDir, 2);
-  For I := 1 to MAX_NUMBERS do Begin
-    NumX := X + 10 + (I - 1) * 43;
-    NumY := Y + 12;
-
-    { Cercle pour le numéro }
-    If I <= Count Then Begin
-      SetColor(White);
-      SetFillStyle(SolidFill, White);
-      FillEllipse(NumX + 15, NumY + 8, 15, 12);
-
-      SetColor(Black);
-      Circle(NumX + 15, NumY + 8, 15);
-
-      { Afficher le numéro }
-      Str(Ticket[I], NumStr);
-      If Ticket[I] < 10 Then
-        OutTextXY(NumX + 10, NumY, NumStr)
-      Else
-        OutTextXY(NumX + 6, NumY, NumStr);
-    End Else Begin
-      { Cercle vide }
-      SetColor(DarkGray);
-      SetFillStyle(SolidFill, DarkGray);
-      FillEllipse(NumX + 15, NumY + 8, 15, 12);
-
-      SetColor(Black);
-      Circle(NumX + 15, NumY + 8, 15);
-    End;
+ If IsSelected Then SetColor(Red)
+               Else SetColor(Black);
+ SetLineStyle(SolidLn, 0, NormWidth);
+ Rectangle(X, Y, X + 280, Y + 40);
+  { Num�ros }
+ SetTextStyle(DefaultFont, HorizDir, 2);
+ For I:=1 to MAX_NUMBERS do Begin
+  NumX:=X+10+(I-1)*43;
+  NumY:=Y+12;
+   { Cercle pour le numéro }
+  If I<=Count Then Begin
+   SetColor(White);
+   SetFillStyle(SolidFill, White);
+   FillEllipse(NumX + 15, NumY + 8, 15, 12);
+   SetColor(Black);
+   Circle(NumX + 15, NumY + 8, 15);
+    { Afficher le num�ro }
+   Str(Ticket[I], NumStr);
+   If Ticket[I]<10 Then OutTextXY(NumX + 10, NumY, NumStr)
+                   Else OutTextXY(NumX + 6, NumY, NumStr);
+  End
+   Else
+  Begin
+    { Cercle vide }
+   SetColor(DarkGray);
+   SetFillStyle(SolidFill, DarkGray);
+   FillEllipse(NumX + 15, NumY + 8, 15, 12);
+   SetColor(Black);
+   Circle(NumX + 15, NumY + 8, 15);
   End;
+ End;
 End;
 
 Procedure DrawNumberPad;
 Var
-  I, J, X, Y, Num: Integer;
-  NumStr: String;
-  TicketToCheck: Integer;
+ I,J,X,Y,Num:Integer;
+ NumStr:String;
+ TicketToCheck:Integer;
 Begin
-  SetTextStyle(DefaultFont, HorizDir, 1);
-
-  { Déterminer quel billet vérifier }
-  If (CurrentTicket <= NumTickets) Then
-    TicketToCheck := CurrentTicket
-  Else
-    TicketToCheck := NumTickets;
-
+ SetTextStyle(DefaultFont, HorizDir, 1);
+  { D�terminer quel billet v�rifier }
+ If(CurrentTicket<=NumTickets)Then TicketToCheck:=CurrentTicket
+                              Else TicketToCheck := NumTickets;
   { Grille de numéros 1-49 }
-  For I := 0 to 6 do Begin
-    For J := 0 to 6 do Begin
-      Num := I * 7 + J + 1;
-      If Num <= MAX_NUMBER Then Begin
-        X := 350 + J * 35;
-        Y := 120 + I * 35;
-
-        { Vérifier si le numéro est déjà sélectionné dans le billet actuel }
-        If (TicketToCheck >= 1) And (TicketToCheck <= NumTickets) And
-           NumberExists(Tickets[TicketToCheck], Num, MAX_NUMBERS) Then
-          SetColor(Red)
-        Else
-          SetColor(LightGray);
-
-        SetFillStyle(SolidFill, LightGray);
-        Bar(X, Y, X + 30, Y + 25);
-
-        SetColor(Black);
-        Rectangle(X, Y, X + 30, Y + 25);
-
-        { Afficher le numéro }
-        Str(Num, NumStr);
-        If Num < 10 Then
-          OutTextXY(X + 12, Y + 8, NumStr)
-        Else
-          OutTextXY(X + 8, Y + 8, NumStr);
-      End;
-    End;
+ For I:=0 to 6 do Begin
+  For J:=0 to 6 do Begin
+   Num:=I * 7 + J + 1;
+   If Num <= MAX_NUMBER Then Begin
+    X:=350+J*35;
+    Y:=120+I*35;
+     { V�rifier si le num�ro est déjà sélectionné dans le billet actuel }
+    If (TicketToCheck >= 1) And (TicketToCheck <= NumTickets) And
+       NumberExists(Tickets[TicketToCheck], Num, MAX_NUMBERS) Then
+     SetColor(Red)
+    Else
+     SetColor(LightGray);
+    SetFillStyle(SolidFill, LightGray);
+    Bar(X,Y,X+30,Y+25);
+    SetColor(Black);
+    Rectangle(X, Y, X + 30, Y + 25);
+     { Afficher le num�ro }
+    Str(Num, NumStr);
+    If Num<10 Then OutTextXY(X + 12, Y + 8,NumStr)
+              Else OutTextXY(X + 8, Y + 8,NumStr);
+   End;
   End;
+ End;
 End;
 
 Procedure DrawStatistics;
 Var
-  Chances: Real;
-  StatStr: String;
+ Chances:Real;
+ StatStr:String;
 Begin
-  SetColor(Cyan);
-  SetTextStyle(DefaultFont, HorizDir, 1);
-
+ SetColor(Cyan);
+ SetTextStyle(DefaultFont,HorizDir,1);
   { Calcul des chances (approximation) }
   { Chances de gagner le 6/49 = 1 sur 13,983,816 }
   { Avec plusieurs billets, les chances augmentent proportionnellement }
-
-  If NumTickets > 0 Then Begin
-    Chances := NumTickets / 13983816.0;
-
-    OutTextXY(20, 380, 'Statistiques:');
-
-    Str(NumTickets, StatStr);
-    OutTextXY(20, 395, 'Nombre de billets: ' + StatStr);
-
-    Str(Chances * 100:0:6, StatStr);
-    OutTextXY(20, 410, 'Chances de gagner le gros lot: ' + StatStr + '%');
-
-    { Autres prix }
-    OutTextXY(370, 395, 'Chances 5/6: ' + Chr(126) + ' 1 sur 55,492');
-    OutTextXY(370, 410, 'Chances 4/6: ' + Chr(126) + ' 1 sur 1,033');
-  End;
+ If NumTickets > 0 Then Begin
+  Chances:=NumTickets / 13983816.0;
+  OutTextXY(20, 380, 'Statistiques:');
+  Str(NumTickets, StatStr);
+  OutTextXY(20, 395, 'Nombre de billets: ' + StatStr);
+  Str(Chances * 100:0:6, StatStr);
+  OutTextXY(20, 410, 'Chances de gagner le gros lot: ' + StatStr + '%');
+   { Autres prix }
+  OutTextXY(370, 395, 'Chances 5/6: ' + Chr(126) + ' 1 sur 55,492');
+  OutTextXY(370, 410, 'Chances 4/6: ' + Chr(126) + ' 1 sur 1,033');
+ End;
 End;
 
 Procedure DrawSelectionScreen;
 Var
-  I: Integer;
-  StatStr: String;
+ I:Integer;
+ StatStr:String;
 Begin
-  DrawBackground;
-
+ DrawBackground;
   { Instructions }
-  SetColor(White);
-  SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(20, 90, 'Selectionnez vos numeros pour chaque billet:');
-
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(20, 90, 'Selectionnez vos numeros pour chaque billet:');
   { Afficher les billets }
-  For I := 1 to NumTickets do Begin
-    DrawTicket(20, 110 + (I - 1) * 50, Tickets[I], MAX_NUMBERS, I = CurrentTicket);
-  End;
-
+ For I := 1 to NumTickets do Begin
+  DrawTicket(20, 110 + (I - 1) * 50, Tickets[I], MAX_NUMBERS, I = CurrentTicket);
+ End;
   { Grille de sélection }
-  If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
-    Str(CurrentTicket, StatStr);
-    SetColor(Yellow);
-    OutTextXY(350, 100, 'Billet ' + StatStr + ' - Numero ' + Chr(Ord('0') + CurrentNumber) + ':');
-    DrawNumberPad;
-  End Else Begin
-    { Afficher un message quand tous les billets sont complets }
-    SetColor(LightGreen);
-    OutTextXY(130, 360, 'Tous les billets sont complets!');
-    OutTextXY(130, 375, 'Appuyez sur T pour le tirage');
-    { Afficher quand même la grille du dernier billet pour référence }
-    If NumTickets > 0 Then Begin
-      SetColor(Yellow);
-      OutTextXY(350, 100, 'Grille de reference (dernier billet):');
-      DrawNumberPad;
-    End;
+ If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
+  Str(CurrentTicket, StatStr);
+  SetColor(Yellow);
+  OutTextXY(350, 100, 'Billet ' + StatStr + ' - Numero ' + Chr(Ord('0') + CurrentNumber) + ':');
+  DrawNumberPad;
+ End Else Begin
+   { Afficher un message quand tous les billets sont complets }
+  SetColor(LightGreen);
+  OutTextXY(130, 360, 'Tous les billets sont complets!');
+  OutTextXY(130, 375, 'Appuyez sur T pour le tirage');
+   { Afficher quand même la grille du dernier billet pour référence }
+  If NumTickets > 0 Then Begin
+   SetColor(Yellow);
+   OutTextXY(350, 100, 'Grille de reference (dernier billet):');
+   DrawNumberPad;
   End;
-
+ End;
   { Statistiques }
-  DrawStatistics;
-
+ DrawStatistics;
   { Instructions de contrôle }
-  SetColor(LightGray);
-  If MouseDriverFound Then
-    OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, '+
-                       'T=Tirage, +/-=Billets, R=Reset, SOURIS=Clic, ESC=Quitter')
-  Else
-    OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, '+
-                       'T=Tirage, +/-=Billets, R=Reset, ESC=Quitter');
+ SetColor(LightGray);
+ If MouseDriverFound Then
+  OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, '+
+                     'T=Tirage, +/-=Billets, R=Reset, SOURIS=Clic, ESC=Quitter')
+ Else
+  OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, '+
+                     'T=Tirage, +/-=Billets, R=Reset, ESC=Quitter');
 End;
 
 Procedure InitializeBalls;
 Var
-  I: Integer;
-  CenterX, CenterY, Radius: Integer;
+ I:Integer;
+ CenterX,CenterY,Radius:Integer;
 Begin
-  CenterX := SCREEN_WIDTH div 2;
-  CenterY := 240;
-  Radius := 140;
-
-  For I := 1 to 49 do Begin
-    Balls[I].Number := I;
-    { Placer les boules dans le cercle }
-    Repeat
-      Balls[I].X := CenterX + Random(Radius * 2) - Radius;
-      Balls[I].Y := CenterY + Random(Radius * 2) - Radius;
-    Until (Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY)) <= Sqr(Radius - 15);
-
-    Balls[I].VelX := Random(6) - 3;
-    Balls[I].VelY := Random(6) - 3;
-    If Balls[I].VelX = 0 Then Balls[I].VelX := 1;
-    If Balls[I].VelY = 0 Then Balls[I].VelY := 1;
-  End;
+ CenterX := SCREEN_WIDTH div 2;
+ CenterY := 240;
+ Radius := 140;
+ For I := 1 to 49 do Begin
+  Balls[I].Number := I;
+   { Placer les boules dans le cercle }
+  Repeat
+   Balls[I].X := CenterX + Random(Radius * 2) - Radius;
+   Balls[I].Y := CenterY + Random(Radius * 2) - Radius;
+  Until (Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY)) <= Sqr(Radius - 15);
+  Balls[I].VelX := Random(6) - 3;
+  Balls[I].VelY := Random(6) - 3;
+  If Balls[I].VelX = 0 Then Balls[I].VelX := 1;
+  If Balls[I].VelY = 0 Then Balls[I].VelY := 1;
+ End;
 End;
 
-Procedure DrawBall(Ball: TBall);
+Procedure DrawBall(Ball:TBall);
 Var
-  NumStr: String;
+ NumStr:String;
 Begin
   { Dessiner la boule }
-  SetColor(White);
-  SetFillStyle(SolidFill, White);
-  FillEllipse(Ball.X, Ball.Y, 12, 12);
-
-  SetColor(Black);
-  Circle(Ball.X, Ball.Y, 12);
-
-  { Afficher le numéro }
-  SetTextStyle(DefaultFont, HorizDir, 1);
-  Str(Ball.Number, NumStr);
-  If Ball.Number < 10 Then
-    OutTextXY(Ball.X - 4, Ball.Y - 4, NumStr)
-  Else
-    OutTextXY(Ball.X - 6, Ball.Y - 4, NumStr);
+ SetColor(White);
+ SetFillStyle(SolidFill, White);
+ FillEllipse(Ball.X, Ball.Y, 12, 12);
+ SetColor(Black);
+ Circle(Ball.X, Ball.Y, 12);
+  { Afficher le num�ro }
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ Str(Ball.Number, NumStr);
+ If Ball.Number<10 Then OutTextXY(Ball.X - 4, Ball.Y - 4, NumStr)
+                   Else OutTextXY(Ball.X - 6, Ball.Y - 4, NumStr);
 End;
 
 Procedure UpdateBalls;
 Var
-  I: Integer;
-  CenterX, CenterY, Radius: Integer;
-  DistanceFromCenter: Real;
+ I:Integer;
+ CenterX,CenterY,Radius:Integer;
+ DistanceFromCenter:Real;
 Begin
-  CenterX := SCREEN_WIDTH div 2;
-  CenterY := 240;
-  Radius := 140;
-
-  For I := 1 to 49 do Begin
-    { Effacer l'ancienne position }
-    SetColor(Blue);
-    SetFillStyle(SolidFill, Blue);
-    FillEllipse(Balls[I].X, Balls[I].Y, 13, 13);
-
-    { Mettre à jour la position }
-    Balls[I].X := Balls[I].X + Balls[I].VelX;
-    Balls[I].Y := Balls[I].Y + Balls[I].VelY;
-
-    { Vérifier si la boule sort du cercle }
-    DistanceFromCenter := Sqrt(Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY));
-
-    If DistanceFromCenter >= (Radius - 12) Then Begin
-      { Rebond sur le bord du cercle }
-      { Calculer la normale au point de contact }
-      Balls[I].VelX := -Balls[I].VelX;
-      Balls[I].VelY := -Balls[I].VelY;
-
-      { Repositionner la boule à l'intérieur }
-      Balls[I].X := CenterX + Round((Balls[I].X - CenterX) * (Radius - 15) / DistanceFromCenter);
-      Balls[I].Y := CenterY + Round((Balls[I].Y - CenterY) * (Radius - 15) / DistanceFromCenter);
-    End;
-
-    { Dessiner la nouvelle position }
-    DrawBall(Balls[I]);
+ CenterX:=SCREEN_WIDTH div 2;
+ CenterY:=240;
+ Radius:=140;
+ For I:=1 to 49 do Begin
+   { Effacer l'ancienne position }
+  SetColor(Blue);
+  SetFillStyle(SolidFill, Blue);
+  FillEllipse(Balls[I].X, Balls[I].Y, 13, 13);
+   { Mettre � jour la position }
+  Balls[I].X := Balls[I].X + Balls[I].VelX;
+  Balls[I].Y := Balls[I].Y + Balls[I].VelY;
+   { V�rifier si la boule sort du cercle }
+  DistanceFromCenter := Sqrt(Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY));
+  If DistanceFromCenter >= (Radius - 12) Then Begin
+    { Rebond sur le bord du cercle }
+    { Calculer la normale au point de contact }
+   Balls[I].VelX := -Balls[I].VelX;
+   Balls[I].VelY := -Balls[I].VelY;
+    { Repositionner la boule à l'intérieur }
+   Balls[I].X := CenterX + Round((Balls[I].X - CenterX) * (Radius - 15) / DistanceFromCenter);
+   Balls[I].Y := CenterY + Round((Balls[I].Y - CenterY) * (Radius - 15) / DistanceFromCenter);
   End;
+   { Dessiner la nouvelle position }
+  DrawBall(Balls[I]);
+ End;
 End;
 
 Procedure DrawBallotScreen;
 Var
-  I: Integer;
-  TimeLeft: Integer;
-  StartTime: LongInt;
-  TimeStr: String;
-  CenterX, CenterY, Radius: Integer;
+ I:Integer;
+ TimeLeft:Integer;
+ StartTime:LongInt;
+ TimeStr:String;
+ CenterX,CenterY,Radius:Integer;
 Begin
-  DrawBackground;
-
+ DrawBackground;
   { Titre de l'animation }
-  SetColor(Yellow);
-  SetTextStyle(DefaultFont, HorizDir, 2);
-  OutTextXY(SCREEN_WIDTH div 2 - 80, 90, 'TIRAGE EN COURS...');
-
+ SetColor(Yellow);
+ SetTextStyle(DefaultFont, HorizDir, 2);
+ OutTextXY(SCREEN_WIDTH div 2 - 80, 90, 'TIRAGE EN COURS...');
   { Dessiner le boulier rond }
-  CenterX := SCREEN_WIDTH div 2;
-  CenterY := 240;
-  Radius := 140;
-
+ CenterX := SCREEN_WIDTH div 2;
+ CenterY := 240;
+ Radius := 140;
   { Boulier principal (sphere transparente) }
+ SetColor(White);
+ SetLineStyle(SolidLn, 0, ThickWidth);
+ Circle(CenterX, CenterY, Radius);
+  { Effet de profondeur - cercles concentriques }
+ SetColor(LightGray);
+ SetLineStyle(SolidLn, 0, NormWidth);
+ Circle(CenterX, CenterY, Radius - 10);
+ Circle(CenterX, CenterY, Radius - 20);
+  { Initialiser les boules }
+ InitializeBalls;
+  { Animation pendant 5 secondes }
+ StartTime := GetTickCount;
+ Repeat
+  UpdateBalls;
+   { Redessiner le contour du boulier par-dessus }
   SetColor(White);
   SetLineStyle(SolidLn, 0, ThickWidth);
   Circle(CenterX, CenterY, Radius);
-
-  { Effet de profondeur - cercles concentriques }
-  SetColor(LightGray);
-  SetLineStyle(SolidLn, 0, NormWidth);
-  Circle(CenterX, CenterY, Radius - 10);
-  Circle(CenterX, CenterY, Radius - 20);
-
-  { Initialiser les boules }
-  InitializeBalls;
-
-  { Animation pendant 5 secondes }
-  StartTime := GetTickCount;
-  Repeat
-    UpdateBalls;
-
-    { Redessiner le contour du boulier par-dessus }
-    SetColor(White);
-    SetLineStyle(SolidLn, 0, ThickWidth);
-    Circle(CenterX, CenterY, Radius);
-
-    { Afficher le temps restant }
-    TimeLeft := 5 - ((GetTickCount - StartTime) div 1000);
-    If TimeLeft < 0 Then TimeLeft := 0;
-
-    SetColor(Blue);
-    SetFillStyle(SolidFill, Blue);
-    Bar(250, 410, 390, 430);
-
-    SetColor(White);
-    SetTextStyle(DefaultFont, HorizDir, 1);
-    Str(TimeLeft, TimeStr);
-    OutTextXY(280, 415, 'Temps restant: ' + TimeStr + ' sec');
-
-    Delay(100);
-  Until (GetTickCount - StartTime) >= 5000;
-
-  { Effacer l'écran avant d'afficher les résultats }
+   { Afficher le temps restant }
+  TimeLeft := 5 - ((GetTickCount - StartTime) div 1000);
+  If TimeLeft < 0 Then TimeLeft := 0;
   SetColor(Blue);
   SetFillStyle(SolidFill, Blue);
-  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  Bar(250, 410, 390, 430);
+  SetColor(White);
+  SetTextStyle(DefaultFont, HorizDir, 1);
+  Str(TimeLeft, TimeStr);
+  OutTextXY(280, 415, 'Temps restant: ' + TimeStr + ' sec');
+  Delay(100);
+ Until (GetTickCount - StartTime) >= 5000;
+  { Effacer l'�cran avant d'afficher les r�sultats }
+ SetColor(Blue);
+ SetFillStyle(SolidFill, Blue);
+ Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 End;
 
 Function GetClickedNumber(X,Y:Integer):Integer;
 Var
  GridX,GridY,Num:Integer;
 Begin
-  GetClickedNumber := 0;
-
-  If (X >= 350) And (X <= 350 + 7 * 35) And (Y >= 120) And (Y <= 120 + 7 * 35) Then Begin
-    GridX := (X - 350) div 35;
-    GridY := (Y - 120) div 35;
-    Num := GridY * 7 + GridX + 1;
-
-    If (Num >= MIN_NUMBER) And (Num <= MAX_NUMBER) Then
-      GetClickedNumber := Num;
-  End;
+ GetClickedNumber:=0;
+ If (X >= 350) And (X <= 350 + 7 * 35) And (Y >= 120) And (Y <= 120 + 7 * 35) Then Begin
+  GridX := (X - 350) div 35;
+  GridY := (Y - 120) div 35;
+  Num := GridY * 7 + GridX + 1;
+  If(Num >= MIN_NUMBER)And(Num <= MAX_NUMBER)Then GetClickedNumber := Num;
+ End;
 End;
 
 Procedure DrawResults;
@@ -624,11 +562,11 @@ Var
  StatStr:String;
 Begin
  DrawBackground;
-  { Titre des résultats }
+  { Titre des r�sultats }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 2);
  OutTextXY(SCREEN_WIDTH div 2 - 100, 90, 'RESULTATS DU TIRAGE');
-  { Num�ros gagnants }
+  { Num�ros gagnants }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(20, 130, 'Numeros gagnants:');
@@ -666,54 +604,53 @@ End;
 
 Procedure HandleInput;
 Var
-  Key: Char;
-  I, J, Num: Integer;
-  Found: Boolean;
-  MouseX, MouseY, MouseButton: LongInt;
+ Key:Char;
+ I,J,Num:Integer;
+ Found:Boolean;
+ MouseX,MouseY,MouseButton:LongInt;
 Begin
-  { Vérifier les clics de souris }
-  If GetMouseButton > 0 Then Begin
-    GetMouseState(MouseX, MouseY, MouseButton);
-    If MouseButton = 1 Then Begin { Clic gauche }
-      Num := GetClickedNumber(MouseX, MouseY);
-      If (Num > 0) And (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
-        If Not NumberExists(Tickets[CurrentTicket], Num, CurrentNumber - 1) Then Begin
-          Tickets[CurrentTicket][CurrentNumber] := Num;
-          Inc(CurrentNumber);
-          If CurrentNumber > MAX_NUMBERS Then Begin
-            SortTicket(Tickets[CurrentTicket]);
-            If CurrentTicket < NumTickets Then Begin
-              Inc(CurrentTicket);
-              CurrentNumber := 1;
-            End Else Begin
-              CurrentNumber := MAX_NUMBERS + 1;
-            End;
-          End;
-          { Redessiner immédiatement pour voir le changement }
-          DrawSelectionScreen;
-          { Attendre que le bouton soit relâché }
-          While GetMouseButton > 0 Do Delay(10);
-        End;
+  { V�rifier les clics de souris }
+ If GetMouseButton > 0 Then Begin
+  GetMouseState(MouseX, MouseY, MouseButton);
+  If MouseButton = 1 Then Begin { Clic gauche }
+   Num:=GetClickedNumber(MouseX,MouseY);
+   If(Num>0)And(CurrentTicket<=NumTickets)And(CurrentNumber<=MAX_NUMBERS)Then Begin
+    If Not NumberExists(Tickets[CurrentTicket],Num,CurrentNumber - 1)Then Begin
+     Tickets[CurrentTicket][CurrentNumber] := Num;
+     Inc(CurrentNumber);
+     If CurrentNumber > MAX_NUMBERS Then Begin
+      SortTicket(Tickets[CurrentTicket]);
+      If CurrentTicket < NumTickets Then Begin
+       Inc(CurrentTicket);
+       CurrentNumber := 1;
+      End
+       Else
+      Begin
+       CurrentNumber := MAX_NUMBERS + 1;
       End;
+     End;
+      { Redessiner immédiatement pour voir le changement }
+     DrawSelectionScreen;
+      { Attendre que le bouton soit relâché }
+     While GetMouseButton > 0 Do Delay(10);
     End;
+   End;
   End;
-
-  If KeyPressed Then Begin
-    Key := ReadKey;
-
-    { Si on est dans l'écran des résultats, toute touche retourne à l'écran principal }
-    If GameState = 2 Then Begin
-      GameState := 0;
-      CurrentTicket := 1;
-      CurrentNumber := 1;
-      NumTickets := 1;
-      FillChar(Tickets, SizeOf(Tickets), 0);
-      ResultsDrawn := False;
-      Exit;
-    End;
-
-    Case UpCase(Key) of
-      '1'..'9': Begin { Sélection directe d'un numéro 1-9 }
+ End;
+ If KeyPressed Then Begin
+  Key := ReadKey;
+   { Si on est dans l'�cran des r�sultats, toute touche retourne � l'�cran principal }
+  If GameState = 2 Then Begin
+   GameState := 0;
+   CurrentTicket := 1;
+   CurrentNumber := 1;
+   NumTickets := 1;
+   FillChar(Tickets, SizeOf(Tickets), 0);
+   ResultsDrawn := False;
+   Exit;
+  End;
+  Case UpCase(Key) of
+   '1'..'9': Begin { Sélection directe d'un numéro 1-9 }
         If (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
           Num := Ord(Key) - Ord('0');
           If Not NumberExists(Tickets[CurrentTicket], Num, CurrentNumber - 1) Then Begin
