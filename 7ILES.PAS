@@ -28,8 +28,9 @@ Type
  End;
 
 Const
-  MAX_GAMES = 65;
+  MAX_GAMES = 67;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
+    (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
     (Title: 'Anagram - Jeu de mots'; ProgramExec: 'ANAGRAM.EXE'),
     (Title: 'Asteroid - Jeu spatial'; ProgramExec: 'ASTEROID.EXE'),
@@ -42,6 +43,7 @@ Const
     (Title: 'Blackjack - Jeu de cartes'; ProgramExec: 'BLACJACK.EXE'),
     (Title: 'Blox - Puzzle de blocs'; ProgramExec: 'BLOX.EXE'),
     (Title: 'Bouncing Babies'; ProgramExec: 'BABY.EXE'),
+    (Title: 'Bowling'; ProgramExec: 'BOWLING.EXE'),
     (Title: 'Breakout - Casse-briques'; ProgramExec: 'BREAKOUT.EXE'),
     (Title: 'Bubble Shooter'; ProgramExec: 'BS.EXE'),
     (Title: 'Cannonball - Tir au canon'; ProgramExec: 'CANNONBA.EXE'),
