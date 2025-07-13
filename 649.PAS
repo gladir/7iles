@@ -24,6 +24,14 @@ Type
   TTicket = Array[1..MAX_NUMBERS] of Integer;
   TTicketArray = Array[1..MAX_TICKETS] of TTicket;
 
+Type
+  TBall = Record
+    X, Y: Integer;
+    VelX, VelY: Integer;
+    Number: Integer;
+  End;
+  TBallArray = Array[1..49] of TBall;
+
 Var
   Tickets: TTicketArray;
   NumTickets: Integer;
@@ -31,6 +39,7 @@ Var
   CurrentNumber: Integer;
   WinningNumbers: TTicket;
   GameState: Integer; { 0=Selection, 1=Playing, 2=Results }
+  Balls: TBallArray;
   
 Function ReadNumber: Integer;
 Var
@@ -360,6 +369,156 @@ Begin
   OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, T=Tirage, +/-=Billets, R=Reset, ESC=Quitter');
 End;
 
+Procedure InitializeBalls;
+Var
+  I: Integer;
+  CenterX, CenterY, Radius: Integer;
+Begin
+  CenterX := SCREEN_WIDTH div 2;
+  CenterY := 240;
+  Radius := 140;
+  
+  For I := 1 to 49 do Begin
+    Balls[I].Number := I;
+    { Placer les boules dans le cercle }
+    Repeat
+      Balls[I].X := CenterX + Random(Radius * 2) - Radius;
+      Balls[I].Y := CenterY + Random(Radius * 2) - Radius;
+    Until (Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY)) <= Sqr(Radius - 15);
+    
+    Balls[I].VelX := Random(6) - 3;
+    Balls[I].VelY := Random(6) - 3;
+    If Balls[I].VelX = 0 Then Balls[I].VelX := 1;
+    If Balls[I].VelY = 0 Then Balls[I].VelY := 1;
+  End;
+End;
+
+Procedure DrawBall(Ball: TBall);
+Var
+  NumStr: String;
+Begin
+  { Dessiner la boule }
+  SetColor(White);
+  SetFillStyle(SolidFill, White);
+  FillEllipse(Ball.X, Ball.Y, 12, 12);
+  
+  SetColor(Black);
+  Circle(Ball.X, Ball.Y, 12);
+  
+  { Afficher le numéro }
+  SetTextStyle(DefaultFont, HorizDir, 1);
+  Str(Ball.Number, NumStr);
+  If Ball.Number < 10 Then
+    OutTextXY(Ball.X - 4, Ball.Y - 4, NumStr)
+  Else
+    OutTextXY(Ball.X - 6, Ball.Y - 4, NumStr);
+End;
+
+Procedure UpdateBalls;
+Var
+  I: Integer;
+  CenterX, CenterY, Radius: Integer;
+  DistanceFromCenter: Real;
+Begin
+  CenterX := SCREEN_WIDTH div 2;
+  CenterY := 240;
+  Radius := 140;
+  
+  For I := 1 to 49 do Begin
+    { Effacer l'ancienne position }
+    SetColor(Blue);
+    SetFillStyle(SolidFill, Blue);
+    FillEllipse(Balls[I].X, Balls[I].Y, 13, 13);
+    
+    { Mettre à jour la position }
+    Balls[I].X := Balls[I].X + Balls[I].VelX;
+    Balls[I].Y := Balls[I].Y + Balls[I].VelY;
+    
+    { Vérifier si la boule sort du cercle }
+    DistanceFromCenter := Sqrt(Sqr(Balls[I].X - CenterX) + Sqr(Balls[I].Y - CenterY));
+    
+    If DistanceFromCenter >= (Radius - 12) Then Begin
+      { Rebond sur le bord du cercle }
+      { Calculer la normale au point de contact }
+      Balls[I].VelX := -Balls[I].VelX;
+      Balls[I].VelY := -Balls[I].VelY;
+      
+      { Repositionner la boule à l'intérieur }
+      Balls[I].X := CenterX + Round((Balls[I].X - CenterX) * (Radius - 15) / DistanceFromCenter);
+      Balls[I].Y := CenterY + Round((Balls[I].Y - CenterY) * (Radius - 15) / DistanceFromCenter);
+    End;
+    
+    { Dessiner la nouvelle position }
+    DrawBall(Balls[I]);
+  End;
+End;
+
+Procedure DrawBallotScreen;
+Var
+  I: Integer;
+  TimeLeft: Integer;
+  StartTime: LongInt;
+  TimeStr: String;
+  CenterX, CenterY, Radius: Integer;
+Begin
+  DrawBackground;
+  
+  { Titre de l'animation }
+  SetColor(Yellow);
+  SetTextStyle(DefaultFont, HorizDir, 2);
+  OutTextXY(SCREEN_WIDTH div 2 - 80, 90, 'TIRAGE EN COURS...');
+  
+  { Dessiner le boulier rond }
+  CenterX := SCREEN_WIDTH div 2;
+  CenterY := 240;
+  Radius := 140;
+  
+  { Boulier principal (sphere transparente) }
+  SetColor(White);
+  SetLineStyle(SolidLn, 0, ThickWidth);
+  Circle(CenterX, CenterY, Radius);
+  
+  { Effet de profondeur - cercles concentriques }
+  SetColor(LightGray);
+  SetLineStyle(SolidLn, 0, NormWidth);
+  Circle(CenterX, CenterY, Radius - 10);
+  Circle(CenterX, CenterY, Radius - 20);
+  
+  { Initialiser les boules }
+  InitializeBalls;
+  
+  { Animation pendant 5 secondes }
+  StartTime := GetTickCount;
+  Repeat
+    UpdateBalls;
+    
+    { Redessiner le contour du boulier par-dessus }
+    SetColor(White);
+    SetLineStyle(SolidLn, 0, ThickWidth);
+    Circle(CenterX, CenterY, Radius);
+    
+    { Afficher le temps restant }
+    TimeLeft := 5 - ((GetTickCount - StartTime) div 1000);
+    If TimeLeft < 0 Then TimeLeft := 0;
+    
+    SetColor(Blue);
+    SetFillStyle(SolidFill, Blue);
+    Bar(250, 410, 390, 430);
+    
+    SetColor(White);
+    SetTextStyle(DefaultFont, HorizDir, 1);
+    Str(TimeLeft, TimeStr);
+    OutTextXY(280, 415, 'Temps restant: ' + TimeStr + ' sec');
+    
+    Delay(100);
+  Until (GetTickCount - StartTime) >= 5000;
+  
+  { Effacer l'écran avant d'afficher les résultats }
+  SetColor(Blue);
+  SetFillStyle(SolidFill, Blue);
+  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+End;
+
 Function GetClickedNumber(X, Y: Integer): Integer;
 Var
   GridX, GridY, Num: Integer;
@@ -510,6 +669,7 @@ Begin
       'T': Begin { Tirage }
         If (CurrentTicket > NumTickets) Or 
            ((CurrentTicket = NumTickets) And (CurrentNumber > MAX_NUMBERS)) Then Begin
+          DrawBallotScreen;
           GenerateRandomTicket(WinningNumbers);
           GameState := 2;
         End;
