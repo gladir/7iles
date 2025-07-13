@@ -96,10 +96,20 @@ Var
   Intr($33,Regs);
  End;
 
+ Function GetTickCount:LongInt;Begin
+  GetTickCount:= MemL[Seg0040:$006C]; { Turbo Pascal - lecture directe de la m�moire }
+ End;
 {$ELSE}
- Function MouseDriverFound:Boolean;
- Begin
+ Function MouseDriverFound:Boolean;Begin
   MouseDriverFound := True; { Pas de support souris direct en Free Pascal }
+ End;
+
+ Function GetMouseButton:Word;
+ Var
+  X,Y,Button:LongInt;
+ Begin
+  GetMouseState(X,Y,Button);
+  GetMouseButton:=Button;
  End;
 
  Procedure ShowMouse;Begin
@@ -434,7 +444,12 @@ Begin
 
   { Instructions de contrôle }
   SetColor(LightGray);
-  OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, T=Tirage, +/-=Billets, R=Reset, ESC=Quitter');
+  If MouseDriverFound Then
+    OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, '+
+                       'T=Tirage, +/-=Billets, R=Reset, SOURIS=Clic, ESC=Quitter')
+  Else
+    OutTextXY(20, 420, '1-9=Numeros rapides, N=Saisir numero, A=Auto, '+
+                       'T=Tirage, +/-=Billets, R=Reset, ESC=Quitter');
 End;
 
 Procedure InitializeBalls;
@@ -613,7 +628,7 @@ Begin
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 2);
  OutTextXY(SCREEN_WIDTH div 2 - 100, 90, 'RESULTATS DU TIRAGE');
-  { Num�ros gagnants }
+  { Num�ros gagnants }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(20, 130, 'Numeros gagnants:');
@@ -654,7 +669,35 @@ Var
   Key: Char;
   I, J, Num: Integer;
   Found: Boolean;
+  MouseX, MouseY, MouseButton: LongInt;
 Begin
+  { Vérifier les clics de souris }
+  If GetMouseButton > 0 Then Begin
+    GetMouseState(MouseX, MouseY, MouseButton);
+    If MouseButton = 1 Then Begin { Clic gauche }
+      Num := GetClickedNumber(MouseX, MouseY);
+      If (Num > 0) And (CurrentTicket <= NumTickets) And (CurrentNumber <= MAX_NUMBERS) Then Begin
+        If Not NumberExists(Tickets[CurrentTicket], Num, CurrentNumber - 1) Then Begin
+          Tickets[CurrentTicket][CurrentNumber] := Num;
+          Inc(CurrentNumber);
+          If CurrentNumber > MAX_NUMBERS Then Begin
+            SortTicket(Tickets[CurrentTicket]);
+            If CurrentTicket < NumTickets Then Begin
+              Inc(CurrentTicket);
+              CurrentNumber := 1;
+            End Else Begin
+              CurrentNumber := MAX_NUMBERS + 1;
+            End;
+          End;
+          { Redessiner immédiatement pour voir le changement }
+          DrawSelectionScreen;
+          { Attendre que le bouton soit relâché }
+          While GetMouseButton > 0 Do Delay(10);
+        End;
+      End;
+    End;
+  End;
+
   If KeyPressed Then Begin
     Key := ReadKey;
 
@@ -788,6 +831,10 @@ End;
 BEGIN
  Randomize;
  InitScreen;
+ { Initialiser la souris si disponible }
+ If MouseDriverFound Then Begin
+   ShowMouse;
+ End;
   { Initialisation }
  NumTickets := 1;
  CurrentTicket := 1;
