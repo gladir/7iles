@@ -327,6 +327,8 @@ Begin
               Else Game.Players[J].Hand[I].Visible := False;
      Game.Players[J].Hand[I].Selected := False;
      Inc(Game.DeckIndex);
+     { Vérifier si on dépasse la limite du deck }
+     If Game.DeckIndex >= DECK_SIZE Then Game.DeckIndex := DECK_SIZE - 1;
     End;
    End;
   End;
@@ -380,10 +382,12 @@ Begin
  If Game.PlayerCount <= 0 Then Exit;
  
  Game.GamePhase := GAME_DEALING;
- Game.Dealer := (Game.Dealer + 1) Mod Game.PlayerCount;
- Game.SmallBlind := (Game.Dealer + 1) Mod Game.PlayerCount;
- Game.BigBlind := (Game.Dealer + 2) Mod Game.PlayerCount;
- Game.CurrentPlayer := (Game.BigBlind + 1) Mod Game.PlayerCount;
+ If Game.PlayerCount > 0 Then Begin
+  Game.Dealer := (Game.Dealer + 1) Mod Game.PlayerCount;
+  Game.SmallBlind := (Game.Dealer + 1) Mod Game.PlayerCount;
+  Game.BigBlind := (Game.Dealer + 2) Mod Game.PlayerCount;
+  Game.CurrentPlayer := (Game.BigBlind + 1) Mod Game.PlayerCount;
+ End;
  Game.DrawRound := 0;
  Game.BettingRound := 1;
  Game.CurrentBet := 0;
@@ -420,6 +424,9 @@ End;
 
 Procedure InitGame;Begin
  InitPlayers;
+ { S'assurer que les variables sont dans des limites valides }
+ If Game.PlayerCount <= 0 Then Game.PlayerCount := 4;
+ If Game.PlayerCount > MAX_PLAYERS Then Game.PlayerCount := MAX_PLAYERS;
  Game.Dealer := 0;
  InitHand;
 End;
@@ -636,7 +643,12 @@ Begin
  OutTextXY(350, 220, 'Tour: ' + RoundText);
   { Tour de draw }
  Str(Game.DrawRound, DrawText);
- OutTextXY(350, 240, 'Draw: ' + DrawText + '/' + Chr(Ord('0') + MAX_DRAWS));
+ If (MAX_DRAWS >= 0) And (MAX_DRAWS <= 9) Then
+  OutTextXY(350, 240, 'Draw: ' + DrawText + '/' + Chr(Ord('0') + MAX_DRAWS))
+ Else Begin
+  Str(MAX_DRAWS, RoundText);
+  OutTextXY(350, 240, 'Draw: ' + DrawText + '/' + RoundText);
+ End;
   { Phase de jeu }
  Case Game.GamePhase of
   GAME_BETTING: OutTextXY(350, 260, 'Phase: Encheres');
@@ -859,10 +871,14 @@ Begin
   If Game.PlayerCount > 0 Then Begin
    Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
    If Game.CurrentPlayer >= Game.PlayerCount Then Game.CurrentPlayer := 0;
+  End
+  Else Begin
+   Game.CurrentPlayer := 0;
   End;
   Inc(LoopCount);
   If LoopCount > Game.PlayerCount Then Break; { Éviter les boucles infinies }
- Until (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
+  If LoopCount > MAX_PLAYERS Then Break; { Protection supplémentaire }
+ Until (Game.PlayerCount > 0) And (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
        (Game.CurrentPlayer < MAX_PLAYERS) And
        ((Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < MAX_PLAYERS) And
         Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded);
@@ -945,6 +961,8 @@ Begin
                         Else Game.Players[PlayerIndex].Hand[I].Visible := False;
      Game.Players[PlayerIndex].Hand[I].Selected := False;
      Inc(Game.DeckIndex);
+     { Vérifier si on dépasse la limite du deck }
+     If Game.DeckIndex >= DECK_SIZE Then Game.DeckIndex := DECK_SIZE - 1;
      Inc(CardsDrawn);
     End;
    End;
@@ -958,10 +976,14 @@ Begin
   If Game.PlayerCount > 0 Then Begin
    Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
    If Game.CurrentPlayer >= Game.PlayerCount Then Game.CurrentPlayer := 0;
+  End
+  Else Begin
+   Game.CurrentPlayer := 0;
   End;
   Inc(LoopCount);
   If LoopCount > Game.PlayerCount Then Break; { Éviter les boucles infinies }
- Until (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
+  If LoopCount > MAX_PLAYERS Then Break; { Protection supplémentaire }
+ Until (Game.PlayerCount > 0) And (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
        (Game.CurrentPlayer < MAX_PLAYERS) And
        ((Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < MAX_PLAYERS) And
         Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded);
@@ -1033,7 +1055,8 @@ Begin
  End;
   { Marquer les cartes à échanger }
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) And
+     (I >= 0) And (I <= 3) Then Begin
    Game.Players[PlayerIndex].Hand[I].Selected := Not KeepCard[I];
   End;
  End;
@@ -1089,7 +1112,8 @@ Begin
  ClickedCard := GetClickedCard(X, Y);
  If ClickedCard >= 0 Then Begin
   { Basculer la sélection de la carte }
-  If (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) Then Begin
+  If (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) And
+     (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) Then Begin
    Game.Players[0].Hand[ClickedCard].Selected := Not Game.Players[0].Hand[ClickedCard].Selected;
    NeedRedraw := True;
   End;
