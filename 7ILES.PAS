@@ -28,7 +28,7 @@ Type
  End;
 
 Const
-  MAX_GAMES = 71;
+  MAX_GAMES = 72;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
@@ -62,6 +62,7 @@ Const
     (Title: 'Gomoku - Alignement 5 pions'; ProgramExec: 'GOMOKU.EXE'),
     (Title: 'Gravity - Jeu de gravit‚'; ProgramExec: 'GRAVITY.EXE'),
     (Title: 'Hangman - Jeu du pendu'; ProgramExec: 'HANGMAN.EXE'),
+    (Title: 'Hex 2048'; ProgramExec: 'HEX2048.EXE'),
     (Title: 'Keno - Jeu de hasard'; ProgramExec: 'KENO.EXE'),
     (Title: 'L25 - Jeu de logique'; ProgramExec: 'L25.EXE'),
     (Title: 'Lights Out - Eteindre des lumiŠres'; ProgramExec: 'LIGHTS.EXE'),
