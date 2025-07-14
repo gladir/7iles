@@ -249,6 +249,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>Blox</b></td>
         <td>Ce fichier contient le clone du jeu Blox proposé sur les CoCo 3.</td>
     </tr>
+    <tr>
+        <td><b>BOURRE.PAS</b></td>
+        <td><b>Bourré</b></td>
+        <td>Ce fichier contient le jeu de carte Bourré.</td>
+    </tr>
     <tr> 
       <td><b>BREAKOUT.PAS</b></td>
       <td><b>BreakOut</b></td>
