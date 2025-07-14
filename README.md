@@ -303,6 +303,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu de carte Gin Rummy.</td>
     </tr>
     <tr>
+        <td><b>GOLF.PAS</b></td>
+        <td><b>Golf</b></td>
+        <td>Ce fichier contient le jeu de carte Golf.</td>
+    </tr>
+    <tr>
         <td><b>GOMOKU.PAS<b/></td>
         <td><b>GOMOKU</b></td>
         <td>Ce fichier contient le jeu japonais GOMOKU.</td>
