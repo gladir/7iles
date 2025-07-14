@@ -12,7 +12,7 @@ Program Hex2048;
 Uses {$IFDEF FPC}
       Windows,PtcMouse,PtcGraph,PtcCrt
      {$ELSE}
-      Crt,Graph
+      DOS,Crt,Graph
      {$ENDIF};
 
 Const
@@ -45,6 +45,7 @@ Var
   GameOver: Boolean;
   Won: Boolean;
   ShowInstructions: Boolean;
+  NeedRedraw: Boolean;  { Indique si un rafraîchissement est nécessaire }
 
 {$IFNDEF FPC}
  Function MouseDriverFound: Boolean;
@@ -102,7 +103,7 @@ Var
  End;
 
  Function GetTickCount:LongInt;Begin
-  GetTickCount:= MemL[Seg0040:$006C]; { Turbo Pascal - lecture directe de la m�moire }
+  GetTickCount:= MemL[$0040:$006C]; { Turbo Pascal - lecture directe de la mémoire }
  End;
 {$ELSE}
  Function MouseDriverFound:Boolean;Begin
@@ -144,7 +145,7 @@ Begin
   { Disposition hexagonale authentique en forme de losange }
   { Pattern: 1-2-3-2-3-2-3-2-1 hexagones par rangée }
   { Espacement réduit pour tenir dans 640x480 }
-  
+
   I := 0;
 
   { Rangée 0 : 1 hexagone - sommet }
@@ -254,9 +255,7 @@ Begin
   End;
 End;
 
-Function GetHexCenter(Index: Integer): THexPoint;
-Var
-  Point: THexPoint;
+Procedure GetHexCenter(Index: Integer; Var Point: THexPoint);
 Begin
   If (Index >= 0) And (Index < MAX_HEXAGONS) And Grid[Index].Active Then Begin
     Point.X := Grid[Index].X;
@@ -265,7 +264,6 @@ Begin
     Point.X := 0;
     Point.Y := 0;
   End;
-  GetHexCenter := Point;
 End;
 
 Procedure DrawHexagon(CenterX, CenterY, Radius: Integer; FillColor, BorderColor: Integer);
@@ -347,7 +345,7 @@ Var
 Begin
   If Not Grid[Index].Active Then Exit;
 
-  Point := GetHexCenter(Index);
+  GetHexCenter(Index, Point);
   Value := Grid[Index].Value;
 
   { Dessiner l'hexagone }
@@ -775,6 +773,7 @@ Begin
   Won := False;
   ShowInstructions := True;  { Afficher les instructions comme dans le JavaScript }
   InitGrid;
+  NeedRedraw := True;  { Marquer pour rafraîchissement }
 End;
 
 Procedure HandleInput;
@@ -790,14 +789,36 @@ Begin
     Case Key Of
       'i', 'I': Begin
         ShowInstructions := Not ShowInstructions;
+        NeedRedraw := True;  { Marquer pour rafraîchissement }
       End;
-      'q', 'Q': Moved := MoveInDirection(0);
-      'w', 'W': Moved := MoveInDirection(1);
-      'e', 'E': Moved := MoveInDirection(2);
-      'a', 'A': Moved := MoveInDirection(3);
-      's', 'S': Moved := MoveInDirection(4);
-      'd', 'D': Moved := MoveInDirection(5);
-      'r', 'R': NewGame;
+      'q', 'Q': Begin
+        Moved := MoveInDirection(0);
+        If Moved Then NeedRedraw := True;
+      End;
+      'w', 'W': Begin
+        Moved := MoveInDirection(1);
+        If Moved Then NeedRedraw := True;
+      End;
+      'e', 'E': Begin
+        Moved := MoveInDirection(2);
+        If Moved Then NeedRedraw := True;
+      End;
+      'a', 'A': Begin
+        Moved := MoveInDirection(3);
+        If Moved Then NeedRedraw := True;
+      End;
+      's', 'S': Begin
+        Moved := MoveInDirection(4);
+        If Moved Then NeedRedraw := True;
+      End;
+      'd', 'D': Begin
+        Moved := MoveInDirection(5);
+        If Moved Then NeedRedraw := True;
+      End;
+      'r', 'R': Begin
+        NewGame;
+        NeedRedraw := True;
+      End;
       #27: Begin
         CloseGraph;
         Halt;
@@ -823,13 +844,17 @@ BEGIN
   GameOver := False;
   Won := False;
   ShowInstructions := True;
+  NeedRedraw := True;  { Dessiner l'écran initial }
 
   NewGame;
 
-  { Boucle principale }
+  { Boucle principale avec rafraîchissement conditionnel }
   Repeat
-    DrawScreen;
+    If NeedRedraw Then Begin
+      DrawScreen;
+      NeedRedraw := False;  { Réinitialiser le flag }
+    End;
     HandleInput;
-    Delay(50);
+    Delay(10);  { Délai réduit pour une meilleure réactivité }
   Until False;
 END.
