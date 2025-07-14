@@ -646,18 +646,20 @@ Function GetTrickWinner: Integer;
 Var
   I, WinnerIndex, HighestValue: Integer;
   WinningCard: TCard;
+  FirstLeadCard: Boolean;
 Begin
   WinnerIndex := 0;
-  WinningCard := Game.CurrentTrick.Cards[0];
   HighestValue := 0;
+  FirstLeadCard := True;
 
   { Trouver la carte la plus haute de la couleur de levée }
   For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
     If Game.CurrentTrick.Cards[I].Suit = Game.CurrentTrick.LeadSuit Then Begin
-      If Game.CurrentTrick.Cards[I].Value > HighestValue Then Begin
+      If FirstLeadCard Or (Game.CurrentTrick.Cards[I].Value > HighestValue) Then Begin
         HighestValue := Game.CurrentTrick.Cards[I].Value;
         WinnerIndex := I;
         WinningCard := Game.CurrentTrick.Cards[I];
+        FirstLeadCard := False;
       End;
     End;
   End;
@@ -723,14 +725,17 @@ Begin
 End;
 
 Procedure NextTrick;
+Var
+  TrickWinner: Integer;
 Begin
   CalculatePenalties;
+  TrickWinner := Game.CurrentTrick.Winner;
 
   { Préparer la prochaine levée }
   Game.CurrentTrick.Count := 0;
   Game.CurrentTrick.Winner := -1;
   Game.CurrentTrick.LeadSuit := -1;
-  Game.CurrentPlayer := Game.CurrentTrick.Winner;
+  Game.CurrentPlayer := TrickWinner;
 
   Inc(Game.TrickNumber);
 
