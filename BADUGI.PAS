@@ -308,7 +308,7 @@ Begin
   { Distribuer 4 cartes � chaque joueur }
  For I := 0 to HAND_SIZE - 1 Do Begin
   For J := 0 to Game.PlayerCount - 1 Do Begin
-   If (J >= 0) And (J < Game.PlayerCount) And (I >= 0) And (I < HAND_SIZE) And
+   If (J >= 0) And (J < Game.PlayerCount) And (J < MAX_PLAYERS) And (I >= 0) And (I < HAND_SIZE) And
       (Game.DeckIndex >= 0) And (Game.DeckIndex < DECK_SIZE) Then Begin
     If Game.Players[J].IsActive And Not Game.Players[J].IsFolded Then Begin
      Game.Players[J].Hand[I] := Game.Deck[Game.DeckIndex];
@@ -327,15 +327,18 @@ Var
  I,J:Integer;
  TempCard:TCard;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Exit;
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
  
  { Tri par valeur croissante (As = 1 est le plus bas) }
  For I := 0 to HAND_SIZE - 2 Do Begin
   For J := I + 1 to HAND_SIZE - 1 Do Begin
-   If Game.Players[PlayerIndex].Hand[I].Value > Game.Players[PlayerIndex].Hand[J].Value Then Begin
-    TempCard := Game.Players[PlayerIndex].Hand[I];
-    Game.Players[PlayerIndex].Hand[I] := Game.Players[PlayerIndex].Hand[J];
-    Game.Players[PlayerIndex].Hand[J] := TempCard;
+   If (I >= 0) And (I < HAND_SIZE) And (J >= 0) And (J < HAND_SIZE) And
+      (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+    If Game.Players[PlayerIndex].Hand[I].Value > Game.Players[PlayerIndex].Hand[J].Value Then Begin
+     TempCard := Game.Players[PlayerIndex].Hand[I];
+     Game.Players[PlayerIndex].Hand[I] := Game.Players[PlayerIndex].Hand[J];
+     Game.Players[PlayerIndex].Hand[J] := TempCard;
+    End;
    End;
   End;
  End;
@@ -390,7 +393,7 @@ Begin
   End;
  End;
  
- If (Game.Dealer >= 0) And (Game.Dealer < Game.PlayerCount) Then
+ If (Game.Dealer >= 0) And (Game.Dealer < Game.PlayerCount) And (Game.Dealer < MAX_PLAYERS) Then
   Game.Players[Game.Dealer].IsDealer := True;
   
  InitDeck;
@@ -468,7 +471,7 @@ Var
  I,X,Y,StartX,StartY:Integer;
  IsHighlighted,IsError:Boolean;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Exit;
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
  If Not Game.Players[PlayerIndex].IsActive Or Game.Players[PlayerIndex].IsFolded Then Exit;
  
  Case PlayerIndex of
@@ -476,34 +479,42 @@ Begin
    StartX := 100;
    StartY := 350;
    For I := 0 to HAND_SIZE - 1 Do Begin
-    X := StartX + I * (CARD_WIDTH + 10);
-    IsHighlighted := False;
-    IsError := (Game.ErrorCard = I) And (Game.ErrorTimer > 0);
-    DrawCard(X, StartY, Game.Players[PlayerIndex].Hand[I], IsHighlighted, IsError);
+    If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+     X := StartX + I * (CARD_WIDTH + 10);
+     IsHighlighted := False;
+     IsError := (Game.ErrorCard = I) And (Game.ErrorTimer > 0);
+     DrawCard(X, StartY, Game.Players[PlayerIndex].Hand[I], IsHighlighted, IsError);
+    End;
    End;
   End;
   1: Begin { Nord - en haut }
    StartX := 100;
    StartY := 20;
    For I := 0 to HAND_SIZE - 1 Do Begin
-    X := StartX + I * (CARD_WIDTH + 10);
-    DrawCard(X, StartY, Game.Players[PlayerIndex].Hand[I], False, False);
+    If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+     X := StartX + I * (CARD_WIDTH + 10);
+     DrawCard(X, StartY, Game.Players[PlayerIndex].Hand[I], False, False);
+    End;
    End;
   End;
   2: Begin { Est - � droite }
    StartX := 550;
    StartY := 150;
    For I := 0 to HAND_SIZE - 1 Do Begin
-    Y := StartY + I * (CARD_HEIGHT Div 2 + 5);
-    DrawCard(StartX, Y, Game.Players[PlayerIndex].Hand[I], False, False);
+    If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+     Y := StartY + I * (CARD_HEIGHT Div 2 + 5);
+     DrawCard(StartX, Y, Game.Players[PlayerIndex].Hand[I], False, False);
+    End;
    End;
   End;
   3: Begin { Ouest - � gauche }
    StartX := 10;
    StartY := 150;
    For I := 0 to HAND_SIZE - 1 Do Begin
-    Y := StartY + I * (CARD_HEIGHT Div 2 + 5);
-    DrawCard(StartX, Y, Game.Players[PlayerIndex].Hand[I], False, False);
+    If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+     Y := StartY + I * (CARD_HEIGHT Div 2 + 5);
+     DrawCard(StartX, Y, Game.Players[PlayerIndex].Hand[I], False, False);
+    End;
    End;
   End;
  End;
@@ -671,7 +682,7 @@ Var
  ValidCards: Array[0..3] of Boolean;
  CardCount: Integer;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Begin
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Begin
   EvaluateBadugiHand := 0;
   Exit;
  End;
@@ -682,21 +693,25 @@ Begin
   { Identifier les cartes valides (couleur et valeur uniques) }
  CardCount := 0;
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
-     (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
-   If (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
-      (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
-    ValidCards[I] := True;
-    UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
-    UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
-    Inc(CardCount);
+  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+   If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+      (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
+    If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
+       (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
+       (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
+     ValidCards[I] := True;
+     UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
+     UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+     Inc(CardCount);
+    End;
    End;
   End;
  End;
   { Calculer le pointage bas� sur les cartes valides }
  Score := 0;
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If ValidCards[I] Then Begin
+  If (I >= 0) And (I < HAND_SIZE) And ValidCards[I] And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
    Score := Score * 100 + Game.Players[PlayerIndex].Hand[I].Value;
   End;
  End;
@@ -713,7 +728,7 @@ Var
  ValidCards:Array[0..3] of Boolean;
  CardCount:Integer;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Begin
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Begin
   GetHandDescription := 'Invalide';
   Exit;
  End;
@@ -724,14 +739,18 @@ Begin
   { Identifier les cartes valides }
  CardCount := 0;
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
-     (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
-   If (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
-      (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
-    ValidCards[I] := True;
-    UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
-    UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
-    Inc(CardCount);
+  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+   If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+      (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
+    If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
+       (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
+       (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
+     ValidCards[I] := True;
+     UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
+     UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+     Inc(CardCount);
+    End;
    End;
   End;
  End;
@@ -799,7 +818,7 @@ Procedure HandlePlayerAction(PlayerIndex, Action: Integer);
 Var
  LoopCount: Integer;
 Begin
- If(PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount)Then Exit;
+ If(PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
  Game.Players[PlayerIndex].Action := Action;
  Case Action of
   ACTION_FOLD: Begin
@@ -895,11 +914,11 @@ Procedure DrawCards(PlayerIndex: Integer);
 Var
  I, CardsDrawn, LoopCount: Integer;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Exit;
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
  CardsDrawn := 0;
   { �changer les cartes s�lectionn�es }
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) Then Begin
+  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
    If Game.Players[PlayerIndex].Hand[I].Selected Then Begin
     If (Game.DeckIndex >= 0) And (Game.DeckIndex < DECK_SIZE) Then Begin
      Game.Players[PlayerIndex].Hand[I] := Game.Deck[Game.DeckIndex];
@@ -943,7 +962,7 @@ Var
  HandStrength:Integer;
  Score:Integer;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Begin
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Begin
   GetComputerAction := ACTION_FOLD;
   Exit;
  End;
@@ -968,7 +987,7 @@ Var
  UsedValues: Array[1..13] of Boolean;
  KeepCard: Array[0..3] of Boolean;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Then Exit;
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
  
  { Initialiser les tableaux }
  For I := 0 to 3 Do UsedSuits[I] := False;
@@ -976,19 +995,23 @@ Begin
  For I := 0 to 3 Do KeepCard[I] := False;
  { Identifier les cartes � garder (couleur et valeur uniques) }
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
-     (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
-   If (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
-      (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
-    KeepCard[I] := True;
-    UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
-    UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+   If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+      (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
+    If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
+       (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
+       (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
+     KeepCard[I] := True;
+     UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
+     UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+    End;
    End;
   End;
  End;
   { Marquer les cartes à échanger }
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) Then Begin
+  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
    Game.Players[PlayerIndex].Hand[I].Selected := Not KeepCard[I];
   End;
  End;
@@ -998,7 +1021,7 @@ Procedure HandleComputerTurn;
 Var
  Action: Integer;
 Begin
- If (Game.CurrentPlayer < 0) Or (Game.CurrentPlayer >= Game.PlayerCount) Then Exit;
+ If (Game.CurrentPlayer < 0) Or (Game.CurrentPlayer >= Game.PlayerCount) Or (Game.CurrentPlayer >= MAX_PLAYERS) Then Exit;
  
  If Not Game.Players[Game.CurrentPlayer].IsHuman Then Begin
   Case Game.GamePhase of
@@ -1040,11 +1063,11 @@ Var
 Begin
  If Game.GamePhase <> GAME_DRAWING Then Exit;
  If Game.CurrentPlayer <> 0 Then Exit;
+ If (Game.PlayerCount <= 0) Or (0 >= MAX_PLAYERS) Then Exit;
  ClickedCard := GetClickedCard(X, Y);
  If ClickedCard >= 0 Then Begin
   { Basculer la sélection de la carte }
-  If (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) And 
-     (Game.PlayerCount > 0) And (0 < MAX_PLAYERS) Then Begin
+  If (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) Then Begin
    Game.Players[0].Hand[ClickedCard].Selected := Not Game.Players[0].Hand[ClickedCard].Selected;
    NeedRedraw := True;
   End;
@@ -1088,10 +1111,10 @@ Begin
     If (Game.GamePhase = GAME_DRAWING) And (Game.CurrentPlayer = 0) And
        (Game.PlayerCount > 0) And (0 < MAX_PLAYERS) Then Begin
      { Rester (ne pas échanger) }
-     If (0 >= 0) And (0 < HAND_SIZE) Then Game.Players[0].Hand[0].Selected := False;
-     If (1 >= 0) And (1 < HAND_SIZE) Then Game.Players[0].Hand[1].Selected := False;
-     If (2 >= 0) And (2 < HAND_SIZE) Then Game.Players[0].Hand[2].Selected := False;
-     If (3 >= 0) And (3 < HAND_SIZE) Then Game.Players[0].Hand[3].Selected := False;
+     Game.Players[0].Hand[0].Selected := False;
+     Game.Players[0].Hand[1].Selected := False;
+     Game.Players[0].Hand[2].Selected := False;
+     Game.Players[0].Hand[3].Selected := False;
      DrawCards(0);
     End;
    End;
