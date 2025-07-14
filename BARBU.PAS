@@ -47,7 +47,7 @@ Const
  CONTRACT_NO_HEARTS = 1;     { Pas de coeurs }
  CONTRACT_NO_QUEENS = 2;     { Pas de dames }
  CONTRACT_NO_KING_HEARTS = 3; { Pas le roi de coeur }
- CONTRACT_NO_LAST_TRICK = 4; { Pas la derniÃ¨re levÃ©e }
+ CONTRACT_NO_LAST_TRICK = 4; { Pas la derniŠre lev‚e }
 
   { Points de pÃ©nalitÃ© }
  PENALTY_TRICK = 2;          { Par lev‚e }
@@ -92,6 +92,8 @@ Type
    SelectedCard: Integer;
    AnimationDelay: Integer;
    ShowScores: Boolean;
+   ErrorCard: Integer;        { Index de la carte en erreur (-1 si aucune) }
+   ErrorTimer: Integer;       { Compteur pour l'animation d'erreur }
  End;
 
 Var
@@ -142,12 +144,12 @@ Var
 
  Procedure ShowMouse;
  Begin
-  { Pas d'implÃ©mentation pour Free Pascal }
+  { Pas d'impl‚mentation pour Free Pascal }
  End;
 
  Procedure HideMouse;
  Begin
-  { Pas d'implÃ©mentation pour Free Pascal }
+  { Pas d'impl‚mentation pour Free Pascal }
  End;
 {$ENDIF}
 
@@ -309,6 +311,8 @@ Procedure InitGame;Begin
  Game.SelectedCard := -1;
  Game.AnimationDelay := 0;
  Game.ShowScores := False;
+ Game.ErrorCard := -1;
+ Game.ErrorTimer := 0;
   { Initialiser la levÃ©e courante }
  Game.CurrentTrick.Count := 0;
  Game.CurrentTrick.Winner := -1;
@@ -323,32 +327,40 @@ Procedure InitGame;Begin
  NeedRedraw := True;
 End;
 
-Procedure DrawCard(X, Y: Integer; Card: TCard; Highlighted: Boolean);
+Procedure DrawCard(X, Y: Integer; Card: TCard; Highlighted: Boolean; ErrorHighlight: Boolean);
 Var
  CardName:String;
  SuitSymbol:String;
  SuitColor:Integer;
 Begin
   { Fond de la carte }
- If Highlighted Then SetColor(Yellow)
-                Else SetColor(White);
+ If ErrorHighlight Then
+  SetColor(LightRed)
+ Else If Highlighted Then
+  SetColor(Yellow)
+ Else
+  SetColor(White);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
   { Bordure }
- If Highlighted Then SetColor(Yellow)
-                Else SetColor(Black);
+ If ErrorHighlight Then
+  SetColor(Red)
+ Else If Highlighted Then
+  SetColor(Yellow)
+ Else
+  SetColor(Black);
  Rectangle(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
  If Card.Visible Then Begin
    { Afficher la carte }
   CardName := GetCardName(Card);
   SuitSymbol := GetSuitSymbol(Card.Suit);
   SuitColor := GetSuitColor(Card.Suit);
-   { Valeur en haut Ã  gauche }
+   { Valeur en haut … gauche }
   SetColor(SuitColor);
   SetTextStyle(DefaultFont, HorizDir, 1);
   OutTextXY(X + 3, Y + 3, CardName);
   OutTextXY(X + 3, Y + 13, SuitSymbol);
-   { Valeur en bas Ã  droite (inversÃ©e) }
+   { Valeur en bas … droite (invers‚e) }
   OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 25, CardName);
   OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 15, SuitSymbol);
    { Symbole au centre }
@@ -372,7 +384,7 @@ End;
 Procedure DrawPlayerCards(PlayerIndex: Integer);
 Var
  I, X, Y, StartX, StartY: Integer;
- IsHighlighted: Boolean;
+ IsHighlighted, IsError: Boolean;
 Begin
  Case PlayerIndex of
   0:Begin { Joueur humain - en bas }
@@ -381,7 +393,8 @@ Begin
    For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
     X := StartX + I * (CARD_WIDTH Div 2 + 5);
     IsHighlighted := (Game.SelectedCard = I) And (Game.CurrentPlayer = 0);
-    DrawCard(X, StartY, Game.Players[PlayerIndex].Cards[I], IsHighlighted);
+    IsError := (Game.ErrorCard = I) And (Game.ErrorTimer > 0);
+    DrawCard(X, StartY, Game.Players[PlayerIndex].Cards[I], IsHighlighted, IsError);
    End;
   End;
   1: Begin { Nord - en haut }
@@ -389,7 +402,7 @@ Begin
    StartY := 20;
    For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
     X := StartX + I * (CARD_WIDTH Div 2 + 5);
-    DrawCard(X, StartY, Game.Players[PlayerIndex].Cards[I], False);
+    DrawCard(X, StartY, Game.Players[PlayerIndex].Cards[I], False, False);
    End;
   End;
   2: Begin { Est - A droite }
@@ -397,15 +410,15 @@ Begin
    StartY := 100;
    For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
     Y := StartY + I * (CARD_HEIGHT Div 3 + 2);
-    DrawCard(StartX, Y, Game.Players[PlayerIndex].Cards[I], False);
+    DrawCard(StartX, Y, Game.Players[PlayerIndex].Cards[I], False, False);
    End;
   End;
-  3: Begin { Ouest - … gauche }
+  3: Begin { Ouest - ï¿½ gauche }
    StartX := 10;
    StartY := 100;
    For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
     Y := StartY + I * (CARD_HEIGHT Div 3 + 2);
-    DrawCard(StartX, Y, Game.Players[PlayerIndex].Cards[I], False);
+    DrawCard(StartX, Y, Game.Players[PlayerIndex].Cards[I], False, False);
    End;
   End;
  End;
@@ -423,7 +436,7 @@ Begin
    2: Begin X := 320; Y := 215; End; { Est }
    3: Begin X := 180; Y := 215; End; { Ouest }
   End;
-  DrawCard(X, Y, Game.CurrentTrick.Cards[I], False);
+  DrawCard(X, Y, Game.CurrentTrick.Cards[I], False, False);
  End;
 End;
 
@@ -483,7 +496,7 @@ Procedure DrawGameInfo;Begin
   { Contrat }
  OutTextXY(400, 50, 'Contrat:');
  OutTextXY(400, 65, GetContractName(Game.Contract));
-  { Num‚ro de lev‚e }
+  { Numï¿½ro de levï¿½e }
  OutTextXY(400, 90, 'Levee: ' + Chr(Ord('0') + (Game.TrickNumber Mod 10)));
   { Instructions }
  SetColor(LightGray);
@@ -553,7 +566,7 @@ Begin
  End
   Else
  Begin
-  { V‚rifier si le joueur a des cartes de la couleur demand‚e }
+  { Vï¿½rifier si le joueur a des cartes de la couleur demandï¿½e }
   For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
    If Game.Players[PlayerIndex].Cards[I].Suit = Game.CurrentTrick.LeadSuit Then Begin
     Exit; { Le joueur a des cartes de la couleur, doit la jouer }
@@ -602,7 +615,7 @@ Begin
  WinnerIndex := 0;
  HighestValue := 0;
  FirstLeadCard := True;
-  { Trouver la carte la plus haute de la couleur de levÃ©e }
+  { Trouver la carte la plus haute de la couleur de lev‚e }
  For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
   If Game.CurrentTrick.Cards[I].Suit = Game.CurrentTrick.LeadSuit Then Begin
    If FirstLeadCard Or (Game.CurrentTrick.Cards[I].Value > HighestValue) Then Begin
@@ -631,223 +644,225 @@ Begin
    Penalties := PENALTY_TRICK;
   End;
   CONTRACT_NO_HEARTS: Begin
-   { 2 points par coeur dans la levÃ©e }
+   { 2 points par coeur dans la lev‚e }
    For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
-        If Game.CurrentTrick.Cards[I].Suit = HEARTS Then Begin
-          Penalties := Penalties + PENALTY_HEART;
-        End;
-      End;
+    If Game.CurrentTrick.Cards[I].Suit = HEARTS Then Begin
+     Penalties := Penalties + PENALTY_HEART;
     End;
-
-    CONTRACT_NO_QUEENS: Begin
-      { 6 points par dame dans la levÃ©e }
-      For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
-        If Game.CurrentTrick.Cards[I].Value = QUEEN Then Begin
-          Penalties := Penalties + PENALTY_QUEEN;
-        End;
-      End;
-    End;
-
-    CONTRACT_NO_KING_HEARTS: Begin
-      { 16 points pour le roi de coeur }
-      For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
-        If (Game.CurrentTrick.Cards[I].Suit = HEARTS) And
-           (Game.CurrentTrick.Cards[I].Value = KING) Then Begin
-          Penalties := PENALTY_KING_HEARTS;
-        End;
-      End;
-    End;
-
-    CONTRACT_NO_LAST_TRICK: Begin
-      { 16 points pour la derniÃ¨re levÃ©e }
-      If Game.TrickNumber = 13 Then Begin
-        Penalties := PENALTY_LAST_TRICK;
-      End;
-    End;
+   End;
   End;
-
-  { Ajouter les pÃ©nalitÃ©s au gagnant de la levÃ©e }
-  Game.Players[Winner].Score := Game.Players[Winner].Score + Penalties;
+  CONTRACT_NO_QUEENS: Begin
+    { 6 points par dame dans la lev‚e }
+   For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
+    If Game.CurrentTrick.Cards[I].Value = QUEEN Then Begin
+     Penalties := Penalties + PENALTY_QUEEN;
+    End;
+   End;
+  End;
+  CONTRACT_NO_KING_HEARTS: Begin
+    { 16 points pour le roi de coeur }
+   For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
+     If (Game.CurrentTrick.Cards[I].Suit = HEARTS) And
+        (Game.CurrentTrick.Cards[I].Value = KING) Then Begin
+      Penalties := PENALTY_KING_HEARTS;
+     End;
+   End;
+  End;
+  CONTRACT_NO_LAST_TRICK: Begin
+    { 16 points pour la derniŠre lev‚e }
+   If Game.TrickNumber = 13 Then Begin
+    Penalties := PENALTY_LAST_TRICK;
+   End;
+  End;
+ End;
+  { Ajouter les p‚nalit‚s au gagnant de la lev‚e }
+ Game.Players[Winner].Score := Game.Players[Winner].Score + Penalties;
 End;
 
 Procedure NextTrick;
 Var
-  TrickWinner: Integer;
+ TrickWinner: Integer;
 Begin
-  CalculatePenalties;
-  TrickWinner := Game.CurrentTrick.Winner;
-
-  { PrÃ©parer la prochaine levÃ©e }
-  Game.CurrentTrick.Count := 0;
-  Game.CurrentTrick.Winner := -1;
-  Game.CurrentTrick.LeadSuit := -1;
-  Game.CurrentPlayer := TrickWinner;
-
-  Inc(Game.TrickNumber);
-
-  If Game.TrickNumber > 13 Then Begin
-    Game.GamePhase := GAME_ROUND_END;
-    Game.ShowScores := True;
-  End Else Begin
-    Game.GamePhase := GAME_PLAYING;
-  End;
-
-  NeedRedraw := True;
+ CalculatePenalties;
+ TrickWinner:=Game.CurrentTrick.Winner;
+  { Pr‚parer la prochaine lev‚e }
+ Game.CurrentTrick.Count := 0;
+ Game.CurrentTrick.Winner := -1;
+ Game.CurrentTrick.LeadSuit := -1;
+ Game.CurrentPlayer := TrickWinner;
+ Inc(Game.TrickNumber);
+ If Game.TrickNumber > 13 Then Begin
+  Game.GamePhase := GAME_ROUND_END;
+  Game.ShowScores := True;
+ End
+  Else
+ Begin
+  Game.GamePhase := GAME_PLAYING;
+ End;
+ NeedRedraw := True;
 End;
 
-Function GetComputerCardChoice(PlayerIndex: Integer): Integer;
+Function GetComputerCardChoice(PlayerIndex:Integer):Integer;
 Var
-  I, BestCard, LowestValue: Integer;
-  CanFollow: Boolean;
+ I,BestCard,LowestValue:Integer;
+ CanFollow:Boolean;
 Begin
-  BestCard := 0;
-  LowestValue := 14;
-  CanFollow := False;
-
-  { StratÃ©gie simple: jouer la carte la plus basse possible }
-  For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
-    If IsValidCard(PlayerIndex, I) Then Begin
-      { Si on peut suivre la couleur, privilÃ©gier les cartes basses }
-      If (Game.CurrentTrick.Count > 0) And
-         (Game.Players[PlayerIndex].Cards[I].Suit = Game.CurrentTrick.LeadSuit) Then Begin
-        If Not CanFollow Or (Game.Players[PlayerIndex].Cards[I].Value < LowestValue) Then Begin
-          BestCard := I;
-          LowestValue := Game.Players[PlayerIndex].Cards[I].Value;
-          CanFollow := True;
-        End;
-      End Else If Not CanFollow Then Begin
-        { Si on ne peut pas suivre, jouer la carte la plus basse }
-        If Game.Players[PlayerIndex].Cards[I].Value < LowestValue Then Begin
-          BestCard := I;
-          LowestValue := Game.Players[PlayerIndex].Cards[I].Value;
-        End;
-      End;
+ BestCard := 0;
+ LowestValue := 14;
+ CanFollow := False;
+  { Strat‚gie simple: jouer la carte la plus basse possible }
+ For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
+  If IsValidCard(PlayerIndex, I) Then Begin
+    { Si on peut suivre la couleur, privilÃ©gier les cartes basses }
+   If (Game.CurrentTrick.Count > 0) And
+      (Game.Players[PlayerIndex].Cards[I].Suit = Game.CurrentTrick.LeadSuit) Then Begin
+    If Not CanFollow Or (Game.Players[PlayerIndex].Cards[I].Value < LowestValue) Then Begin
+     BestCard := I;
+     LowestValue := Game.Players[PlayerIndex].Cards[I].Value;
+     CanFollow := True;
     End;
+   End
+    Else
+   If Not CanFollow Then Begin
+     { Si on ne peut pas suivre, jouer la carte la plus basse }
+    If Game.Players[PlayerIndex].Cards[I].Value < LowestValue Then Begin
+     BestCard := I;
+     LowestValue := Game.Players[PlayerIndex].Cards[I].Value;
+    End;
+   End;
   End;
-
-  GetComputerCardChoice := BestCard;
+ End;
+ GetComputerCardChoice := BestCard;
 End;
 
 Procedure HandleComputerTurn;
 Var
-  CardChoice: Integer;
+ CardChoice: Integer;
 Begin
-  If Not Game.Players[Game.CurrentPlayer].IsHuman Then Begin
-    CardChoice := GetComputerCardChoice(Game.CurrentPlayer);
-    PlayCard(Game.CurrentPlayer, CardChoice);
-    Delay(1000); { DÃ©lai pour l'animation }
-  End;
+ If Not Game.Players[Game.CurrentPlayer].IsHuman Then Begin
+  CardChoice := GetComputerCardChoice(Game.CurrentPlayer);
+  PlayCard(Game.CurrentPlayer, CardChoice);
+  Delay(1000); { D‚lai pour l'animation }
+ End;
 End;
 
-Function GetClickedCard(X, Y: Integer): Integer;
+Function GetClickedCard(X,Y:Integer):Integer;
 Var
-  I, CardX, CardY: Integer;
+ I, CardX, CardY: Integer;
 Begin
-  GetClickedCard := -1;
-
-  { VÃ©rifier les cartes du joueur humain seulement }
-  If Game.CurrentPlayer <> 0 Then Exit;
-
-  CardY := 350;
-  For I := 0 to Game.Players[0].CardCount - 1 Do Begin
-    CardX := 50 + I * (CARD_WIDTH Div 2 + 5);
-    If (X >= CardX) And (X <= CardX + CARD_WIDTH) And
-       (Y >= CardY) And (Y <= CardY + CARD_HEIGHT) Then Begin
-      GetClickedCard := I;
-      Exit;
-    End;
+ GetClickedCard := -1;
+  { V‚rifier les cartes du joueur humain seulement }
+ If Game.CurrentPlayer <> 0 Then Exit;
+ CardY := 350;
+ For I := 0 to Game.Players[0].CardCount - 1 Do Begin
+  CardX := 50 + I * (CARD_WIDTH Div 2 + 5);
+  If (X >= CardX) And (X <= CardX + CARD_WIDTH) And
+     (Y >= CardY) And (Y <= CardY + CARD_HEIGHT) Then Begin
+   GetClickedCard := I;
+   Exit;
   End;
+ End;
 End;
 
-Procedure HandleMouseClick(X, Y: Integer);
+Procedure HandleMouseClick(X,Y:Integer);
 Var
-  ClickedCard: Integer;
+ ClickedCard: Integer;
 Begin
-  If Game.GamePhase <> GAME_PLAYING Then Exit;
-  If Game.CurrentPlayer <> 0 Then Exit; { Seulement pour le joueur humain }
-
-  ClickedCard := GetClickedCard(X, Y);
-  If (ClickedCard >= 0) And IsValidCard(0, ClickedCard) Then Begin
-    Game.SelectedCard := ClickedCard;
-    PlayCard(0, ClickedCard);
+ If Game.GamePhase <> GAME_PLAYING Then Exit;
+ If Game.CurrentPlayer <> 0 Then Exit; { Seulement pour le joueur humain }
+ ClickedCard := GetClickedCard(X, Y);
+ If ClickedCard >= 0 Then Begin
+  If IsValidCard(0, ClickedCard) Then Begin
+   Game.SelectedCard := ClickedCard;
+   PlayCard(0, ClickedCard);
+  End
+   Else
+  Begin
+    { Clic sur une carte invalide - afficher l'erreur }
+   Game.ErrorCard := ClickedCard;
+   Game.ErrorTimer := 60; { 60 frames = ~2 secondes Ã  30 FPS }
+   NeedRedraw := True;
   End;
+ End;
 End;
 
-Procedure ChangeContract;
-Begin
-  Game.Contract := (Game.Contract + 1) Mod 5;
-  NeedRedraw := True;
+Procedure ChangeContract;Begin
+ Game.Contract := (Game.Contract + 1) Mod 5;
+ NeedRedraw := True;
 End;
 
 Procedure HandleInput;
 Var
-  Key: Char;
-  MouseX, MouseY, MouseButton: LongInt;
+ Key: Char;
+ MouseX, MouseY, MouseButton: LongInt;
 Begin
   { Clavier }
-  If KeyPressed Then Begin
-    Key := ReadKey;
-    Case Key of
-      'c', 'C': Begin
-        If Game.GamePhase = GAME_PLAYING Then
-          ChangeContract;
-      End;
-      'n', 'N': Begin
-        InitGame;
-      End;
-      #27: Begin
-        CloseGraph;
-        Halt;
-      End;
-      #13, ' ': Begin
-        If Game.ShowScores Then Begin
-          Game.ShowScores := False;
-          InitGame;
-        End;
-      End;
-    End;
+ If KeyPressed Then Begin
+ Key := ReadKey;
+ Case Key of
+  'c', 'C': Begin
+   If Game.GamePhase = GAME_PLAYING Then
+   ChangeContract;
   End;
-
+  'n', 'N': Begin
+    InitGame;
+   End;
+   #27:Begin
+    CloseGraph;
+    Halt;
+   End;
+   #13, ' ': Begin
+    If Game.ShowScores Then Begin
+     Game.ShowScores := False;
+     InitGame;
+    End;
+   End;
+  End;
+ End;
   { Souris }
-  If MouseDriverFound Then Begin
-    GetMouseState(MouseX, MouseY, MouseButton);
-    If MouseButton = 1 Then Begin
-      HandleMouseClick(MouseX, MouseY);
-      While MouseButton = 1 Do
-        GetMouseState(MouseX, MouseY, MouseButton);
-    End;
+ If MouseDriverFound Then Begin
+  GetMouseState(MouseX, MouseY, MouseButton);
+  If MouseButton = 1 Then Begin
+   HandleMouseClick(MouseX, MouseY);
+   While MouseButton = 1 Do GetMouseState(MouseX, MouseY, MouseButton);
   End;
+ End;
 End;
 
 BEGIN
-  Randomize;
-  InitScreen;
-  If MouseDriverFound Then ShowMouse;
-  InitGame;
-
+ Randomize;
+ InitScreen;
+ If MouseDriverFound Then ShowMouse;
+ InitGame;
   { Boucle principale }
-  Repeat
-    If NeedRedraw Then Begin
-      DrawScreen;
-      NeedRedraw := False;
+ Repeat
+  If NeedRedraw Then Begin
+   DrawScreen;
+   NeedRedraw := False;
+  End;
+  HandleInput;
+   { Gestion du timer d'erreur pour l'affichage rouge }
+  If Game.ErrorTimer > 0 Then Begin
+   Dec(Game.ErrorTimer);
+   If Game.ErrorTimer = 0 Then Begin
+    Game.ErrorCard := -1;
+    NeedRedraw := True;
+   End;
+  End;
+  Case Game.GamePhase of
+   GAME_PLAYING: Begin
+    HandleComputerTurn;
+   End;
+   GAME_TRICK_END: Begin
+    If Game.AnimationDelay > 0 Then Begin
+     Dec(Game.AnimationDelay);
+    End
+     Else
+    Begin
+     NextTrick;
     End;
-
-    HandleInput;
-
-    Case Game.GamePhase of
-      GAME_PLAYING: Begin
-        HandleComputerTurn;
-      End;
-
-      GAME_TRICK_END: Begin
-        If Game.AnimationDelay > 0 Then Begin
-          Dec(Game.AnimationDelay);
-        End Else Begin
-          NextTrick;
-        End;
-      End;
-    End;
-
-    Delay(50);
-  Until False;
+   End;
+  End;
+  Delay(50);
+ Until False;
 END.
