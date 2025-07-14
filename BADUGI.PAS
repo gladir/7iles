@@ -2,8 +2,8 @@
   @created: 2025
   @website(https://www.gladir.com/7iles)
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
-  @description: Badugi - Jeu de poker draw cor‚en
-  L'objectif est d'avoir la main la plus basse avec 4 cartes de couleurs diff‚rentes
+  @description: Badugi - Jeu de poker draw corï¿½en
+  L'objectif est d'avoir la main la plus basse avec 4 cartes de couleurs diffï¿½rentes
 }
 
 Program Badugi;
@@ -316,7 +316,7 @@ Var
  I,J:Integer;
 Begin
  Game.DeckIndex := 0;
-  { Distribuer 4 cartes … chaque joueur }
+  { Distribuer 4 cartes ï¿½ chaque joueur }
  For I := 0 to HAND_SIZE - 1 Do Begin
   For J := 0 to Game.PlayerCount - 1 Do Begin
    If (J >= 0) And (J < Game.PlayerCount) And (J < MAX_PLAYERS) And (I >= 0) And (I < HAND_SIZE) And
@@ -523,7 +523,7 @@ Begin
    { Symbole au centre }
   SetTextStyle(DefaultFont, HorizDir, 2);
   OutTextXY(X + CARD_WIDTH Div 2 - 8, Y + CARD_HEIGHT Div 2 - 8, SuitSymbol);
-   { Marquer si s‚lectionn‚e }
+   { Marquer si sï¿½lectionnï¿½e }
   If Card.Selected Then Begin
    SetColor(Blue);
    SetTextStyle(DefaultFont, HorizDir, 1);
@@ -614,7 +614,7 @@ Begin
   Str(Game.Players[I].Chips, ChipsText);
   Str(Game.Players[I].Bet, BetText);
   ActionText := GetActionName(Game.Players[I].Action);
-   { Marquer les r“les sp‚ciaux }
+   { Marquer les rï¿½les spï¿½ciaux }
   If Game.Players[I].IsDealer Then PlayerName := PlayerName + ' (D)';
   If Game.Players[I].IsSmallBlind Then PlayerName := PlayerName + ' (SB)';
   If Game.Players[I].IsBigBlind Then PlayerName := PlayerName + ' (BB)';
@@ -758,65 +758,44 @@ End;
 
 Function EvaluateBadugiHand(PlayerIndex: Integer): Integer;
 Var
- I, J, Score, UniqueSuits, UniqueValues: Integer;
- UsedSuits: Array[0..3] of Boolean;
- UsedValues: Array[1..13] of Boolean;
- ValidCards: Array[0..3] of Boolean;
+ I: Integer;
  CardCount: Integer;
- TempSuit, TempValue: Integer;
  SafeScore: Integer;
 Begin
+ { Valeur par dÃ©faut }
  EvaluateBadugiHand := 0;
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
- If Game.PlayerCount <= 0 Then Exit;
-
- { Initialiser les tableaux avec une sÃ©curitÃ© supplÃ©mentaire }
- For I := 0 to 3 Do Begin
-  If (I >= 0) And (I <= 3) Then Begin
-   UsedSuits[I] := False;
-   ValidCards[I] := False;
-  End;
- End;
- For I := 1 to 13 Do Begin
-  If (I >= 1) And (I <= 13) Then UsedValues[I] := False;
- End;
-
- { Identifier les cartes valides (couleur et valeur uniques) }
+ 
+ { VÃ©rifications de base }
+ If (PlayerIndex < 0) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
+ If (Game.PlayerCount <= 0) Or (Game.PlayerCount > MAX_PLAYERS) Then Exit;
+ If (PlayerIndex >= Game.PlayerCount) Then Exit;
+ 
+ { VÃ©rifier que le joueur est valide }
+ If Not Game.Players[PlayerIndex].IsActive Then Exit;
+ 
+ { Compter les cartes valides de maniÃ¨re simple }
  CardCount := 0;
- For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) And (I <= 3) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
-   TempSuit := Game.Players[PlayerIndex].Hand[I].Suit;
-   TempValue := Game.Players[PlayerIndex].Hand[I].Value;
-   { Validation stricte des valeurs }
-   If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) Then Begin
-    If (Not UsedSuits[TempSuit]) And (Not UsedValues[TempValue]) Then Begin
-     ValidCards[I] := True;
-     UsedSuits[TempSuit] := True;
-     UsedValues[TempValue] := True;
-     Inc(CardCount);
-    End;
-   End;
-  End;
- End;
-
- { Calculer le pointage bas‚ sur les cartes valides }
  SafeScore := 0;
+ 
+ { Parcourir les cartes une par une }
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) And (I <= 3) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
-   If ValidCards[I] Then Begin
-    TempValue := Game.Players[PlayerIndex].Hand[I].Value;
-    If (TempValue >= 1) And (TempValue <= 13) Then Begin
-     SafeScore := SafeScore * 100 + TempValue;
-    End;
+  If (I >= 0) And (I < HAND_SIZE) And (I <= 3) Then Begin
+   { VÃ©rifier que la carte a des valeurs valides }
+   If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And
+      (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+      (Game.Players[PlayerIndex].Hand[I].Value >= 1) And
+      (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
+    Inc(CardCount);
+    SafeScore := SafeScore + Game.Players[PlayerIndex].Hand[I].Value;
    End;
   End;
  End;
-
- { Ajouter un bonus pour le nombre de cartes valides }
- If CardCount >= 0 Then Begin
-  SafeScore := SafeScore + CardCount * 10000;
+ 
+ { Calculer un score simple basÃ© sur le nombre de cartes et leur valeur }
+ If CardCount > 0 Then Begin
+  SafeScore := SafeScore + CardCount * 1000;
  End;
-
+ 
  EvaluateBadugiHand := SafeScore;
 End;
 
@@ -965,7 +944,7 @@ Begin
    End;
   End;
   ACTION_CHECK: Begin
-   { Rien … faire }
+   { Rien ï¿½ faire }
   End;
  End;
   { Passer au joueur suivant }
@@ -1025,7 +1004,7 @@ Begin
  Game.GamePhase := GAME_DRAWING;
  Game.CurrentPlayer := 0;
  Inc(Game.DrawRound);
-  { R‚initialiser les mises pour le prochain tour }
+  { Rï¿½initialiser les mises pour le prochain tour }
  Game.CurrentBet := 0;
  For I := 0 to Game.PlayerCount - 1 Do Begin
   If (I >= 0) And (I < Game.PlayerCount) And (I < MAX_PLAYERS) Then Begin
@@ -1065,7 +1044,7 @@ Var
 Begin
  If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
  CardsDrawn := 0;
-  { Echanger les cartes s‚lectionn‚es }
+  { Echanger les cartes sï¿½lectionnï¿½es }
  For I := 0 to HAND_SIZE - 1 Do Begin
   If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
    If Game.Players[PlayerIndex].Hand[I].Selected Then Begin
@@ -1096,12 +1075,12 @@ Begin
   End;
   Inc(LoopCount);
   If LoopCount > Game.PlayerCount Then Break; { Ã‰viter les boucles infinies }
-  If LoopCount > MAX_PLAYERS Then Break; { Protection suppl‚mentaire }
+  If LoopCount > MAX_PLAYERS Then Break; { Protection supplï¿½mentaire }
  Until (Game.PlayerCount > 0) And (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
        (Game.CurrentPlayer < MAX_PLAYERS) And
        ((Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < MAX_PLAYERS) And
         Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded);
-  { V‚rifier si le tour d'‚change est termin‚e }
+  { Vï¿½rifier si le tour d'ï¿½change est terminï¿½e }
  If Game.CurrentPlayer = 0 Then Begin
   If Game.DrawRound >= MAX_DRAWS Then Begin
    Game.GamePhase := GAME_SHOWDOWN;
@@ -1127,7 +1106,7 @@ Begin
  End;
  Score := EvaluateBadugiHand(PlayerIndex);
  If Score < 0 Then Score := 0;
-  { ‚valuer la force de la main }
+  { ï¿½valuer la force de la main }
  If Score >= 40000 Then HandStrength := 3 Else { Badugi }
  If Score >= 30000 Then HandStrength := 2 Else { Tri }
  If Score >= 20000 Then HandStrength := 1  { Paire }
@@ -1153,7 +1132,7 @@ Begin
  For I := 0 to 3 Do UsedSuits[I] := False;
  For I := 1 to 13 Do UsedValues[I] := False;
  For I := 0 to 3 Do KeepCard[I] := False;
- { Identifier les cartes … garder (couleur et valeur uniques) }
+ { Identifier les cartes ï¿½ garder (couleur et valeur uniques) }
  For I := 0 to HAND_SIZE - 1 Do Begin
   If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
    TempSuit := Game.Players[PlayerIndex].Hand[I].Suit;
@@ -1169,7 +1148,7 @@ Begin
    End;
   End;
  End;
-  { Marquer les cartes … ‚changer }
+  { Marquer les cartes ï¿½ ï¿½changer }
  For I := 0 to HAND_SIZE - 1 Do Begin
   If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) And
      (I >= 0) And (I <= 3) Then Begin
@@ -1204,7 +1183,7 @@ Var
  I, CardX, CardY: Integer;
 Begin
  GetClickedCard := -1;
-  { V‚rifier les cartes du joueur humain seulement }
+  { Vï¿½rifier les cartes du joueur humain seulement }
  If Game.CurrentPlayer <> 0 Then Exit;
  If Game.GamePhase <> GAME_DRAWING Then Exit;
  CardY := 350;
