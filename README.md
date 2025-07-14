@@ -323,6 +323,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <td>Ce fichier de jeu permet d'indiquer le jeu Tours d'Hanois. Ce jeux consiste a déplacer les pneus sur trois bâtons sans jamais les déplacé sur un pneu plus petit.</td>
      </tr>
     <tr>
+        <td><b>HEX2048.PAS</b></td>
+        <td><b>Hex 2048</b></td>
+        <td>Ce fichier contient le jeu Hex 2048.</tr>
+    </tr>
+    <tr>
         <td><b>KENO.PAS</b></td>
         <td><b>Keno</b></td>
         <td>Ce fichier contient le jeu de hasard Keno.</td>
