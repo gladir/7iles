@@ -270,6 +270,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Bubble Shooter, un jeu où il faut viser des bulles de façon à avoir 3 bulles de la meme couleurs pour les faires disparaitre.</td>
     </tr>
     <tr>
+        <td><b>BADUGI.PAS</b></td>
+        <td><b>Badugi</b></td>
+        <td>Ce fichier contient le jeu de carte Badugi</td>
+    </tr>
+    <tr>
         <td><b>CANNONBA.PAS</b></td>
         <td><b>Cannonball</b></td>
         <td>Ce fichier contient le jeu Cannonball (Human Cannonball) inspiré des Atari 2600. Il s'agit d'un canon tirant un humain et qu'un filet doit rattraper.</td>
