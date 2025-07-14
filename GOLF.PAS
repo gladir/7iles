@@ -9,7 +9,7 @@
 Program Golf;
 
 Uses {$IFDEF FPC}
-      PtcGraph,PtcCrt
+      PtcMouse,PtcGraph,PtcCrt
      {$ELSE}
       DOS,Graph,Crt
      {$ENDIF};
@@ -35,7 +35,7 @@ Const
   QUEEN = 12;
   KING = 13;
 
-  { États du jeu }
+  { �tats du jeu }
   GAME_SETUP = 0;
   GAME_PLAYING = 1;
   GAME_OVER = 2;
@@ -45,45 +45,45 @@ Const
   TURN_DISCARD = 1;
 
 Type
-  TCard = Record
-    Suit: Integer;      { Couleur: 0=♥, 1=♦, 2=♣, 3=♠ }
-    Value: Integer;     { Valeur: 1-13 }
-    Visible: Boolean;   { Carte visible ou face cachée }
-  End;
+ TCard=Record
+  Suit:Integer;      { Couleur: 0=Coeur, 1=Pique 2=carreau, 3=tr�fle }
+  Value:Integer;     { Valeur: 1-13 }
+  Visible:Boolean;   { Carte visible ou face cach�e }
+ End;
 
-  TPlayer = Record
-    Name: String;
-    Cards: Array[0..CARDS_PER_PLAYER-1] of TCard;
-    Score: Integer;
-    IsHuman: Boolean;
-    CardsRevealed: Integer;
-  End;
+ TPlayer=Record
+  Name: String;
+  Cards: Array[0..CARDS_PER_PLAYER-1] of TCard;
+  Score: Integer;
+  IsHuman: Boolean;
+  CardsRevealed: Integer;
+ End;
 
-  TGameState = Record
-    Players: Array[0..MAX_PLAYERS-1] of TPlayer;
-    Deck: Array[0..DECK_SIZE-1] of TCard;
-    DiscardPile: Array[0..DECK_SIZE-1] of TCard;
-    DeckTop: Integer;
-    DiscardTop: Integer;
-    CurrentPlayer: Integer;
-    GamePhase: Integer;
-    TurnPhase: Integer;
-    Round: Integer;
-    DrawnCard: TCard;
-    HasDrawn: Boolean;
-    SelectedCard: Integer;
-    GameWon: Boolean;
-    ShowScores: Boolean;
-  End;
+ TGameState = Record
+  Players: Array[0..MAX_PLAYERS-1] of TPlayer;
+  Deck: Array[0..DECK_SIZE-1] of TCard;
+  DiscardPile: Array[0..DECK_SIZE-1] of TCard;
+  DeckTop: Integer;
+  DiscardTop: Integer;
+  CurrentPlayer: Integer;
+  GamePhase: Integer;
+  TurnPhase: Integer;
+  Round: Integer;
+  DrawnCard: TCard;
+  HasDrawn: Boolean;
+  SelectedCard: Integer;
+  GameWon: Boolean;
+  ShowScores: Boolean;
+ End;
 
 Var
-  Game: TGameState;
-  NeedRedraw: Boolean;
+ Game:TGameState;
+ NeedRedraw:Boolean;
 
-Procedure NewGame; Forward;
+Procedure NewGame;Forward;
 
 {$IFNDEF FPC}
- Function MouseDriverFound: Boolean;
+ Function MouseDriverFound:Boolean;
  Var
   Regs: Registers;
  Begin
@@ -133,11 +133,6 @@ Procedure NewGame; Forward;
  Begin
   { Pas d'implémentation pour Free Pascal }
  End;
-
- Procedure GetMouseState(Var X, Y, Button: LongInt);
- Begin
-  X := 0; Y := 0; Button := 0;
- End;
 {$ENDIF}
 
 Procedure InitScreen;
@@ -160,503 +155,456 @@ Begin
   End;
 End;
 
-Function GetCardScore(Card: TCard): Integer;
-Begin
-  Case Card.Value of
-    ACE: GetCardScore := 1;
-    2..10: GetCardScore := Card.Value;
-    JACK, QUEEN: GetCardScore := 10;
-    KING: GetCardScore := 0;
-    Else GetCardScore := 0;
-  End;
+Function GetCardScore(Card:TCard):Integer;Begin
+ Case Card.Value of
+  ACE: GetCardScore := 1;
+  2..10: GetCardScore := Card.Value;
+  JACK, QUEEN: GetCardScore := 10;
+  KING: GetCardScore := 0;
+  Else GetCardScore := 0;
+ End;
 End;
 
-Function GetCardName(Card: TCard): String;
-Begin
-  Case Card.Value of
-    ACE: GetCardName := 'A';
-    2..10: GetCardName := Chr(Ord('0') + Card.Value);
-    JACK: GetCardName := 'J';
-    QUEEN: GetCardName := 'Q';
-    KING: GetCardName := 'K';
-    Else GetCardName := '?';
-  End;
+Function GetCardName(Card:TCard):String;Begin
+ Case Card.Value of
+  ACE: GetCardName := 'A';
+  2..10: GetCardName := Chr(Ord('0') + Card.Value);
+  JACK: GetCardName := 'J';
+  QUEEN: GetCardName := 'Q';
+  KING: GetCardName := 'K';
+  Else GetCardName := '?';
+ End;
 End;
 
-Function GetSuitSymbol(Suit: Integer): String;
-Begin
-  Case Suit of
-    HEARTS: GetSuitSymbol := #3;
-    DIAMONDS: GetSuitSymbol := #4;
-    CLUBS: GetSuitSymbol := #5;
-    SPADES: GetSuitSymbol := #6;
-    Else GetSuitSymbol := '?';
-  End;
+Function GetSuitSymbol(Suit:Integer):String;Begin
+ Case Suit of
+  HEARTS: GetSuitSymbol := #3;
+  DIAMONDS: GetSuitSymbol := #4;
+  CLUBS: GetSuitSymbol := #5;
+  SPADES: GetSuitSymbol := #6;
+  Else GetSuitSymbol := '?';
+ End;
 End;
 
-Function GetSuitColor(Suit: Integer): Integer;
-Begin
-  Case Suit of
-    HEARTS, DIAMONDS: GetSuitColor := Red;
-    CLUBS, SPADES: GetSuitColor := Black;
-    Else GetSuitColor := White;
-  End;
+Function GetSuitColor(Suit:Integer):Integer;Begin
+ Case Suit of
+  HEARTS, DIAMONDS: GetSuitColor := Red;
+  CLUBS, SPADES: GetSuitColor := Black;
+  Else GetSuitColor := White;
+ End;
 End;
 
 Procedure InitDeck;
 Var
-  I, Suit, Value: Integer;
+ I,Suit,Value:Integer;
 Begin
-  I := 0;
-  For Suit := 0 to 3 Do Begin
-    For Value := 1 to 13 Do Begin
-      Game.Deck[I].Suit := Suit;
-      Game.Deck[I].Value := Value;
-      Game.Deck[I].Visible := False;
-      Inc(I);
-    End;
+ I:=0;
+ For Suit := 0 to 3 Do Begin
+  For Value := 1 to 13 Do Begin
+   Game.Deck[I].Suit := Suit;
+   Game.Deck[I].Value := Value;
+   Game.Deck[I].Visible := False;
+   Inc(I);
   End;
-  Game.DeckTop := DECK_SIZE - 1;
+ End;
+ Game.DeckTop := DECK_SIZE - 1;
 End;
 
 Procedure ShuffleDeck;
 Var
-  I, J: Integer;
-  TempCard: TCard;
+ I,J:Integer;
+ TempCard:TCard;
 Begin
-  For I := 0 to DECK_SIZE - 1 Do Begin
-    J := Random(DECK_SIZE);
-    TempCard := Game.Deck[I];
-    Game.Deck[I] := Game.Deck[J];
-    Game.Deck[J] := TempCard;
-  End;
+ For I:=0 to DECK_SIZE - 1 Do Begin
+  J:=Random(DECK_SIZE);
+  TempCard:=Game.Deck[I];
+  Game.Deck[I]:=Game.Deck[J];
+  Game.Deck[J]:=TempCard;
+ End;
 End;
 
-Function DrawCard: TCard;
-Begin
-  DrawCard := Game.Deck[Game.DeckTop];
-  Dec(Game.DeckTop);
+Procedure DrawCardFromDeck(Var Card:TCard);Begin
+ Card := Game.Deck[Game.DeckTop];
+ Dec(Game.DeckTop);
 End;
 
-Procedure AddToDiscard(Card: TCard);
-Begin
-  Inc(Game.DiscardTop);
-  Game.DiscardPile[Game.DiscardTop] := Card;
+Procedure AddToDiscard(Card:TCard);Begin
+ Inc(Game.DiscardTop);
+ Game.DiscardPile[Game.DiscardTop] := Card;
 End;
 
-Function GetTopDiscard: TCard;
-Begin
-  If Game.DiscardTop >= 0 Then
-    GetTopDiscard := Game.DiscardPile[Game.DiscardTop]
-  Else Begin
-    GetTopDiscard.Suit := 0;
-    GetTopDiscard.Value := 0;
-    GetTopDiscard.Visible := False;
-  End;
+Procedure GetTopDiscard(Var Card:TCard);Begin
+ If Game.DiscardTop >= 0 Then Card := Game.DiscardPile[Game.DiscardTop]
+  Else
+ Begin
+  Card.Suit := 0;
+  Card.Value := 0;
+  Card.Visible := False;
+ End;
 End;
 
 Procedure InitPlayers;
 Var
-  I, J: Integer;
+ I,J:Integer;
 Begin
   { Joueur humain }
-  Game.Players[0].Name := 'Joueur';
-  Game.Players[0].IsHuman := True;
-  Game.Players[0].Score := 0;
-  Game.Players[0].CardsRevealed := 0;
-
+ Game.Players[0].Name := 'Joueur';
+ Game.Players[0].IsHuman := True;
+ Game.Players[0].Score := 0;
+ Game.Players[0].CardsRevealed := 0;
   { Joueur ordinateur }
-  Game.Players[1].Name := 'Ordinateur';
-  Game.Players[1].IsHuman := False;
-  Game.Players[1].Score := 0;
-  Game.Players[1].CardsRevealed := 0;
-
+ Game.Players[1].Name := 'Ordinateur';
+ Game.Players[1].IsHuman := False;
+ Game.Players[1].Score := 0;
+ Game.Players[1].CardsRevealed := 0;
   { Distribuer les cartes }
-  For I := 0 to MAX_PLAYERS - 1 Do Begin
-    For J := 0 to CARDS_PER_PLAYER - 1 Do Begin
-      Game.Players[I].Cards[J] := DrawCard;
-      { Les 2 premières cartes sont révélées }
-      If J < 2 Then Begin
-        Game.Players[I].Cards[J].Visible := True;
-        Inc(Game.Players[I].CardsRevealed);
-      End;
-    End;
+ For I := 0 to MAX_PLAYERS - 1 Do Begin
+  For J := 0 to CARDS_PER_PLAYER - 1 Do Begin
+   DrawCardFromDeck(Game.Players[I].Cards[J]);
+    { Les 2 premi�res cartes sont r�v�l�es }
+   If J < 2 Then Begin
+    Game.Players[I].Cards[J].Visible := True;
+    Inc(Game.Players[I].CardsRevealed);
+   End;
   End;
-
-  { Première carte sur la pile de défausse }
-  AddToDiscard(DrawCard);
-  Game.DiscardPile[Game.DiscardTop].Visible := True;
+ End;
+  { Premi�re carte sur la pile de d�fausse }
+ DrawCardFromDeck(Game.DrawnCard);
+ AddToDiscard(Game.DrawnCard);
+ Game.DiscardPile[Game.DiscardTop].Visible := True;
 End;
 
-Function CalculatePlayerScore(PlayerIndex: Integer): Integer;
+Function CalculatePlayerScore(PlayerIndex:Integer):Integer;
 Var
-  I, Total: Integer;
+ I,Total:Integer;
 Begin
-  Total := 0;
-  For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
-    If Game.Players[PlayerIndex].Cards[I].Visible Then
-      Total := Total + GetCardScore(Game.Players[PlayerIndex].Cards[I]);
-  End;
-  CalculatePlayerScore := Total;
+ Total := 0;
+ For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
+  If Game.Players[PlayerIndex].Cards[I].Visible Then
+   Total := Total + GetCardScore(Game.Players[PlayerIndex].Cards[I]);
+ End;
+ CalculatePlayerScore := Total;
 End;
 
-Procedure DrawCard(X, Y: Integer; Card: TCard; Highlighted: Boolean);
+Procedure DrawCard(X,Y:Integer;Card:TCard;Highlighted:Boolean);
 Var
-  CardName: String;
-  SuitSymbol: String;
-  SuitColor: Integer;
+ CardName:String;
+ SuitSymbol:String;
+ SuitColor:Integer;
 Begin
   { Fond de la carte }
-  If Highlighted Then
-    SetColor(Yellow)
-  Else
-    SetColor(White);
-  SetFillStyle(SolidFill, White);
-  Bar(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
-
+ If Highlighted Then SetColor(Yellow)
+                Else SetColor(White);
+ SetFillStyle(SolidFill, White);
+ Bar(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
   { Bordure }
-  If Highlighted Then
-    SetColor(Yellow)
+ If Highlighted Then SetColor(Yellow)
+                Else SetColor(Black);
+ Rectangle(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
+ If Card.Visible Then Begin
+   { Afficher la carte }
+  CardName := GetCardName(Card);
+  SuitSymbol := GetSuitSymbol(Card.Suit);
+  SuitColor := GetSuitColor(Card.Suit);
+   { Valeur en haut à gauche }
+  SetColor(SuitColor);
+  SetTextStyle(DefaultFont, HorizDir, 1);
+  OutTextXY(X + 5, Y + 5, CardName);
+  OutTextXY(X + 5, Y + 15, SuitSymbol);
+   { Valeur en bas à droite (inversée) }
+  OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 25, CardName);
+  OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 15, SuitSymbol);
+   { Symbole au centre }
+  SetTextStyle(DefaultFont, HorizDir, 2);
+  OutTextXY(X + CARD_WIDTH Div 2 - 8, Y + CARD_HEIGHT Div 2 - 8, SuitSymbol);
+ End
   Else
-    SetColor(Black);
-  Rectangle(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
-
-  If Card.Visible Then Begin
-    { Afficher la carte }
-    CardName := GetCardName(Card);
-    SuitSymbol := GetSuitSymbol(Card.Suit);
-    SuitColor := GetSuitColor(Card.Suit);
-
-    { Valeur en haut à gauche }
-    SetColor(SuitColor);
-    SetTextStyle(DefaultFont, HorizDir, 1);
-    OutTextXY(X + 5, Y + 5, CardName);
-    OutTextXY(X + 5, Y + 15, SuitSymbol);
-
-    { Valeur en bas à droite (inversée) }
-    OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 25, CardName);
-    OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 15, SuitSymbol);
-
-    { Symbole au centre }
-    SetTextStyle(DefaultFont, HorizDir, 2);
-    OutTextXY(X + CARD_WIDTH Div 2 - 8, Y + CARD_HEIGHT Div 2 - 8, SuitSymbol);
-  End Else Begin
-    { Dos de carte }
-    SetColor(Blue);
-    SetFillStyle(SolidFill, Blue);
-    Bar(X + 5, Y + 5, X + CARD_WIDTH - 5, Y + CARD_HEIGHT - 5);
-
-    SetColor(White);
-    SetTextStyle(DefaultFont, HorizDir, 1);
-    OutTextXY(X + CARD_WIDTH Div 2 - 10, Y + CARD_HEIGHT Div 2 - 4, 'GOLF');
-  End;
+ Begin
+   { Dos de carte }
+  SetColor(Blue);
+  SetFillStyle(SolidFill, Blue);
+  Bar(X + 5, Y + 5, X + CARD_WIDTH - 5, Y + CARD_HEIGHT - 5);
+  SetColor(White);
+  SetTextStyle(DefaultFont, HorizDir, 1);
+  OutTextXY(X + CARD_WIDTH Div 2 - 10, Y + CARD_HEIGHT Div 2 - 4, 'GOLF');
+ End;
 End;
 
-Procedure DrawPlayerCards(PlayerIndex: Integer);
+Procedure DrawPlayerCards(PlayerIndex:Integer);
 Var
-  I, X, Y, Row, Col: Integer;
-  StartX, StartY: Integer;
-  IsCurrentPlayer: Boolean;
+ I, X, Y, Row, Col: Integer;
+ StartX, StartY: Integer;
+ IsCurrentPlayer: Boolean;
 Begin
-  IsCurrentPlayer := (PlayerIndex = Game.CurrentPlayer);
-
-  If PlayerIndex = 0 Then Begin
-    { Joueur humain - en bas }
-    StartX := 50;
-    StartY := 320;
-  End Else Begin
-    { Ordinateur - en haut }
-    StartX := 50;
-    StartY := 50;
-  End;
-
-  { Nom du joueur }
-  If IsCurrentPlayer Then
-    SetColor(Yellow)
+ IsCurrentPlayer:=(PlayerIndex = Game.CurrentPlayer);
+ If PlayerIndex = 0 Then Begin
+   { Joueur humain - en bas }
+  StartX := 50;
+  StartY := 320;
+ End
   Else
-    SetColor(White);
-  SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(StartX, StartY - 20, Game.Players[PlayerIndex].Name);
-
-  { Score }
-  SetColor(LightGray);
-  OutTextXY(StartX + 200, StartY - 15, 'Pointage: ' + Chr(Ord('0') + CalculatePlayerScore(PlayerIndex)));
-
+ Begin
+   { Ordinateur - en haut }
+  StartX := 50;
+  StartY := 50;
+ End;
+  { Nom du joueur }
+ If IsCurrentPlayer Then SetColor(Yellow)
+                    Else SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(StartX, StartY - 20, Game.Players[PlayerIndex].Name);
+  { Pointage }
+ SetColor(LightGray);
+ OutTextXY(StartX + 200, StartY - 15, 'Pointage: ' + Chr(Ord('0') + CalculatePlayerScore(PlayerIndex)));
   { Cartes arrangées en 2 rangées de 3 }
-  For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
-    Row := I Div 3;
-    Col := I Mod 3;
-    X := StartX + Col * (CARD_WIDTH + 10);
-    Y := StartY + Row * (CARD_HEIGHT + 10);
-
-    { Mettre en évidence la carte sélectionnée }
-    DrawCard(X, Y, Game.Players[PlayerIndex].Cards[I],
-             (PlayerIndex = 0) And (Game.SelectedCard = I) And IsCurrentPlayer);
-  End;
+ For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
+  Row := I Div 3;
+  Col := I Mod 3;
+  X := StartX + Col * (CARD_WIDTH + 10);
+  Y := StartY + Row * (CARD_HEIGHT + 10);
+   { Mettre en évidence la carte sélectionnée }
+  DrawCard(X, Y, Game.Players[PlayerIndex].Cards[I],
+           (PlayerIndex = 0) And (Game.SelectedCard = I) And IsCurrentPlayer);
+ End;
 End;
 
 Procedure DrawDeckAndDiscard;
 Var
-  DeckCard, DiscardCard: TCard;
+ DeckCard,DiscardCard:TCard;
 Begin
   { Pile de pioche }
-  SetColor(White);
-  SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(400, 170, 'Pioche');
-
-  DeckCard.Visible := False;
-  DrawCard(400, 190, DeckCard, False);
-
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(400, 170, 'Pioche');
+ DeckCard.Visible := False;
+ DrawCard(400, 190, DeckCard, False);
   { Pile de défausse }
-  OutTextXY(480, 170, 'Defausse');
-  DiscardCard := GetTopDiscard;
-  DrawCard(480, 190, DiscardCard, False);
-
+ OutTextXY(480, 170, 'Defausse');
+ GetTopDiscard(DiscardCard);
+ DrawCard(480, 190, DiscardCard, False);
   { Carte piochée si applicable }
-  If Game.HasDrawn Then Begin
-    SetColor(Yellow);
-    OutTextXY(360, 170, 'Piochee');
-    DrawCard(360, 190, Game.DrawnCard, False);
-  End;
+ If Game.HasDrawn Then Begin
+  SetColor(Yellow);
+  OutTextXY(360, 170, 'Piochee');
+  DrawCard(360, 190, Game.DrawnCard, False);
+ End;
 End;
 
-Procedure DrawGameInfo;
-Begin
-  SetColor(White);
-  SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(400, 300, 'Round: ' + Chr(Ord('0') + Game.Round));
-
-  SetColor(LightGray);
-  OutTextXY(400, 320, 'Tour: ' + Game.Players[Game.CurrentPlayer].Name);
-
+Procedure DrawGameInfo;Begin
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(400, 300, 'Round: ' + Chr(Ord('0') + Game.Round));
+ SetColor(LightGray);
+ OutTextXY(400, 320, 'Tour: ' + Game.Players[Game.CurrentPlayer].Name);
   { Instructions }
-  SetColor(LightGray);
-  OutTextXY(400, 350, 'Instructions:');
-  OutTextXY(400, 365, 'Clic - Selectionner carte');
-  OutTextXY(400, 380, 'D - Piocher');
-  OutTextXY(400, 395, 'P - Prendre defausse');
-  OutTextXY(400, 410, 'E - Echanger');
-  OutTextXY(400, 425, 'F - Finir tour');
-  OutTextXY(400, 440, 'R - Nouvelle partie');
-  OutTextXY(400, 455, 'ESC - Quitter');
+ SetColor(LightGray);
+ OutTextXY(400, 350, 'Instructions:');
+ OutTextXY(400, 365, 'Clic - Selectionner carte');
+ OutTextXY(400, 380, 'D - Piocher');
+ OutTextXY(400, 395, 'P - Prendre defausse');
+ OutTextXY(400, 410, 'E - Echanger');
+ OutTextXY(400, 425, 'F - Finir tour');
+ OutTextXY(400, 440, 'R - Nouvelle partie');
+ OutTextXY(400, 455, 'ESC - Quitter');
 End;
 
 Procedure DrawGameOver;
 Var
-  Winner: Integer;
-  WinnerName: String;
+ Winner:Integer;
+ WinnerName:String;
 Begin
-  If Game.GameWon Then Begin
-    { Déterminer le gagnant }
-    If CalculatePlayerScore(0) < CalculatePlayerScore(1) Then Begin
-      Winner := 0;
-      WinnerName := 'Joueur';
-    End Else Begin
-      Winner := 1;
-      WinnerName := 'Ordinateur';
-    End;
-
-    { Afficher le résultat }
-    SetColor(Green);
-    SetFillStyle(SolidFill, Green);
-    Bar(200, 200, 440, 280);
-
-    SetColor(White);
-    SetTextStyle(DefaultFont, HorizDir, 2);
-    OutTextXY(220, 220, 'Partie terminee!');
-
-    SetTextStyle(DefaultFont, HorizDir, 1);
-    OutTextXY(220, 250, 'Gagnant: ' + WinnerName);
-    OutTextXY(220, 265, 'Appuyez sur R pour rejouer');
+ If Game.GameWon Then Begin
+   { D�terminer le gagnant }
+  If CalculatePlayerScore(0) < CalculatePlayerScore(1) Then Begin
+   Winner := 0;
+   WinnerName := 'Joueur';
+  End
+   Else
+  Begin
+   Winner := 1;
+   WinnerName := 'Ordinateur';
   End;
-End;
-
-Procedure DrawBackground;
-Begin
+   { Afficher le r�sultat }
   SetColor(Green);
   SetFillStyle(SolidFill, Green);
-  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-  { Titre }
+  Bar(200, 200, 440, 280);
   SetColor(White);
-  SetTextStyle(DefaultFont, HorizDir, 3);
-  OutTextXY(250, 10, 'GOLF');
+  SetTextStyle(DefaultFont, HorizDir, 2);
+  OutTextXY(220, 220, 'Partie terminee!');
+  SetTextStyle(DefaultFont, HorizDir, 1);
+  OutTextXY(220, 250, 'Gagnant: ' + WinnerName);
+  OutTextXY(220, 265, 'Appuyez sur R pour rejouer');
+ End;
 End;
 
-Procedure DrawScreen;
-Begin
-  DrawBackground;
-  DrawPlayerCards(0);  { Joueur humain }
-  DrawPlayerCards(1);  { Ordinateur }
-  DrawDeckAndDiscard;
-  DrawGameInfo;
-  DrawGameOver;
+Procedure DrawBackground;Begin
+ SetColor(Green);
+ SetFillStyle(SolidFill, Green);
+ Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  { Titre }
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 3);
+ OutTextXY(250, 10, 'GOLF');
 End;
 
-Function GetClickedCard(X, Y: Integer): Integer;
+Procedure DrawScreen;Begin
+ DrawBackground;
+ DrawPlayerCards(0);  { Joueur humain }
+ DrawPlayerCards(1);  { Ordinateur }
+ DrawDeckAndDiscard;
+ DrawGameInfo;
+ DrawGameOver;
+End;
+
+Function GetClickedCard(X,Y:Integer):Integer;
 Var
-  I, CardX, CardY, Row, Col: Integer;
-  StartX, StartY: Integer;
+ I,CardX,CardY,Row,Col:Integer;
+ StartX,StartY:Integer;
 Begin
-  GetClickedCard := -1;
-
-  { Vérifier les cartes du joueur humain }
-  StartX := 50;
-  StartY := 320;
-
-  For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
-    Row := I Div 3;
-    Col := I Mod 3;
-    CardX := StartX + Col * (CARD_WIDTH + 10);
-    CardY := StartY + Row * (CARD_HEIGHT + 10);
-
-    If (X >= CardX) And (X <= CardX + CARD_WIDTH) And
-       (Y >= CardY) And (Y <= CardY + CARD_HEIGHT) Then Begin
-      GetClickedCard := I;
-      Exit;
-    End;
+ GetClickedCard := -1;
+  { V�rifier les cartes du joueur humain }
+ StartX := 50;
+ StartY := 320;
+ For I := 0 to CARDS_PER_PLAYER-1 Do Begin
+  Row := I Div 3;
+  Col := I Mod 3;
+  CardX := StartX + Col * (CARD_WIDTH + 10);
+  CardY := StartY + Row * (CARD_HEIGHT + 10);
+  If (X >= CardX) And (X <= CardX + CARD_WIDTH) And
+     (Y >= CardY) And (Y <= CardY + CARD_HEIGHT) Then Begin
+    GetClickedCard := I;
+    Exit;
   End;
+ End;
 End;
 
-Procedure HandleMouseClick(X, Y: Integer);
+Procedure HandleMouseClick(X,Y:Integer);
 Var
-  ClickedCard: Integer;
+ ClickedCard: Integer;
 Begin
-  If Game.CurrentPlayer = 0 Then Begin { Joueur humain }
-    ClickedCard := GetClickedCard(X, Y);
-    If ClickedCard >= 0 Then Begin
-      Game.SelectedCard := ClickedCard;
-      NeedRedraw := True;
-    End;
+ If Game.CurrentPlayer = 0 Then Begin { Joueur humain }
+  ClickedCard := GetClickedCard(X, Y);
+  If ClickedCard >= 0 Then Begin
+   Game.SelectedCard := ClickedCard;
+   NeedRedraw := True;
   End;
+ End;
 End;
 
-Procedure DrawFromDeck;
-Begin
-  If Game.DeckTop >= 0 Then Begin
-    Game.DrawnCard := DrawCard;
-    Game.HasDrawn := True;
-    Game.TurnPhase := TURN_DISCARD;
-    NeedRedraw := True;
-  End;
+Procedure DrawFromDeck;Begin
+ If Game.DeckTop >= 0 Then Begin
+  DrawCardFromDeck(Game.DrawnCard);
+  Game.HasDrawn := True;
+  Game.TurnPhase := TURN_DISCARD;
+  NeedRedraw := True;
+ End;
 End;
 
-Procedure DrawFromDiscard;
-Begin
-  If Game.DiscardTop >= 0 Then Begin
-    Game.DrawnCard := Game.DiscardPile[Game.DiscardTop];
-    Dec(Game.DiscardTop);
-    Game.HasDrawn := True;
-    Game.TurnPhase := TURN_DISCARD;
-    NeedRedraw := True;
-  End;
+Procedure DrawFromDiscard;Begin
+ If Game.DiscardTop >= 0 Then Begin
+  Game.DrawnCard := Game.DiscardPile[Game.DiscardTop];
+  Dec(Game.DiscardTop);
+  Game.HasDrawn := True;
+  Game.TurnPhase := TURN_DISCARD;
+  NeedRedraw := True;
+ End;
 End;
 
-Procedure ExchangeCard;
-Begin
-  If Game.HasDrawn And (Game.SelectedCard >= 0) Then Begin
-    { Échanger la carte sélectionnée avec la carte piochée }
-    AddToDiscard(Game.Players[Game.CurrentPlayer].Cards[Game.SelectedCard]);
-    Game.DiscardPile[Game.DiscardTop].Visible := True;
-
-    Game.Players[Game.CurrentPlayer].Cards[Game.SelectedCard] := Game.DrawnCard;
-    Game.Players[Game.CurrentPlayer].Cards[Game.SelectedCard].Visible := True;
-
-    Game.HasDrawn := False;
-    Game.SelectedCard := -1;
-
-    { Passer au joueur suivant }
-    Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod MAX_PLAYERS;
-    Game.TurnPhase := TURN_DRAW;
-    NeedRedraw := True;
-  End;
-End;
-
-Procedure FinishTurn;
-Begin
-  If Game.HasDrawn Then Begin
-    { Défausser la carte piochée }
-    AddToDiscard(Game.DrawnCard);
-    Game.DiscardPile[Game.DiscardTop].Visible := True;
-    Game.HasDrawn := False;
-  End;
-
-  { Passer au joueur suivant }
+Procedure ExchangeCard;Begin
+ If Game.HasDrawn And (Game.SelectedCard >= 0) Then Begin
+   { �changer la carte sélectionnée avec la carte pioch�e }
+  AddToDiscard(Game.Players[Game.CurrentPlayer].Cards[Game.SelectedCard]);
+  Game.DiscardPile[Game.DiscardTop].Visible := True;
+  Game.Players[Game.CurrentPlayer].Cards[Game.SelectedCard] := Game.DrawnCard;
+  Game.Players[Game.CurrentPlayer].Cards[Game.SelectedCard].Visible := True;
+  Game.HasDrawn := False;
+  Game.SelectedCard := -1;
+   { Passer au joueur suivant }
   Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod MAX_PLAYERS;
   Game.TurnPhase := TURN_DRAW;
-  Game.SelectedCard := -1;
   NeedRedraw := True;
+ End;
+End;
+
+Procedure FinishTurn;Begin
+ If Game.HasDrawn Then Begin
+   { D�fausser la carte pioch�e }
+  AddToDiscard(Game.DrawnCard);
+  Game.DiscardPile[Game.DiscardTop].Visible := True;
+  Game.HasDrawn := False;
+ End;
+  { Passer au joueur suivant }
+ Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod MAX_PLAYERS;
+ Game.TurnPhase := TURN_DRAW;
+ Game.SelectedCard := -1;
+ NeedRedraw := True;
 End;
 
 Procedure ComputerTurn;
 Var
-  I, BestCard, BestScore, CurrentScore: Integer;
-  TopDiscard: TCard;
+ I,BestCard,BestScore,CurrentScore:Integer;
+ TopDiscard:TCard;
 Begin
-  If Game.CurrentPlayer = 1 Then Begin { Ordinateur }
-    Case Game.TurnPhase of
-      TURN_DRAW: Begin
-        { Décider de piocher ou prendre la défausse }
-        TopDiscard := GetTopDiscard;
-        If GetCardScore(TopDiscard) <= 5 Then
-          DrawFromDiscard
-        Else
-          DrawFromDeck;
-        Delay(1000);
+ If Game.CurrentPlayer = 1 Then Begin { Ordinateur }
+  Case Game.TurnPhase of
+   TURN_DRAW: Begin
+     { D�cider de piocher ou prendre la d�fausse }
+    GetTopDiscard(TopDiscard);
+    If GetCardScore(TopDiscard) <= 5 Then DrawFromDiscard
+                                     Else DrawFromDeck;
+    Delay(1000);
+   End;
+   TURN_DISCARD:Begin
+     { Trouver la meilleure carte à remplacer }
+    BestCard := -1;
+    BestScore := -1;
+    For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
+     If Game.Players[1].Cards[I].Visible Then Begin
+      CurrentScore := GetCardScore(Game.Players[1].Cards[I]);
+      If CurrentScore > BestScore Then Begin
+       BestScore := CurrentScore;
+       BestCard := I;
       End;
-
-      TURN_DISCARD: Begin
-        { Trouver la meilleure carte à remplacer }
-        BestCard := -1;
-        BestScore := -1;
-
-        For I := 0 to CARDS_PER_PLAYER - 1 Do Begin
-          If Game.Players[1].Cards[I].Visible Then Begin
-            CurrentScore := GetCardScore(Game.Players[1].Cards[I]);
-            If CurrentScore > BestScore Then Begin
-              BestScore := CurrentScore;
-              BestCard := I;
-            End;
-          End;
-        End;
-
-        { Décider d'échanger ou de finir le tour }
-        If (BestCard >= 0) And (GetCardScore(Game.DrawnCard) < BestScore) Then Begin
-          Game.SelectedCard := BestCard;
-          ExchangeCard;
-        End Else Begin
-          FinishTurn;
-        End;
-
-        Delay(1000);
-      End;
+     End;
     End;
+     { D�cider d'échanger ou de finir le tour }
+    If (BestCard >= 0) And (GetCardScore(Game.DrawnCard) < BestScore) Then Begin
+     Game.SelectedCard := BestCard;
+     ExchangeCard;
+    End
+     Else
+    Begin
+     FinishTurn;
+    End;
+    Delay(1000);
+   End;
   End;
+ End;
 End;
 
 Procedure CheckGameEnd;
 Var
-  I: Integer;
+ I:Integer;
 Begin
-  { Vérifier si toutes les cartes d'un joueur sont révélées }
-  For I := 0 to MAX_PLAYERS - 1 Do Begin
-    If Game.Players[I].CardsRevealed >= CARDS_PER_PLAYER Then Begin
-      Game.GameWon := True;
-      NeedRedraw := True;
-      Exit;
-    End;
+  { V�rifier si toutes les cartes d'un joueur sont r�v�l�es }
+ For I := 0 to MAX_PLAYERS - 1 Do Begin
+  If Game.Players[I].CardsRevealed >= CARDS_PER_PLAYER Then Begin
+   Game.GameWon := True;
+   NeedRedraw := True;
+   Exit;
   End;
+ End;
 End;
 
 Procedure HandleInput;
 Var
-  Key: Char;
-  MouseX, MouseY, MouseButton: LongInt;
+ Key:Char;
+ MouseX,MouseY,MouseButton:LongInt;
 Begin
   { Clavier }
-  If KeyPressed Then Begin
-    Key := ReadKey;
-    Case Key of
+ If KeyPressed Then Begin
+  Key := ReadKey;
+  Case Key of
       'd', 'D': Begin
         If (Game.CurrentPlayer = 0) And (Game.TurnPhase = TURN_DRAW) Then
           DrawFromDeck;
@@ -682,11 +630,7 @@ Begin
       End;
     End;
   End;
-
-  { Souris }
-  {$IFDEF FPC}
-  GetMouseState(MouseX, MouseY, MouseButton);
-  {$ELSE}
+   { Souris }
   If MouseDriverFound Then Begin
     GetMouseState(MouseX, MouseY, MouseButton);
     If MouseButton = 1 Then Begin
@@ -695,26 +639,22 @@ Begin
         GetMouseState(MouseX, MouseY, MouseButton);
     End;
   End;
-  {$ENDIF}
 End;
 
-Procedure NewGame;
-Begin
-  Game.CurrentPlayer := 0;
-  Game.GamePhase := GAME_PLAYING;
-  Game.TurnPhase := TURN_DRAW;
-  Game.Round := 1;
-  Game.HasDrawn := False;
-  Game.SelectedCard := -1;
-  Game.GameWon := False;
-  Game.ShowScores := False;
-  Game.DiscardTop := -1;
-
-  InitDeck;
-  ShuffleDeck;
-  InitPlayers;
-
-  NeedRedraw := True;
+Procedure NewGame;Begin
+ Game.CurrentPlayer := 0;
+ Game.GamePhase := GAME_PLAYING;
+ Game.TurnPhase := TURN_DRAW;
+ Game.Round := 1;
+ Game.HasDrawn := False;
+ Game.SelectedCard := -1;
+ Game.GameWon := False;
+ Game.ShowScores := False;
+ Game.DiscardTop := -1;
+ InitDeck;
+ ShuffleDeck;
+ InitPlayers;
+ NeedRedraw := True;
 End;
 
 BEGIN
