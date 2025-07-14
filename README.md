@@ -170,6 +170,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
       <th>Description</th>
      </tr>
     <tr>
+        <td><b>421.PAS</b></td>
+        <td><b>421</b></td>
+        <td>Ce fichier contient le jeu de dés 421.</td>
+    </tr>
+    <tr>
         <td><b>649.PAS</b></td>
         <td><b>6/49</b></td>
         <td>Ce fichier contient un jeu de Lotto 6/49.</td>
