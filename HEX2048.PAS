@@ -149,7 +149,7 @@ Begin
 
   { Rangée 0 : 1 hexagone - sommet }
   StartX := 320;  { Centré }
-  StartY := 100;  { Plus haut pour avoir la place }
+  StartY := 140;  { Plus haut pour avoir la place }
   Grid[I].X := StartX;
   Grid[I].Y := StartY;
   Grid[I].Active := True;
@@ -157,7 +157,7 @@ Begin
 
   { Rangée 1 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 130;  { Espacement réduit à 30px }
+  StartY := 168;  { Espacement réduit à 28px }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -167,7 +167,7 @@ Begin
 
   { Rangée 2 : 3 hexagones }
   StartX := 248;  { Centré pour 3 hexagones }
-  StartY := 160;  { 130 + 30 }
+  StartY := 196;  { 168 + 28 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -177,7 +177,7 @@ Begin
 
   { Rangée 3 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 190;  { 160 + 30 }
+  StartY := 224;  { 196 + 28 }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -187,7 +187,7 @@ Begin
 
   { Rangée 4 : 3 hexagones }
   StartX := 248;  { Centré pour 3 hexagones }
-  StartY := 220;  { 190 + 30 }
+  StartY := 252;  { 224 + 28 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -197,7 +197,7 @@ Begin
 
   { Rangée 5 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 250;  { 220 + 30 }
+  StartY := 280;  { 252 + 28 }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -207,7 +207,7 @@ Begin
 
   { Rangée 6 : 3 hexagones }
   StartX := 248;  { Centré pour 3 hexagones }
-  StartY := 280;  { 250 + 30 }
+  StartY := 308;  { 280 + 28 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -217,7 +217,7 @@ Begin
 
   { Rangée 7 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 310;  { 280 + 30 }
+  StartY := 336;  { 308 + 28 }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -227,7 +227,7 @@ Begin
 
   { Rangée 8 : 1 hexagone - pointe }
   StartX := 320;  { Centré }
-  StartY := 340;  { 310 + 30 }
+  StartY := 364;  { 336 + 28 }
   Grid[I].X := StartX;
   Grid[I].Y := StartY;
   Grid[I].Active := True;
