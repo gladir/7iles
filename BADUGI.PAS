@@ -422,7 +422,64 @@ Begin
  NeedRedraw := True;
 End;
 
+Procedure InitGlobalVariables;
+Var
+ I, J: Integer;
+Begin
+ { Initialiser complètement la structure Game }
+ Game.PlayerCount := 0;
+ Game.CurrentPlayer := 0;
+ Game.Dealer := 0;
+ Game.SmallBlind := 0;
+ Game.BigBlind := 0;
+ Game.CurrentBet := 0;
+ Game.Pot := 0;
+ Game.GamePhase := GAME_DEALING;
+ Game.DrawRound := 0;
+ Game.BettingRound := 0;
+ Game.AnimationDelay := 0;
+ Game.ShowResults := False;
+ Game.WinnerIndex := -1;
+ Game.ErrorCard := -1;
+ Game.ErrorTimer := 0;
+ Game.DeckIndex := 0;
+ 
+ { Initialiser tous les joueurs }
+ For I := 0 to MAX_PLAYERS - 1 Do Begin
+  Game.Players[I].Name := '';
+  Game.Players[I].IsHuman := False;
+  Game.Players[I].Chips := 0;
+  Game.Players[I].Bet := 0;
+  Game.Players[I].TotalBet := 0;
+  Game.Players[I].IsActive := False;
+  Game.Players[I].IsFolded := False;
+  Game.Players[I].Action := ACTION_CHECK;
+  Game.Players[I].IsDealer := False;
+  Game.Players[I].IsSmallBlind := False;
+  Game.Players[I].IsBigBlind := False;
+  { Initialiser les cartes de chaque joueur }
+  For J := 0 to HAND_SIZE - 1 Do Begin
+   Game.Players[I].Hand[J].Suit := 0;
+   Game.Players[I].Hand[J].Value := 1;
+   Game.Players[I].Hand[J].Visible := False;
+   Game.Players[I].Hand[J].Selected := False;
+  End;
+ End;
+ 
+ { Initialiser le deck }
+ For I := 0 to DECK_SIZE - 1 Do Begin
+  Game.Deck[I].Suit := 0;
+  Game.Deck[I].Value := 1;
+  Game.Deck[I].Visible := False;
+  Game.Deck[I].Selected := False;
+ End;
+ 
+ { Initialiser la variable de redessin }
+ NeedRedraw := True;
+End;
+
 Procedure InitGame;Begin
+ InitGlobalVariables;
  InitPlayers;
  { S'assurer que les variables sont dans des limites valides }
  If Game.PlayerCount <= 0 Then Game.PlayerCount := 4;
@@ -1197,6 +1254,7 @@ BEGIN
  Randomize;
  InitScreen;
  If MouseDriverFound Then ShowMouse;
+ InitGlobalVariables;
  InitGame;
   { Boucle principale }
  Repeat
