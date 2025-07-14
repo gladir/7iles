@@ -20,6 +20,9 @@ Const
  SCREEN_HEIGHT = 480;
  DIE_SIZE = 60;
  
+ { Couleurs personnalisées }
+ Green = 2;
+ 
  { États du jeu }
  GAME_COME_OUT = 0;  { Premier lancer }
  GAME_POINT = 1;     { Phase point }
@@ -268,12 +271,50 @@ Begin
  SetColor(White);
  Rectangle(10, 10, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10);
  
- { Table de craps stylisée }
+ { Table de craps avec coins arrondis }
  SetColor(DarkGray);
  SetFillStyle(SolidFill, DarkGray);
- Bar(200, 150, 450, 330);
+ 
+ { Corps principal de la table }
+ Bar(220, 160, 430, 320);
+ 
+ { Coins arrondis - gauche }
+ FillEllipse(220, 170, 10, 10);
+ FillEllipse(220, 310, 10, 10);
+ Bar(210, 170, 220, 310);
+ 
+ { Coins arrondis - droite }
+ FillEllipse(430, 170, 10, 10);
+ FillEllipse(430, 310, 10, 10);
+ Bar(430, 170, 440, 310);
+ 
+ { Bordure verte de la table }
+ SetColor(Green);
+ SetLineStyle(SolidLn, 0, ThickWidth);
+ 
+ { Bordures droites }
+ Line(220, 160, 430, 160); { Haut }
+ Line(220, 320, 430, 320); { Bas }
+ Line(210, 170, 210, 310); { Gauche }
+ Line(440, 170, 440, 310); { Droite }
+ 
+ { Bordures courbes }
+ Arc(220, 170, 90, 180, 10);  { Coin haut-gauche }
+ Arc(220, 310, 180, 270, 10); { Coin bas-gauche }
+ Arc(430, 170, 0, 90, 10);    { Coin haut-droite }
+ Arc(430, 310, 270, 360, 10); { Coin bas-droite }
+ 
+ { Ligne centrale de la table }
  SetColor(White);
- Rectangle(200, 150, 450, 330);
+ SetLineStyle(SolidLn, 0, NormWidth);
+ Line(325, 170, 325, 310);
+ 
+ { Zones de paris simplifiées }
+ SetColor(LightGray);
+ OutTextXY(230, 180, 'PASS');
+ OutTextXY(230, 290, 'DON''T PASS');
+ OutTextXY(350, 180, 'COME');
+ OutTextXY(350, 290, 'DON''T COME');
 End;
 
 Procedure DrawScreen;
