@@ -157,7 +157,7 @@ Begin
 
   { Rangée 1 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 140;  { Espacement réduit à 40px }
+  StartY := 130;  { Espacement réduit à 30px }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -167,7 +167,7 @@ Begin
 
   { Rangée 2 : 3 hexagones }
   StartX := 248;  { Centré pour 3 hexagones }
-  StartY := 180;  { 140 + 40 }
+  StartY := 160;  { 130 + 30 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -177,7 +177,7 @@ Begin
 
   { Rangée 3 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 220;  { 180 + 40 }
+  StartY := 190;  { 160 + 30 }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -187,7 +187,7 @@ Begin
 
   { Rangée 4 : 3 hexagones }
   StartX := 248;  { Centré pour 3 hexagones }
-  StartY := 260;  { 220 + 40 }
+  StartY := 220;  { 190 + 30 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -197,7 +197,7 @@ Begin
 
   { Rangée 5 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 300;  { 260 + 40 }
+  StartY := 250;  { 220 + 30 }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -207,7 +207,7 @@ Begin
 
   { Rangée 6 : 3 hexagones }
   StartX := 248;  { Centré pour 3 hexagones }
-  StartY := 340;  { 300 + 40 }
+  StartY := 280;  { 250 + 30 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -217,7 +217,7 @@ Begin
 
   { Rangée 7 : 2 hexagones }
   StartX := 284;  { Centré pour 2 hexagones }
-  StartY := 380;  { 340 + 40 }
+  StartY := 310;  { 280 + 30 }
   For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
@@ -227,7 +227,7 @@ Begin
 
   { Rangée 8 : 1 hexagone - pointe }
   StartX := 320;  { Centré }
-  StartY := 420;  { 380 + 40 }
+  StartY := 340;  { 310 + 30 }
   Grid[I].X := StartX;
   Grid[I].Y := StartY;
   Grid[I].Active := True;
@@ -404,20 +404,17 @@ Begin
     { Affichage modal des instructions basé sur displayInstructionsModal }
     SetColor(DarkGray);
     SetFillStyle(SolidFill, DarkGray);
-    Bar(40, 50, SCREEN_WIDTH - 40, 150);
+    Bar(40, 50, SCREEN_WIDTH - 40, 100);
 
     SetColor(Blue);
     SetLineStyle(SolidLn, 0, ThickWidth);
-    Rectangle(40, 50, SCREEN_WIDTH - 40, 150);
+    Rectangle(40, 50, SCREEN_WIDTH - 40, 100);
 
     SetColor(White);
-    SetTextStyle(DefaultFont, HorizDir, 2);
-    OutTextXY(60, 70, 'Utilisez les touches Q/W/E/A/S/D');
-    OutTextXY(60, 90, 'pour deplacer les tuiles');
-
     SetTextStyle(DefaultFont, HorizDir, 1);
-    OutTextXY(60, 110, 'Cliquez ou appuyez sur une touche pour commencer');
-    OutTextXY(60, 125, 'R - Nouveau jeu, ESC - Quitter');
+    OutTextXY(60, 60, 'Utilisez les touches Q/W/E/A/S/D');
+    OutTextXY(60, 75, 'pour deplacer les tuiles');
+    OutTextXY(60, 90, 'R - Nouveau jeu, ESC - Quitter');
   End Else Begin
     { Instructions normales en bas }
     SetColor(LightGray);
