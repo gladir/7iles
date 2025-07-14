@@ -3,7 +3,7 @@
   @website(https://www.gladir.com/7iles)
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
   @description: BourrÇ - Jeu de cartes traditionnel louisianais
-  Jeu de lev√©es avec mise et bourrage pour 3-6 joueurs
+  Jeu de levÇes avec mise et bourrage pour 3-6 joueurs
 }
 
 Program Bourre;
@@ -49,7 +49,7 @@ Const
  BID_PLAY = 1;
  BID_BOURRE = 2;
 
-  { Ordre des cartes au Bourr√© (Ace haut) }
+  { Ordre des cartes au BourrÇ (Ace haut) }
  BOURRE_VALUES: Array[1..13] of Integer = (14, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 
 Type
@@ -145,14 +145,12 @@ Var
   MouseDriverFound := True;
  End;
 
- Procedure ShowMouse;
- Begin
-  { Pas d'impl√©mentation pour Free Pascal }
+ Procedure ShowMouse;Begin
+  { Pas d'implÇmentation pour Free Pascal }
  End;
 
- Procedure HideMouse;
- Begin
-  { Pas d'impl√©mentation pour Free Pascal }
+ Procedure HideMouse;Begin
+  { Pas d'implÇmentation pour Free Pascal }
  End;
 {$ENDIF}
 
@@ -176,8 +174,7 @@ Begin
  End;
 End;
 
-Function GetCardName(Card: TCard): String;
-Begin
+Function GetCardName(Card:TCard):String;Begin
  Case Card.Value of
   ACE: GetCardName := 'A';
   2..10: GetCardName := Chr(Ord('0') + Card.Value);
@@ -188,8 +185,7 @@ Begin
  End;
 End;
 
-Function GetSuitSymbol(Suit: Integer): String;
-Begin
+Function GetSuitSymbol(Suit:Integer):String;Begin
  Case Suit of
   HEARTS: GetSuitSymbol := #3;
   DIAMONDS: GetSuitSymbol := #4;
@@ -199,8 +195,7 @@ Begin
  End;
 End;
 
-Function GetSuitColor(Suit: Integer): Integer;
-Begin
+Function GetSuitColor(Suit:Integer):Integer;Begin
  Case Suit of
   HEARTS, DIAMONDS: GetSuitColor := Red;
   CLUBS, SPADES: GetSuitColor := Black;
@@ -208,8 +203,7 @@ Begin
  End;
 End;
 
-Function GetSuitName(Suit: Integer): String;
-Begin
+Function GetSuitName(Suit:Integer):String;Begin
  Case Suit of
   HEARTS: GetSuitName := 'Coeurs';
   DIAMONDS: GetSuitName := 'Carreaux';
@@ -219,13 +213,11 @@ Begin
  End;
 End;
 
-Function GetBourreValue(Card: TCard): Integer;
-Begin
+Function GetBourreValue(Card:TCard):Integer;Begin
  GetBourreValue := BOURRE_VALUES[Card.Value];
 End;
 
-Function GetBidName(Bid: Integer): String;
-Begin
+Function GetBidName(Bid:Integer):String;Begin
  Case Bid of
   BID_FOLD: GetBidName := 'Passe';
   BID_PLAY: GetBidName := 'Joue';
@@ -236,9 +228,9 @@ End;
 
 Procedure InitDeck;
 Var
- I, Suit, Value: Integer;
+ I,Suit,Value:Integer;
 Begin
- I := 0;
+ I:=0;
  For Suit := 0 to 3 Do Begin
   For Value := 1 to 13 Do Begin
    Game.Deck[I].Suit := Suit;
@@ -251,10 +243,10 @@ End;
 
 Procedure ShuffleDeck;
 Var
- I, J: Integer;
- TempCard: TCard;
+ I,J:Integer;
+ TempCard:TCard;
 Begin
- For I := 0 to DECK_SIZE - 1 Do Begin
+ For I:=0 to DECK_SIZE-1 Do Begin
   J := Random(DECK_SIZE);
   TempCard := Game.Deck[I];
   Game.Deck[I] := Game.Deck[J];
@@ -266,30 +258,25 @@ Procedure InitPlayers;
 Var
  I: Integer;
 Begin
- Game.PlayerCount := 4; { 4 joueurs par d√©faut }
-
- { Joueur humain }
+ Game.PlayerCount := 4; { 4 joueurs par dÇfaut }
+  { Joueur humain }
  Game.Players[0].Name := 'Joueur';
  Game.Players[0].IsHuman := True;
  Game.Players[0].Chips := 100;
  Game.Players[0].IsActive := True;
-
- { Joueurs ordinateurs }
+  { Joueurs ordinateurs }
  Game.Players[1].Name := 'Nord';
  Game.Players[1].IsHuman := False;
  Game.Players[1].Chips := 100;
  Game.Players[1].IsActive := True;
-
  Game.Players[2].Name := 'Est';
  Game.Players[2].IsHuman := False;
  Game.Players[2].Chips := 100;
  Game.Players[2].IsActive := True;
-
  Game.Players[3].Name := 'Ouest';
  Game.Players[3].IsHuman := False;
  Game.Players[3].Chips := 100;
  Game.Players[3].IsActive := True;
-
  For I := 0 to MAX_PLAYERS - 1 Do Begin
   Game.Players[I].CardCount := 0;
   Game.Players[I].TricksWon := 0;
@@ -303,8 +290,7 @@ Var
  I, J, CardIndex: Integer;
 Begin
  CardIndex := 0;
-
- { Distribuer 5 cartes √† chaque joueur }
+  { Distribuer 5 cartes Ö chaque joueur }
  For I := 0 to CARDS_PER_HAND - 1 Do Begin
   For J := 0 to Game.PlayerCount - 1 Do Begin
    If Game.Players[J].IsActive Then Begin
@@ -315,11 +301,9 @@ Begin
    End;
   End;
  End;
-
- { D√©finir l'atout avec la carte suivante }
+  { DÇfinir l'atout avec la carte suivante }
  Game.TrumpCard := Game.Deck[CardIndex];
  Game.TrumpSuit := Game.TrumpCard.Suit;
-
  For I := 0 to Game.PlayerCount - 1 Do Begin
   If Game.Players[I].IsActive Then Begin
    Game.Players[I].CardCount := CARDS_PER_HAND;
@@ -329,10 +313,10 @@ End;
 
 Procedure SortPlayerCards(PlayerIndex: Integer);
 Var
- I, J: Integer;
- TempCard: TCard;
+ I,J:Integer;
+ TempCard:TCard;
 Begin
- { Tri par couleur puis par valeur Bourr√© }
+ { Tri par couleur puis par valeur BourrÇ }
  For I := 0 to Game.Players[PlayerIndex].CardCount - 2 Do Begin
   For J := I + 1 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
    If (Game.Players[PlayerIndex].Cards[I].Suit > Game.Players[PlayerIndex].Cards[J].Suit) Or
@@ -346,8 +330,7 @@ Begin
  End;
 End;
 
-Procedure InitHand;
-Begin
+Procedure InitHand;Begin
  Game.GamePhase := GAME_DEALING;
  Game.Dealer := (Game.Dealer + 1) Mod Game.PlayerCount;
  Game.BiddingPlayer := (Game.Dealer + 1) Mod Game.PlayerCount;
@@ -359,8 +342,7 @@ Begin
  Game.ErrorCard := -1;
  Game.ErrorTimer := 0;
  Game.Pot := 0;
-
- { R√©initialiser les donn√©es des joueurs }
+ { RÇinitialiser les donnÇes des joueurs }
  Game.Players[0].TricksWon := 0;
  Game.Players[0].Bid := BID_FOLD;
  Game.Players[0].IsBourre := False;
@@ -373,81 +355,64 @@ Begin
  Game.Players[3].TricksWon := 0;
  Game.Players[3].Bid := BID_FOLD;
  Game.Players[3].IsBourre := False;
-
- { Initialiser la lev√©e courante }
+  { Initialiser la levÇe courante }
  Game.CurrentTrick.Count := 0;
  Game.CurrentTrick.Winner := -1;
  Game.CurrentTrick.LeadSuit := -1;
-
  InitDeck;
  ShuffleDeck;
  DealCards;
  SortPlayerCards(0);
-
  Game.GamePhase := GAME_BIDDING;
  NeedRedraw := True;
 End;
 
-Procedure InitGame;
-Begin
+Procedure InitGame;Begin
  InitPlayers;
- Game.Dealer := 0;
+ Game.Dealer:=0;
  InitHand;
 End;
 
-Procedure DrawCard(X, Y: Integer; Card: TCard; Highlighted: Boolean; ErrorHighlight: Boolean);
+Procedure DrawCard(X, Y: Integer; Card: TCard; Highlighted: Boolean;ErrorHighlight:Boolean);
 Var
  CardName: String;
  SuitSymbol: String;
  SuitColor: Integer;
 Begin
- { Fond de la carte }
- If ErrorHighlight Then
-  SetColor(LightRed)
- Else If Highlighted Then
-  SetColor(Yellow)
- Else
-  SetColor(White);
+  { Fond de la carte }
+ If ErrorHighlight Then SetColor(LightRed) Else
+ If Highlighted Then SetColor(Yellow)
+                Else SetColor(White);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
-
- { Bordure }
- If ErrorHighlight Then
-  SetColor(Red)
- Else If Highlighted Then
-  SetColor(Yellow)
- Else
-  SetColor(Black);
+  { Bordure }
+ If ErrorHighlight Then SetColor(Red)
+ Else If Highlighted Then SetColor(Yellow)
+                     Else SetColor(Black);
  Rectangle(X, Y, X + CARD_WIDTH, Y + CARD_HEIGHT);
-
  If Card.Visible Then Begin
-  { Afficher la carte }
+   { Afficher la carte }
   CardName := GetCardName(Card);
   SuitSymbol := GetSuitSymbol(Card.Suit);
   SuitColor := GetSuitColor(Card.Suit);
-
-  { Valeur en haut √† gauche }
+   { Valeur en haut √† gauche }
   SetColor(SuitColor);
   SetTextStyle(DefaultFont, HorizDir, 1);
   OutTextXY(X + 3, Y + 3, CardName);
   OutTextXY(X + 3, Y + 13, SuitSymbol);
-
-  { Valeur en bas √† droite (invers√©e) }
+   { Valeur en bas √† droite (invers√©e) }
   OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 25, CardName);
   OutTextXY(X + CARD_WIDTH - 15, Y + CARD_HEIGHT - 15, SuitSymbol);
-
-  { Symbole au centre }
+   { Symbole au centre }
   SetTextStyle(DefaultFont, HorizDir, 2);
   OutTextXY(X + CARD_WIDTH Div 2 - 8, Y + CARD_HEIGHT Div 2 - 8, SuitSymbol);
-
-  { Marquer l'atout }
+   { Marquer l'atout }
   If Card.Suit = Game.TrumpSuit Then Begin
    SetColor(Magenta);
    SetTextStyle(DefaultFont, HorizDir, 1);
    OutTextXY(X + 2, Y + CARD_HEIGHT - 12, 'T');
   End;
-
-  { Remettre la taille de police normale }
+   { Remettre la taille de police normale }
   SetTextStyle(DefaultFont, HorizDir, 1);
  End
  Else Begin
@@ -467,7 +432,6 @@ Var
  IsHighlighted, IsError: Boolean;
 Begin
  If Not Game.Players[PlayerIndex].IsActive Then Exit;
-
  Case PlayerIndex of
   0: Begin { Joueur humain - en bas }
    StartX := 50;
@@ -487,7 +451,7 @@ Begin
     DrawCard(X, StartY, Game.Players[PlayerIndex].Cards[I], False, False);
    End;
   End;
-  2: Begin { Est - √† droite }
+  2: Begin { Est - Ö droite }
    StartX := 550;
    StartY := 100;
    For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
@@ -495,7 +459,7 @@ Begin
     DrawCard(StartX, Y, Game.Players[PlayerIndex].Cards[I], False, False);
    End;
   End;
-  3: Begin { Ouest - √† gauche }
+  3: Begin { Ouest - Ö gauche }
    StartX := 10;
    StartY := 100;
    For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
@@ -510,7 +474,7 @@ Procedure DrawCurrentTrick;
 Var
  I, X, Y: Integer;
 Begin
- { Positions pour les cartes de la lev√©e courante }
+ { Positions pour les cartes de la levÇe courante }
  For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
   Case Game.CurrentTrick.Players[I] of
    0: Begin X := 250; Y := 280; End; { Joueur humain }
@@ -522,8 +486,7 @@ Begin
  End;
 End;
 
-Procedure DrawTrumpCard;
-Begin
+Procedure DrawTrumpCard;Begin
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(450, 370, 'Atout: ' + GetSuitName(Game.TrumpSuit));
@@ -532,23 +495,20 @@ End;
 
 Procedure DrawPlayerInfo;
 Var
- I: Integer;
- PlayerName: String;
- ChipsText: String;
- BidText: String;
- TricksText: String;
+ I:Integer;
+ PlayerName:String;
+ ChipsText:String;
+ BidText:String;
+ TricksText:String;
 Begin
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
-
  For I := 0 to Game.PlayerCount - 1 Do Begin
   If Not Game.Players[I].IsActive Then Continue;
-
   PlayerName := Game.Players[I].Name;
   Str(Game.Players[I].Chips, ChipsText);
   BidText := GetBidName(Game.Players[I].Bid);
   Str(Game.Players[I].TricksWon, TricksText);
-
   Case I of
    0: Begin { Joueur humain }
     OutTextXY(60, 320, PlayerName + ' - Jetons: ' + ChipsText);
@@ -601,23 +561,19 @@ Var
 Begin
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
-
- { Pot }
+  { Pot }
  Str(Game.Pot, PotText);
  OutTextXY(400, 200, 'Pot: ' + PotText + ' jetons');
-
- { Num√©ro de lev√©e }
+ { NumÇro de levÇe }
  Str(Game.TrickNumber, TrickText);
  OutTextXY(400, 220, 'Levee: ' + TrickText + '/5');
-
  { Phase de jeu }
  Case Game.GamePhase of
   GAME_BIDDING: OutTextXY(400, 240, 'Phase: Encheres');
   GAME_PLAYING: OutTextXY(400, 240, 'Phase: Jeu');
   GAME_HAND_END: OutTextXY(400, 240, 'Phase: Fin de donne');
  End;
-
- { Instructions }
+  { Instructions }
  SetColor(LightGray);
  OutTextXY(400, 270, 'Instructions:');
  Case Game.GamePhase of
@@ -634,13 +590,11 @@ Begin
  OutTextXY(400, 345, 'ESC - Quitter');
 End;
 
-Procedure DrawBackground;
-Begin
+Procedure DrawBackground;Begin
  SetColor(Green);
  SetFillStyle(SolidFill, Green);
  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
- { Titre }
+  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 3);
  OutTextXY(500, 5, 'BOURRE');
@@ -651,22 +605,18 @@ Var
  I: Integer;
 Begin
  DrawBackground;
-
- { Dessiner les cartes de tous les joueurs }
+  { Dessiner les cartes de tous les joueurs }
  For I := 0 to Game.PlayerCount - 1 Do Begin
   DrawPlayerCards(I);
  End;
-
  If Game.GamePhase = GAME_PLAYING Then Begin
   DrawCurrentTrick;
  End;
-
  DrawTrumpCard;
  DrawPlayerInfo;
  DrawGameInfo;
-
  If Game.ShowResults Then Begin
-  { Afficher les r√©sultats de fin de donne }
+   { Afficher les r√©sultats de fin de donne }
   SetColor(Green);
   SetFillStyle(SolidFill, Green);
   Bar(150, 150, 490, 330);
@@ -675,7 +625,6 @@ Begin
   SetTextStyle(DefaultFont, HorizDir, 2);
   OutTextXY(180, 170, 'Fin de donne');
   SetTextStyle(DefaultFont, HorizDir, 1);
-
   For I := 0 to Game.PlayerCount - 1 Do Begin
    If Game.Players[I].IsActive Then Begin
     OutTextXY(160, 200 + I * 20, Game.Players[I].Name + ': ' +
@@ -687,12 +636,11 @@ Begin
     End;
    End;
   End;
-
   OutTextXY(160, 300, 'Appuyez sur une touche...');
  End;
 End;
 
-Function CountActivePlayers: Integer;
+Function CountActivePlayers:Integer;
 Var
  I, Count: Integer;
 Begin
@@ -713,27 +661,22 @@ Var
 Begin
  IsValidCard := False;
  If (CardIndex < 0) Or (CardIndex >= Game.Players[PlayerIndex].CardCount) Then Exit;
-
  Card := Game.Players[PlayerIndex].Cards[CardIndex];
-
- { Si c'est la premi√®re carte de la lev√©e }
+  { Si c'est la premi√®re carte de la lev√©e }
  If Game.CurrentTrick.Count = 0 Then Begin
   IsValidCard := True;
   Exit;
  End;
-
- { V√©rifier si le joueur a la couleur demand√©e }
+  { VÇrifier si le joueur a la couleur demandÇe }
  HasLeadSuit := False;
  HasTrump := False;
-
  For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
   If Game.Players[PlayerIndex].Cards[I].Suit = Game.CurrentTrick.LeadSuit Then
    HasLeadSuit := True;
   If Game.Players[PlayerIndex].Cards[I].Suit = Game.TrumpSuit Then
    HasTrump := True;
  End;
-
- { Doit suivre la couleur si possible }
+  { Doit suivre la couleur si possible }
  If HasLeadSuit And (Card.Suit = Game.CurrentTrick.LeadSuit) Then Begin
   IsValidCard := True;
  End
@@ -749,9 +692,8 @@ Var
  PlayersCount: Integer;
  WinAmount: Integer;
 Begin
- PlayersCount := CountActivePlayers;
-
- { Calculer les gains et bourres }
+ PlayersCount:=CountActivePlayers;
+  { Calculer les gains et bourres }
  For I := 0 to Game.PlayerCount - 1 Do Begin
   If Game.Players[I].IsActive And (Game.Players[I].Bid <> BID_FOLD) Then Begin
    Case Game.Players[I].Bid of
@@ -762,7 +704,7 @@ Begin
       Game.Players[I].Chips := Game.Players[I].Chips + WinAmount;
      End
      Else Begin
-      { Bourr√© - doit payer le pot }
+      { BourrÇ - doit payer le pot }
       Game.Players[I].Chips := Game.Players[I].Chips - Game.Pot;
       Game.Players[I].IsBourre := True;
      End;
@@ -773,7 +715,7 @@ Begin
       Game.Players[I].Chips := Game.Players[I].Chips + Game.Pot;
      End
      Else Begin
-      { Bourr√© - doit payer double le pot }
+      { BourrÇ - doit payer double le pot }
       Game.Players[I].Chips := Game.Players[I].Chips - (Game.Pot * 2);
       Game.Players[I].IsBourre := True;
      End;
@@ -781,47 +723,41 @@ Begin
    End;
   End;
  End;
-
  Game.ShowResults := True;
 End;
 
 Procedure StartPlayingPhase;
 Var
- I: Integer;
+ I:Integer;
 Begin
- { Trouver le premier joueur qui n'a pas pass√© }
+ { Trouver le premier joueur qui n'a pas passÇ }
  For I := 0 to Game.PlayerCount - 1 Do Begin
   If Game.Players[I].IsActive And (Game.Players[I].Bid <> BID_FOLD) Then Begin
    Game.CurrentPlayer := I;
    Break;
   End;
  End;
-
- Game.GamePhase := GAME_PLAYING;
+ Game.GamePhase:=GAME_PLAYING;
 End;
 
 Procedure PlayCard(PlayerIndex, CardIndex: Integer);
 Var
- I: Integer;
+ I:Integer;
 Begin
- { Ajouter la carte √† la lev√©e courante }
+ { Ajouter la carte Ö la levÇe courante }
  Game.CurrentTrick.Cards[Game.CurrentTrick.Count] := Game.Players[PlayerIndex].Cards[CardIndex];
  Game.CurrentTrick.Players[Game.CurrentTrick.Count] := PlayerIndex;
-
- { D√©finir la couleur de la lev√©e si c'est la premi√®re carte }
+ { DÇfinir la couleur de la levÇe si c'est la premiäre carte }
  If Game.CurrentTrick.Count = 0 Then Begin
   Game.CurrentTrick.LeadSuit := Game.Players[PlayerIndex].Cards[CardIndex].Suit;
  End;
-
  Inc(Game.CurrentTrick.Count);
-
- { Retirer la carte de la main du joueur }
+  { Retirer la carte de la main du joueur }
  For I := CardIndex to Game.Players[PlayerIndex].CardCount - 2 Do Begin
   Game.Players[PlayerIndex].Cards[I] := Game.Players[PlayerIndex].Cards[I + 1];
  End;
  Dec(Game.Players[PlayerIndex].CardCount);
-
- { Passer au joueur suivant ou √©valuer la lev√©e }
+  { Passer au joueur suivant ou Çvaluer la levÇe }
  If Game.CurrentTrick.Count = CountActivePlayers Then Begin
   Game.GamePhase := GAME_TRICK_END;
   Game.AnimationDelay := 100;
@@ -831,22 +767,20 @@ Begin
    Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
   Until Game.Players[Game.CurrentPlayer].IsActive And (Game.Players[Game.CurrentPlayer].Bid <> BID_FOLD);
  End;
-
  NeedRedraw := True;
 End;
 
-Function GetTrickWinner: Integer;
+Function GetTrickWinner:Integer;
 Var
- I, WinnerIndex, HighestValue: Integer;
- HasTrump: Boolean;
- FirstCard: Boolean;
+ I, WinnerIndex,HighestValue:Integer;
+ HasTrump:Boolean;
+ FirstCard:Boolean;
 Begin
  WinnerIndex := 0;
  HighestValue := 0;
  HasTrump := False;
  FirstCard := True;
-
- { Chercher d'abord les atouts }
+  { Chercher d'abord les atouts }
  For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
   If Game.CurrentTrick.Cards[I].Suit = Game.TrumpSuit Then Begin
    If (Not HasTrump) Or (GetBourreValue(Game.CurrentTrick.Cards[I]) > HighestValue) Then Begin
@@ -856,8 +790,7 @@ Begin
    End;
   End;
  End;
-
- { Si pas d'atout, chercher la carte la plus haute de la couleur demand√©e }
+  { Si pas d'atout, chercher la carte la plus haute de la couleur demand√©e }
  If Not HasTrump Then Begin
   For I := 0 to Game.CurrentTrick.Count - 1 Do Begin
    If Game.CurrentTrick.Cards[I].Suit = Game.CurrentTrick.LeadSuit Then Begin
@@ -869,7 +802,6 @@ Begin
    End;
   End;
  End;
-
  GetTrickWinner := Game.CurrentTrick.Players[WinnerIndex];
 End;
 
@@ -880,30 +812,26 @@ Begin
  TrickWinner := GetTrickWinner;
  Game.CurrentTrick.Winner := TrickWinner;
  Inc(Game.Players[TrickWinner].TricksWon);
-
- { Pr√©parer la prochaine lev√©e }
+  { PrÇparer la prochaine levÇe }
  Game.CurrentTrick.Count := 0;
  Game.CurrentTrick.Winner := -1;
  Game.CurrentTrick.LeadSuit := -1;
  Game.CurrentPlayer := TrickWinner;
  Inc(Game.TrickNumber);
-
  If Game.TrickNumber > 5 Then Begin
   Game.GamePhase := GAME_HAND_END;
   CalculateResults;
  End
- Else Begin
+  Else
+ Begin
   Game.GamePhase := GAME_PLAYING;
  End;
-
  NeedRedraw := True;
 End;
 
-Procedure PlaceBid(PlayerIndex, BidType: Integer);
-Begin
+Procedure PlaceBid(PlayerIndex,BidType:Integer);Begin
  Game.Players[PlayerIndex].Bid := BidType;
-
- { Ajouter au pot selon la mise }
+  { Ajouter au pot selon la mise }
  Case BidType of
   BID_PLAY: Begin
    Game.Players[PlayerIndex].Chips := Game.Players[PlayerIndex].Chips - 5;
@@ -914,24 +842,22 @@ Begin
    Game.Pot := Game.Pot + 10;
   End;
  End;
-
- { Passer au joueur suivant }
+  { Passer au joueur suivant }
  Repeat
   Game.BiddingPlayer := (Game.BiddingPlayer + 1) Mod Game.PlayerCount;
  Until Game.Players[Game.BiddingPlayer].IsActive Or (Game.BiddingPlayer = (Game.Dealer + 1) Mod Game.PlayerCount);
-
- { V√©rifier si les ench√®res sont termin√©es }
+ { VÇrifier si les enchäres sont terminÇes }
  If Game.BiddingPlayer = (Game.Dealer + 1) Mod Game.PlayerCount Then Begin
   StartPlayingPhase;
  End
- Else Begin
+  Else
+ Begin
   Game.CurrentPlayer := Game.BiddingPlayer;
  End;
-
  NeedRedraw := True;
 End;
 
-Function GetComputerBid(PlayerIndex: Integer): Integer;
+Function GetComputerBid(PlayerIndex:Integer):Integer;
 Var
  I: Integer;
  TrumpCards: Integer;
@@ -939,25 +865,20 @@ Var
 Begin
  TrumpCards := 0;
  HighCards := 0;
-
- { Compter les atouts et les cartes hautes }
+  { Compter les atouts et les cartes hautes }
  For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
   If Game.Players[PlayerIndex].Cards[I].Suit = Game.TrumpSuit Then
    Inc(TrumpCards);
   If GetBourreValue(Game.Players[PlayerIndex].Cards[I]) >= 12 Then
    Inc(HighCards);
  End;
-
- { Strat√©gie simple }
- If (TrumpCards >= 3) And (HighCards >= 2) Then
-  GetComputerBid := BID_BOURRE
- Else If (TrumpCards >= 2) Or (HighCards >= 3) Then
-  GetComputerBid := BID_PLAY
- Else
-  GetComputerBid := BID_FOLD;
+  { StratÇgie simple }
+ If(TrumpCards >= 3)And(HighCards >= 2)Then GetComputerBid := BID_BOURRE Else
+ If(TrumpCards >= 2)Or(HighCards >= 3)Then GetComputerBid := BID_PLAY
+                                      Else GetComputerBid := BID_FOLD;
 End;
 
-Function GetComputerCardChoice(PlayerIndex: Integer): Integer;
+Function GetComputerCardChoice(PlayerIndex:Integer):Integer;
 Var
  I, BestCard: Integer;
  BestValue: Integer;
@@ -966,8 +887,7 @@ Begin
  BestCard := 0;
  BestValue := 0;
  CanFollow := False;
-
- { Strat√©gie simple: jouer la carte la plus haute possible }
+  { StratÇgie simple: jouer la carte la plus haute possible }
  For I := 0 to Game.Players[PlayerIndex].CardCount - 1 Do Begin
   If IsValidCard(PlayerIndex, I) Then Begin
    If (Game.CurrentTrick.Count > 0) And
@@ -993,7 +913,6 @@ Begin
    End;
   End;
  End;
-
  GetComputerCardChoice := BestCard;
 End;
 
@@ -1016,15 +935,13 @@ Begin
  End;
 End;
 
-Function GetClickedCard(X, Y: Integer): Integer;
+Function GetClickedCard(X,Y:Integer):Integer;
 Var
- I, CardX, CardY: Integer;
+ I,CardX,CardY:Integer;
 Begin
  GetClickedCard := -1;
-
- { V√©rifier les cartes du joueur humain seulement }
+  { VÇrifier les cartes du joueur humain seulement }
  If Game.CurrentPlayer <> 0 Then Exit;
-
  CardY := 350;
  For I := 0 to Game.Players[0].CardCount - 1 Do Begin
   CardX := 50 + I * (CARD_WIDTH + 5);
@@ -1036,13 +953,12 @@ Begin
  End;
 End;
 
-Procedure HandleMouseClick(X, Y: Integer);
+Procedure HandleMouseClick(X,Y:Integer);
 Var
  ClickedCard: Integer;
 Begin
  If Game.GamePhase <> GAME_PLAYING Then Exit;
  If Game.CurrentPlayer <> 0 Then Exit;
-
  ClickedCard := GetClickedCard(X, Y);
  If ClickedCard >= 0 Then Begin
   If IsValidCard(0, ClickedCard) Then Begin
@@ -1063,7 +979,7 @@ Var
  Key: Char;
  MouseX, MouseY, MouseButton: LongInt;
 Begin
- { Clavier }
+  { Clavier }
  If KeyPressed Then Begin
   Key := ReadKey;
   Case Key of
@@ -1094,8 +1010,7 @@ Begin
    End;
   End;
  End;
-
- { Souris }
+  { Souris }
  If MouseDriverFound Then Begin
   GetMouseState(MouseX, MouseY, MouseButton);
   If MouseButton = 1 Then Begin
@@ -1110,17 +1025,14 @@ BEGIN
  InitScreen;
  If MouseDriverFound Then ShowMouse;
  InitGame;
-
- { Boucle principale }
+  { Boucle principale }
  Repeat
   If NeedRedraw Then Begin
    DrawScreen;
    NeedRedraw := False;
   End;
-
   HandleInput;
-
-  { Gestion du timer d'erreur }
+   { Gestion du timer d'erreur }
   If Game.ErrorTimer > 0 Then Begin
    Dec(Game.ErrorTimer);
    If Game.ErrorTimer = 0 Then Begin
@@ -1128,7 +1040,6 @@ BEGIN
     NeedRedraw := True;
    End;
   End;
-
   Case Game.GamePhase of
    GAME_BIDDING, GAME_PLAYING: Begin
     HandleComputerTurn;
@@ -1142,7 +1053,6 @@ BEGIN
     End;
    End;
   End;
-
   Delay(50);
  Until False;
 END.
