@@ -28,7 +28,7 @@ Type
  End;
 
 Const
-  MAX_GAMES = 67;
+  MAX_GAMES = 71;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
@@ -36,6 +36,7 @@ Const
     (Title: 'Asteroid - Jeu spatial'; ProgramExec: 'ASTEROID.EXE'),
     (Title: 'Baccarat - Jeu de carte'; ProgramExec: 'BACCARAT.EXE'),
     (Title: 'Backgammon - Jeu de strategie'; ProgramExec: 'BACKGAM.EXE'),
+    (Title: 'Barbu - Jeu de carte'; ProgramExec: 'BARBU.EXE'),
     (Title: 'Baseball - Jeu de sport'; ProgramExec: 'BASEBALL.EXE'),
     (Title: 'Berzerk - Labyrinthe action'; ProgramExec: 'BERZERK.EXE'),
     (Title: 'Billard - Jeu de billard'; ProgramExec: 'BILLARD.EXE'),
@@ -43,6 +44,7 @@ Const
     (Title: 'Blackjack - Jeu de cartes'; ProgramExec: 'BLACJACK.EXE'),
     (Title: 'Blox - Puzzle de blocs'; ProgramExec: 'BLOX.EXE'),
     (Title: 'Bouncing Babies'; ProgramExec: 'BABY.EXE'),
+    (Title: 'Bourr‚ - Jeu de carte'; ProgramExec: 'BOURRE.EXE'),
     (Title: 'Bowling'; ProgramExec: 'BOWLING.EXE'),
     (Title: 'Breakout - Casse-briques'; ProgramExec: 'BREAKOUT.EXE'),
     (Title: 'Bubble Shooter'; ProgramExec: 'BS.EXE'),
@@ -53,8 +55,10 @@ Const
     (Title: 'Color Space Invaders'; ProgramExec: 'CSI.EXE'),
     (Title: 'Domino'; ProgramExec: 'DOMINO.EXE'),
     (Title: 'Dr Mario - Puzzle medical'; ProgramExec: 'DRMARIO.EXE'),
+    (Title: 'FreeCell - Jeu de carte'; ProgramExec: 'FREECELL.EXE'),
     (Title: 'Frogger - Traversee de route'; ProgramExec: 'FROGGER.EXE'),
     (Title: 'Gin Rummmy - Jeu de carte'; ProgramExec: 'GINRUMMY.EXE'),
+    (Title: 'Golf - Jeu de carte'; ProgramExec: 'GOLF.EXE'),
     (Title: 'Gomoku - Alignement 5 pions'; ProgramExec: 'GOMOKU.EXE'),
     (Title: 'Gravity - Jeu de gravit‚'; ProgramExec: 'GRAVITY.EXE'),
     (Title: 'Hangman - Jeu du pendu'; ProgramExec: 'HANGMAN.EXE'),
