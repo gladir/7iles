@@ -177,7 +177,12 @@ End;
 Function GetCardName(Card:TCard):String;Begin
  Case Card.Value of
   ACE: GetCardName := 'A';
-  2..10: GetCardName := Chr(Ord('0') + Card.Value);
+  2..10: Begin
+   If (Card.Value >= 2) And (Card.Value <= 10) Then
+    GetCardName := Chr(Ord('0') + Card.Value)
+   Else
+    GetCardName := '?';
+  End;
   JACK: GetCardName := 'J';
   QUEEN: GetCardName := 'Q';
   KING: GetCardName := 'K';
@@ -366,6 +371,8 @@ Procedure InitHand;
 Var
  I: Integer;
 Begin
+ If Game.PlayerCount <= 0 Then Exit;
+ 
  Game.GamePhase := GAME_DEALING;
  Game.Dealer := (Game.Dealer + 1) Mod Game.PlayerCount;
  Game.SmallBlind := (Game.Dealer + 1) Mod Game.PlayerCount;
@@ -698,11 +705,15 @@ Begin
       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
     If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
        (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
+       (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
        (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
        (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
      ValidCards[I] := True;
-     UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
-     UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+     If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) Then
+      UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
+     If (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then
+      UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
      Inc(CardCount);
     End;
    End;
@@ -744,11 +755,15 @@ Begin
       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
     If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
        (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
+       (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
        (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
        (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
      ValidCards[I] := True;
-     UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
-     UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+     If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) Then
+      UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
+     If (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then
+      UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
      Inc(CardCount);
     End;
    End;
@@ -840,13 +855,16 @@ Begin
   { Passer au joueur suivant }
  LoopCount := 0;
  Repeat
-  Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
-  If Game.CurrentPlayer >= Game.PlayerCount Then Game.CurrentPlayer := 0;
+  If Game.PlayerCount > 0 Then Begin
+   Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
+   If Game.CurrentPlayer >= Game.PlayerCount Then Game.CurrentPlayer := 0;
+  End;
   Inc(LoopCount);
   If LoopCount > Game.PlayerCount Then Break; { Éviter les boucles infinies }
  Until (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
        (Game.CurrentPlayer < MAX_PLAYERS) And
-       Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded;
+       ((Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < MAX_PLAYERS) And
+        Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded);
  NeedRedraw := True;
 End;
 
@@ -936,13 +954,16 @@ Begin
   { Passer au joueur suivant }
  LoopCount := 0;
  Repeat
-  Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
-  If Game.CurrentPlayer >= Game.PlayerCount Then Game.CurrentPlayer := 0;
+  If Game.PlayerCount > 0 Then Begin
+   Game.CurrentPlayer := (Game.CurrentPlayer + 1) Mod Game.PlayerCount;
+   If Game.CurrentPlayer >= Game.PlayerCount Then Game.CurrentPlayer := 0;
+  End;
   Inc(LoopCount);
   If LoopCount > Game.PlayerCount Then Break; { Éviter les boucles infinies }
  Until (Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < Game.PlayerCount) And
        (Game.CurrentPlayer < MAX_PLAYERS) And
-       Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded;
+       ((Game.CurrentPlayer >= 0) And (Game.CurrentPlayer < MAX_PLAYERS) And
+        Game.Players[Game.CurrentPlayer].IsActive And Not Game.Players[Game.CurrentPlayer].IsFolded);
   { V�rifier si le tour d'�change est termin�e }
  If Game.CurrentPlayer = 0 Then Begin
   If Game.DrawRound >= MAX_DRAWS Then Begin
@@ -1000,11 +1021,15 @@ Begin
       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then Begin
     If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
        (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
+       (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) And
+       (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) And
        (Not UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit]) And
        (Not UsedValues[Game.Players[PlayerIndex].Hand[I].Value]) Then Begin
      KeepCard[I] := True;
-     UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
-     UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
+     If (Game.Players[PlayerIndex].Hand[I].Suit >= 0) And (Game.Players[PlayerIndex].Hand[I].Suit <= 3) Then
+      UsedSuits[Game.Players[PlayerIndex].Hand[I].Suit] := True;
+     If (Game.Players[PlayerIndex].Hand[I].Value >= 1) And (Game.Players[PlayerIndex].Hand[I].Value <= 13) Then
+      UsedValues[Game.Players[PlayerIndex].Hand[I].Value] := True;
     End;
    End;
   End;
@@ -1067,7 +1092,7 @@ Begin
  ClickedCard := GetClickedCard(X, Y);
  If ClickedCard >= 0 Then Begin
   { Basculer la sélection de la carte }
-  If (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) Then Begin
+  If (ClickedCard >= 0) And (ClickedCard < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) Then Begin
    Game.Players[0].Hand[ClickedCard].Selected := Not Game.Players[0].Hand[ClickedCard].Selected;
    NeedRedraw := True;
   End;
@@ -1111,10 +1136,14 @@ Begin
     If (Game.GamePhase = GAME_DRAWING) And (Game.CurrentPlayer = 0) And
        (Game.PlayerCount > 0) And (0 < MAX_PLAYERS) Then Begin
      { Rester (ne pas échanger) }
-     Game.Players[0].Hand[0].Selected := False;
-     Game.Players[0].Hand[1].Selected := False;
-     Game.Players[0].Hand[2].Selected := False;
-     Game.Players[0].Hand[3].Selected := False;
+     If (0 >= 0) And (0 < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) Then
+      Game.Players[0].Hand[0].Selected := False;
+     If (1 >= 0) And (1 < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) Then
+      Game.Players[0].Hand[1].Selected := False;
+     If (2 >= 0) And (2 < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) Then
+      Game.Players[0].Hand[2].Selected := False;
+     If (3 >= 0) And (3 < HAND_SIZE) And (0 >= 0) And (0 < MAX_PLAYERS) Then
+      Game.Players[0].Hand[3].Selected := False;
      DrawCards(0);
     End;
    End;
