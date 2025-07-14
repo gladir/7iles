@@ -194,6 +194,58 @@ Begin
  DrawDie(Game.Die2.X, Game.Die2.Y, Game.Die2.Value);
 End;
 
+Procedure DrawTokens;
+Var
+ I, TokenCount: Integer;
+ X, Y: Integer;
+Begin
+ { Déterminer le nombre de jetons selon la mise }
+ Case Game.Bet of
+  5: TokenCount := 1;
+  10: TokenCount := 2;
+  25: TokenCount := 3;
+  50: TokenCount := 4;
+  100: TokenCount := 5;
+  Else TokenCount := 0;
+ End;
+ 
+ { Position des jetons dans le coin supérieur droit }
+ X := 550;
+ Y := 50;
+ 
+ { Dessiner les jetons empilés }
+ For I := 1 to TokenCount Do Begin
+  { Ombre du jeton }
+  SetColor(DarkGray);
+  SetFillStyle(SolidFill, DarkGray);
+  FillEllipse(X + 2, Y - (I-1) * 3 + 2, 15, 15);
+  
+  { Jeton principal }
+  SetColor(LightGray);
+  SetFillStyle(SolidFill, LightGray);
+  FillEllipse(X, Y - (I-1) * 3, 15, 15);
+  
+  { Bordure du jeton }
+  SetColor(White);
+  Circle(X, Y - (I-1) * 3, 15);
+  
+  { Cercle intérieur pour l'effet 3D }
+  SetColor(DarkGray);
+  Circle(X, Y - (I-1) * 3, 12);
+  
+  { Point central }
+  SetColor(White);
+  FillEllipse(X, Y - (I-1) * 3, 3, 3);
+ End;
+ 
+ { Afficher le texte "MISE" }
+ If TokenCount > 0 Then Begin
+  SetColor(White);
+  SetTextStyle(DefaultFont, HorizDir, 1);
+  OutTextXY(X - 10, Y + 20, 'MISE');
+ End;
+End;
+
 Procedure DrawGameInfo;
 Var
  TotalText, PointText, CreditsText, BetText, RollText: String;
@@ -257,8 +309,8 @@ Begin
  OutTextXY(400, 390, 'N - Nouvelle partie');
  OutTextXY(400, 410, 'ESC - Quitter');
  
- { Afficher les boutons de mise }
- OutTextXY(400, 430, '1-5 - Changer la mise');
+ { Afficher les boutons de mise avec détails }
+ OutTextXY(400, 430, 'Mises: 1=5  2=10  3=25  4=50  5=100');
 End;
 
 Procedure DrawBackground;
@@ -321,6 +373,7 @@ Procedure DrawScreen;
 Begin
  DrawBackground;
  DrawDice;
+ DrawTokens;
  DrawGameInfo;
  DrawMessages;
  DrawInstructions;
