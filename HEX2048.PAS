@@ -18,7 +18,7 @@ Uses {$IFDEF FPC}
 Const
   SCREEN_WIDTH = 640;
   SCREEN_HEIGHT = 480;
-  HEX_RADIUS = 35;
+  HEX_RADIUS = 25;
   CENTER_X = 320;
   CENTER_Y = 240;
 
@@ -141,46 +141,44 @@ Begin
     Grid[I].Value := 0;
   End;
 
-  { Disposition hexagonale compacte avec espacement de 2 pixels }
-  { Rayon hexagone = 35px, largeur = 70px, espacement = 2px }
-  { Espacement horizontal = 72px, vertical = 60px }
+  { Disposition hexagonale authentique en forme de losange }
+  { Pattern: 1-2-3-2-3-2-3-2-1 hexagones par rangée }
+  { Espacement réduit pour tenir dans 640x480 }
   
   I := 0;
 
-  { Rangée 0 : 3 hexagones - descendu de 60px pour éviter le chevauchement avec les instructions }
-  StartX := 200;
-  StartY := 180;
+  { Rangée 0 : 1 hexagone - sommet }
+  StartX := 320;  { Centré }
+  StartY := 100;  { Plus haut pour avoir la place }
+  Grid[I].X := StartX;
+  Grid[I].Y := StartY;
+  Grid[I].Active := True;
+  Inc(I);
+
+  { Rangée 1 : 2 hexagones }
+  StartX := 284;  { Centré pour 2 hexagones }
+  StartY := 140;  { Espacement réduit à 40px }
+  For Col := 0 to 1 Do Begin
+    Grid[I].X := StartX + Col * 72;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+
+  { Rangée 2 : 3 hexagones }
+  StartX := 248;  { Centré pour 3 hexagones }
+  StartY := 180;  { 140 + 40 }
   For Col := 0 to 2 Do Begin
-    Grid[I].X := StartX + Col * 72;  { Espacement horizontal de 72px (70+2) }
-    Grid[I].Y := StartY;
-    Grid[I].Active := True;
-    Inc(I);
-  End;
-
-  { Rangée 1 : 4 hexagones - décalé de 36px à gauche }
-  StartX := 164;
-  StartY := 240;
-  For Col := 0 to 3 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
     Grid[I].Active := True;
     Inc(I);
   End;
 
-  { Rangée 2 : 5 hexagones - centre }
-  StartX := 128;
-  StartY := 300;
-  For Col := 0 to 4 Do Begin
-    Grid[I].X := StartX + Col * 72;
-    Grid[I].Y := StartY;
-    Grid[I].Active := True;
-    Inc(I);
-  End;
-
-  { Rangée 3 : 4 hexagones - décalé de 36px à droite }
-  StartX := 164;
-  StartY := 360;
-  For Col := 0 to 3 Do Begin
+  { Rangée 3 : 2 hexagones }
+  StartX := 284;  { Centré pour 2 hexagones }
+  StartY := 220;  { 180 + 40 }
+  For Col := 0 to 1 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
     Grid[I].Active := True;
@@ -188,14 +186,52 @@ Begin
   End;
 
   { Rangée 4 : 3 hexagones }
-  StartX := 200;
-  StartY := 420;
+  StartX := 248;  { Centré pour 3 hexagones }
+  StartY := 260;  { 220 + 40 }
   For Col := 0 to 2 Do Begin
     Grid[I].X := StartX + Col * 72;
     Grid[I].Y := StartY;
     Grid[I].Active := True;
     Inc(I);
   End;
+
+  { Rangée 5 : 2 hexagones }
+  StartX := 284;  { Centré pour 2 hexagones }
+  StartY := 300;  { 260 + 40 }
+  For Col := 0 to 1 Do Begin
+    Grid[I].X := StartX + Col * 72;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+
+  { Rangée 6 : 3 hexagones }
+  StartX := 248;  { Centré pour 3 hexagones }
+  StartY := 340;  { 300 + 40 }
+  For Col := 0 to 2 Do Begin
+    Grid[I].X := StartX + Col * 72;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+
+  { Rangée 7 : 2 hexagones }
+  StartX := 284;  { Centré pour 2 hexagones }
+  StartY := 380;  { 340 + 40 }
+  For Col := 0 to 1 Do Begin
+    Grid[I].X := StartX + Col * 72;
+    Grid[I].Y := StartY;
+    Grid[I].Active := True;
+    Inc(I);
+  End;
+
+  { Rangée 8 : 1 hexagone - pointe }
+  StartX := 320;  { Centré }
+  StartY := 420;  { 380 + 40 }
+  Grid[I].X := StartX;
+  Grid[I].Y := StartY;
+  Grid[I].Active := True;
+  Inc(I);
 End;
 
 Procedure InitScreen;
@@ -505,143 +541,156 @@ Begin
   End;
 End;
 
-{ Mapping des voisins hexagonaux basé sur la fonction connectBlocks() du JavaScript }
-{ Direction 0=Q (nord-ouest), 1=W (nord), 2=E (est) }
-{ Direction 3=A (ouest), 4=S (sud), 5=D (sud-est) }
+{ Mapping des voisins hexagonaux pour disposition en losange }
+{ Pattern: 1-2-3-2-3-2-3-2-1 }
+{ Direction 0=Q (nord-ouest), 1=W (nord), 2=E (nord-est) }
+{ Direction 3=A (sud-ouest), 4=S (sud), 5=D (sud-est) }
 Function GetNeighbor(Index: Integer; Direction: Integer): Integer;
 Begin
   GetNeighbor := -1; { -1 = pas de voisin }
 
   Case Index of
-    { Rangée 0 : 3 hexagones (0-2) }
+    { Index 0 : Sommet (rangée 0, 1 hexagone) }
     0: Case Direction of
-         2: GetNeighbor := 1;      { E -> horizontalement à droite }
-         4: GetNeighbor := 3;      { S -> rangée 1, pos 0 }
-         5: GetNeighbor := 4;      { D -> rangée 1, pos 0+1 }
+         3: GetNeighbor := 1;      { A -> rangée 1, gauche }
+         5: GetNeighbor := 2;      { D -> rangée 1, droite }
        End;
+
+    { Index 1-2 : Rangée 1 (2 hexagones) }
     1: Case Direction of
-         2: GetNeighbor := 2;      { E -> horizontalement à droite }
-         3: GetNeighbor := 0;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 4;      { S -> rangée 1, pos 1 }
-         5: GetNeighbor := 5;      { D -> rangée 1, pos 1+1 }
+         1: GetNeighbor := 0;      { W -> rangée 0 }
+         2: GetNeighbor := 2;      { E -> droite }
+         4: GetNeighbor := 3;      { S -> rangée 2, gauche }
+         5: GetNeighbor := 4;      { D -> rangée 2, centre }
        End;
     2: Case Direction of
-         3: GetNeighbor := 1;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 5;      { S -> rangée 1, pos 2 }
-         5: GetNeighbor := 6;      { D -> rangée 1, pos 2+1 }
+         1: GetNeighbor := 0;      { W -> rangée 0 }
+         3: GetNeighbor := 1;      { A -> gauche }
+         4: GetNeighbor := 4;      { S -> rangée 2, centre }
+         5: GetNeighbor := 5;      { D -> rangée 2, droite }
        End;
 
-    { Rangée 1 : 4 hexagones (3-6) }
+    { Index 3-5 : Rangée 2 (3 hexagones) }
     3: Case Direction of
-         1: GetNeighbor := 0;      { W -> rangée 0, pos 0 }
-         2: GetNeighbor := 4;      { E -> horizontalement à droite }
-         4: GetNeighbor := 7;      { S -> rangée 2, pos 0 }
-         5: GetNeighbor := 8;      { D -> rangée 2, pos 0+1 }
+         0: GetNeighbor := 1;      { Q -> rangée 1, gauche }
+         2: GetNeighbor := 4;      { E -> droite }
+         3: GetNeighbor := 6;      { A -> rangée 3, gauche }
+         4: GetNeighbor := 7;      { S -> rangée 3, droite }
        End;
     4: Case Direction of
-         0: GetNeighbor := 0;      { Q -> rangée 0, pos 0 }
-         1: GetNeighbor := 1;      { W -> rangée 0, pos 1 }
-         2: GetNeighbor := 5;      { E -> horizontalement à droite }
-         3: GetNeighbor := 3;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 8;      { S -> rangée 2, pos 1 }
-         5: GetNeighbor := 9;      { D -> rangée 2, pos 1+1 }
+         0: GetNeighbor := 1;      { Q -> rangée 1, gauche }
+         1: GetNeighbor := 2;      { W -> rangée 1, droite }
+         2: GetNeighbor := 5;      { E -> droite }
+         3: GetNeighbor := 3;      { A -> gauche }
+         4: GetNeighbor := 6;      { S -> rangée 3, gauche }
+         5: GetNeighbor := 7;      { D -> rangée 3, droite }
        End;
     5: Case Direction of
-         0: GetNeighbor := 1;      { Q -> rangée 0, pos 1 }
-         1: GetNeighbor := 2;      { W -> rangée 0, pos 2 }
-         2: GetNeighbor := 6;      { E -> horizontalement à droite }
-         3: GetNeighbor := 4;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 9;      { S -> rangée 2, pos 2 }
-         5: GetNeighbor := 10;     { D -> rangée 2, pos 2+1 }
-       End;
-    6: Case Direction of
-         0: GetNeighbor := 2;      { Q -> rangée 0, pos 2 }
-         3: GetNeighbor := 5;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 10;     { S -> rangée 2, pos 3 }
-         5: GetNeighbor := 11;     { D -> rangée 2, pos 3+1 }
+         1: GetNeighbor := 2;      { W -> rangée 1, droite }
+         3: GetNeighbor := 4;      { A -> gauche }
+         4: GetNeighbor := 7;      { S -> rangée 3, droite }
+         5: GetNeighbor := 8;      { D -> rangée 4, gauche }
        End;
 
-    { Rangée 2 : 5 hexagones - centre (7-11) }
-    7: Case Direction of
-         0: GetNeighbor := 3;      { Q -> rangée 1, pos 0 }
-         1: GetNeighbor := 12;     { W -> rangée 3, pos 0 }
-         2: GetNeighbor := 8;      { E -> horizontalement à droite }
-         4: GetNeighbor := 13;     { S -> rangée 3, pos 0+1 }
+    { Index 6-7 : Rangée 3 (2 hexagones) }
+    6: Case Direction of
+         1: GetNeighbor := 3;      { W -> rangée 2, gauche }
+         0: GetNeighbor := 4;      { Q -> rangée 2, centre }
+         2: GetNeighbor := 7;      { E -> droite }
+         4: GetNeighbor := 8;      { S -> rangée 4, gauche }
+         5: GetNeighbor := 9;      { D -> rangée 4, centre }
        End;
+    7: Case Direction of
+         0: GetNeighbor := 3;      { Q -> rangée 2, gauche }
+         1: GetNeighbor := 4;      { W -> rangée 2, centre }
+         2: GetNeighbor := 5;      { E -> rangée 2, droite }
+         3: GetNeighbor := 6;      { A -> gauche }
+         4: GetNeighbor := 9;      { S -> rangée 4, centre }
+         5: GetNeighbor := 10;     { D -> rangée 4, droite }
+       End;
+
+    { Index 8-10 : Rangée 4 (3 hexagones) }
     8: Case Direction of
-         0: GetNeighbor := 3;      { Q -> rangée 1, pos 0 }
-         1: GetNeighbor := 4;      { W -> rangée 1, pos 1 }
-         2: GetNeighbor := 9;      { E -> horizontalement à droite }
-         3: GetNeighbor := 7;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 12;     { S -> rangée 3, pos 0 }
-         5: GetNeighbor := 13;     { D -> rangée 3, pos 1 }
+         0: GetNeighbor := 6;      { Q -> rangée 3, gauche }
+         1: GetNeighbor := 7;      { W -> rangée 3, droite }
+         2: GetNeighbor := 9;      { E -> droite }
+         4: GetNeighbor := 11;     { S -> rangée 5, gauche }
+         5: GetNeighbor := 12;     { D -> rangée 5, droite }
        End;
     9: Case Direction of
-         0: GetNeighbor := 4;      { Q -> rangée 1, pos 1 }
-         1: GetNeighbor := 5;      { W -> rangée 1, pos 2 }
-         2: GetNeighbor := 10;     { E -> horizontalement à droite }
-         3: GetNeighbor := 8;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 13;     { S -> rangée 3, pos 1 }
-         5: GetNeighbor := 14;     { D -> rangée 3, pos 2 }
+         0: GetNeighbor := 6;      { Q -> rangée 3, gauche }
+         1: GetNeighbor := 7;      { W -> rangée 3, droite }
+         2: GetNeighbor := 10;     { E -> droite }
+         3: GetNeighbor := 8;      { A -> gauche }
+         4: GetNeighbor := 11;     { S -> rangée 5, gauche }
+         5: GetNeighbor := 12;     { D -> rangée 5, droite }
        End;
     10: Case Direction of
-         0: GetNeighbor := 5;      { Q -> rangée 1, pos 2 }
-         1: GetNeighbor := 6;      { W -> rangée 1, pos 3 }
-         2: GetNeighbor := 11;     { E -> horizontalement à droite }
-         3: GetNeighbor := 9;      { A -> horizontalement à gauche }
-         4: GetNeighbor := 14;     { S -> rangée 3, pos 2 }
-         5: GetNeighbor := 15;     { D -> rangée 3, pos 3 }
-       End;
-    11: Case Direction of
-         0: GetNeighbor := 6;      { Q -> rangée 1, pos 3 }
-         3: GetNeighbor := 10;     { A -> horizontalement à gauche }
-         4: GetNeighbor := 15;     { S -> rangée 3, pos 3 }
+         1: GetNeighbor := 7;      { W -> rangée 3, droite }
+         3: GetNeighbor := 9;      { A -> gauche }
+         4: GetNeighbor := 12;     { S -> rangée 5, droite }
+         5: GetNeighbor := 13;     { D -> rangée 6, gauche }
        End;
 
-    { Rangée 3 : 4 hexagones (12-15) }
-    12: Case Direction of
-         1: GetNeighbor := 7;      { W -> rangée 2, pos 0 }
-         2: GetNeighbor := 13;     { E -> horizontalement à droite }
-         4: GetNeighbor := 16;     { S -> rangée 4, pos 0 }
-         5: GetNeighbor := 17;     { D -> rangée 4, pos 0+1 }
+    { Index 11-12 : Rangée 5 (2 hexagones) }
+    11: Case Direction of
+         1: GetNeighbor := 8;      { W -> rangée 4, gauche }
+         0: GetNeighbor := 9;      { Q -> rangée 4, centre }
+         2: GetNeighbor := 12;     { E -> droite }
+         4: GetNeighbor := 13;     { S -> rangée 6, gauche }
+         5: GetNeighbor := 14;     { D -> rangée 6, centre }
        End;
+    12: Case Direction of
+         0: GetNeighbor := 8;      { Q -> rangée 4, gauche }
+         1: GetNeighbor := 9;      { W -> rangée 4, centre }
+         2: GetNeighbor := 10;     { E -> rangée 4, droite }
+         3: GetNeighbor := 11;     { A -> gauche }
+         4: GetNeighbor := 14;     { S -> rangée 6, centre }
+         5: GetNeighbor := 15;     { D -> rangée 6, droite }
+       End;
+
+    { Index 13-15 : Rangée 6 (3 hexagones) }
     13: Case Direction of
-         0: GetNeighbor := 7;      { Q -> rangée 2, pos 0 }
-         1: GetNeighbor := 8;      { W -> rangée 2, pos 1 }
-         2: GetNeighbor := 14;     { E -> horizontalement à droite }
-         3: GetNeighbor := 12;     { A -> horizontalement à gauche }
-         4: GetNeighbor := 17;     { S -> rangée 4, pos 1 }
+         0: GetNeighbor := 11;     { Q -> rangée 5, gauche }
+         1: GetNeighbor := 12;     { W -> rangée 5, droite }
+         2: GetNeighbor := 14;     { E -> droite }
+         4: GetNeighbor := 16;     { S -> rangée 7, gauche }
+         5: GetNeighbor := 17;     { D -> rangée 7, droite }
        End;
     14: Case Direction of
-         0: GetNeighbor := 8;      { Q -> rangée 2, pos 1 }
-         1: GetNeighbor := 9;      { W -> rangée 2, pos 2 }
-         2: GetNeighbor := 15;     { E -> horizontalement à droite }
-         3: GetNeighbor := 13;     { A -> horizontalement à gauche }
-         4: GetNeighbor := 17;     { S -> rangée 4, pos 1 }
-         5: GetNeighbor := 18;     { D -> rangée 4, pos 2 }
+         0: GetNeighbor := 11;     { Q -> rangée 5, gauche }
+         1: GetNeighbor := 12;     { W -> rangée 5, droite }
+         2: GetNeighbor := 15;     { E -> droite }
+         3: GetNeighbor := 13;     { A -> gauche }
+         4: GetNeighbor := 16;     { S -> rangée 7, gauche }
+         5: GetNeighbor := 17;     { D -> rangée 7, droite }
        End;
     15: Case Direction of
-         0: GetNeighbor := 9;      { Q -> rangée 2, pos 2 }
-         1: GetNeighbor := 10;     { W -> rangée 2, pos 3 }
-         3: GetNeighbor := 14;     { A -> horizontalement à gauche }
-         4: GetNeighbor := 18;     { S -> rangée 4, pos 2 }
+         1: GetNeighbor := 12;     { W -> rangée 5, droite }
+         3: GetNeighbor := 14;     { A -> gauche }
+         4: GetNeighbor := 17;     { S -> rangée 7, droite }
+         5: GetNeighbor := 18;     { D -> pointe }
        End;
 
-    { Rangée 4 : 3 hexagones (16-18) }
+    { Index 16-17 : Rangée 7 (2 hexagones) }
     16: Case Direction of
-         1: GetNeighbor := 12;     { W -> rangée 3, pos 0 }
-         2: GetNeighbor := 17;     { E -> horizontalement à droite }
+         1: GetNeighbor := 13;     { W -> rangée 6, gauche }
+         0: GetNeighbor := 14;     { Q -> rangée 6, centre }
+         2: GetNeighbor := 17;     { E -> droite }
+         4: GetNeighbor := 18;     { S -> pointe }
        End;
     17: Case Direction of
-         0: GetNeighbor := 12;     { Q -> rangée 3, pos 0 }
-         1: GetNeighbor := 13;     { W -> rangée 3, pos 1 }
-         2: GetNeighbor := 18;     { E -> horizontalement à droite }
-         3: GetNeighbor := 16;     { A -> horizontalement à gauche }
+         0: GetNeighbor := 13;     { Q -> rangée 6, gauche }
+         1: GetNeighbor := 14;     { W -> rangée 6, centre }
+         2: GetNeighbor := 15;     { E -> rangée 6, droite }
+         3: GetNeighbor := 16;     { A -> gauche }
+         4: GetNeighbor := 18;     { S -> pointe }
        End;
+
+    { Index 18 : Pointe (rangée 8, 1 hexagone) }
     18: Case Direction of
-         0: GetNeighbor := 13;     { Q -> rangée 3, pos 1 }
-         1: GetNeighbor := 14;     { W -> rangée 3, pos 2 }
-         3: GetNeighbor := 17;     { A -> horizontalement à gauche }
+         0: GetNeighbor := 16;     { Q -> rangée 7, gauche }
+         1: GetNeighbor := 17;     { W -> rangée 7, droite }
        End;
   End;
 End;
