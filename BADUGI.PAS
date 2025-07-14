@@ -764,24 +764,32 @@ Var
  ValidCards: Array[0..3] of Boolean;
  CardCount: Integer;
  TempSuit, TempValue: Integer;
+ SafeScore: Integer;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Begin
-  EvaluateBadugiHand := 0;
-  Exit;
+ EvaluateBadugiHand := 0;
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
+ If Game.PlayerCount <= 0 Then Exit;
+ 
+ { Initialiser les tableaux avec une sécurité supplémentaire }
+ For I := 0 to 3 Do Begin
+  If (I >= 0) And (I <= 3) Then Begin
+   UsedSuits[I] := False;
+   ValidCards[I] := False;
+  End;
  End;
-  { Initialiser les tableaux }
- For I := 0 to 3 Do UsedSuits[I] := False;
- For I := 1 to 13 Do UsedValues[I] := False;
- For I := 0 to 3 Do ValidCards[I] := False;
-  { Identifier les cartes valides (couleur et valeur uniques) }
+ For I := 1 to 13 Do Begin
+  If (I >= 1) And (I <= 13) Then UsedValues[I] := False;
+ End;
+ 
+ { Identifier les cartes valides (couleur et valeur uniques) }
  CardCount := 0;
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+  If (I >= 0) And (I < HAND_SIZE) And (I <= 3) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
    TempSuit := Game.Players[PlayerIndex].Hand[I].Suit;
    TempValue := Game.Players[PlayerIndex].Hand[I].Value;
+   { Validation stricte des valeurs }
    If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) Then Begin
-    If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) And
-       (Not UsedSuits[TempSuit]) And (Not UsedValues[TempValue]) Then Begin
+    If (Not UsedSuits[TempSuit]) And (Not UsedValues[TempValue]) Then Begin
      ValidCards[I] := True;
      UsedSuits[TempSuit] := True;
      UsedValues[TempValue] := True;
@@ -790,19 +798,26 @@ Begin
    End;
   End;
  End;
-  { Calculer le pointage bas� sur les cartes valides }
- Score := 0;
+ 
+ { Calculer le pointage basé sur les cartes valides }
+ SafeScore := 0;
  For I := 0 to HAND_SIZE - 1 Do Begin
-  If (I >= 0) And (I < HAND_SIZE) And ValidCards[I] And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
-   TempValue := Game.Players[PlayerIndex].Hand[I].Value;
-   If (TempValue >= 1) And (TempValue <= 13) Then Begin
-    Score := Score * 100 + TempValue;
+  If (I >= 0) And (I < HAND_SIZE) And (I <= 3) And (PlayerIndex >= 0) And (PlayerIndex < MAX_PLAYERS) Then Begin
+   If ValidCards[I] Then Begin
+    TempValue := Game.Players[PlayerIndex].Hand[I].Value;
+    If (TempValue >= 1) And (TempValue <= 13) Then Begin
+     SafeScore := SafeScore * 100 + TempValue;
+    End;
    End;
   End;
  End;
-  { Ajouter un bonus pour le nombre de cartes valides }
- Score := Score + CardCount * 10000;
- EvaluateBadugiHand := Score;
+ 
+ { Ajouter un bonus pour le nombre de cartes valides }
+ If CardCount >= 0 Then Begin
+  SafeScore := SafeScore + CardCount * 10000;
+ End;
+ 
+ EvaluateBadugiHand := SafeScore;
 End;
 
 Function GetHandDescription(PlayerIndex:Integer):String;
@@ -829,7 +844,8 @@ Begin
    TempSuit := Game.Players[PlayerIndex].Hand[I].Suit;
    TempValue := Game.Players[PlayerIndex].Hand[I].Value;
    If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) Then Begin
-    If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) And
+    If (I >= 0) And (I <= 3) And (TempSuit >= 0) And (TempSuit <= 3) And 
+       (TempValue >= 1) And (TempValue <= 13) And
        (Not UsedSuits[TempSuit]) And (Not UsedValues[TempValue]) Then Begin
      ValidCards[I] := True;
      UsedSuits[TempSuit] := True;
@@ -886,15 +902,33 @@ Begin
  End;
 End;
 
-Procedure PlaceBet(PlayerIndex,Amount:Integer);Begin
+Procedure PlaceBet(PlayerIndex,Amount:Integer);
+Var
+ SafeAmount: Integer;
+Begin
  If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or 
     (PlayerIndex >= MAX_PLAYERS) Then Exit;
- If Amount > Game.Players[PlayerIndex].Chips Then
-  Amount := Game.Players[PlayerIndex].Chips;
- Game.Players[PlayerIndex].Chips := Game.Players[PlayerIndex].Chips - Amount;
- Game.Players[PlayerIndex].Bet := Game.Players[PlayerIndex].Bet + Amount;
- Game.Players[PlayerIndex].TotalBet := Game.Players[PlayerIndex].TotalBet + Amount;
- Game.Pot := Game.Pot + Amount;
+ If Game.PlayerCount <= 0 Then Exit;
+ If Game.PlayerCount > MAX_PLAYERS Then Exit;
+ 
+ SafeAmount := Amount;
+ If SafeAmount < 0 Then SafeAmount := 0;
+ If SafeAmount > Game.Players[PlayerIndex].Chips Then
+  SafeAmount := Game.Players[PlayerIndex].Chips;
+ If SafeAmount < 0 Then SafeAmount := 0;
+ 
+ Game.Players[PlayerIndex].Chips := Game.Players[PlayerIndex].Chips - SafeAmount;
+ If Game.Players[PlayerIndex].Chips < 0 Then Game.Players[PlayerIndex].Chips := 0;
+ 
+ Game.Players[PlayerIndex].Bet := Game.Players[PlayerIndex].Bet + SafeAmount;
+ If Game.Players[PlayerIndex].Bet < 0 Then Game.Players[PlayerIndex].Bet := 0;
+ 
+ Game.Players[PlayerIndex].TotalBet := Game.Players[PlayerIndex].TotalBet + SafeAmount;
+ If Game.Players[PlayerIndex].TotalBet < 0 Then Game.Players[PlayerIndex].TotalBet := 0;
+ 
+ Game.Pot := Game.Pot + SafeAmount;
+ If Game.Pot < 0 Then Game.Pot := 0;
+ 
  If Game.Players[PlayerIndex].Bet > Game.CurrentBet Then
   Game.CurrentBet := Game.Players[PlayerIndex].Bet;
 End;
@@ -902,21 +936,33 @@ End;
 Procedure HandlePlayerAction(PlayerIndex, Action: Integer);
 Var
  LoopCount: Integer;
+ SafePlayerIndex: Integer;
 Begin
  If(PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Exit;
- Game.Players[PlayerIndex].Action := Action;
+ If Game.PlayerCount <= 0 Then Exit;
+ If Game.PlayerCount > MAX_PLAYERS Then Exit;
+ 
+ SafePlayerIndex := PlayerIndex;
+ If (SafePlayerIndex < 0) Or (SafePlayerIndex >= MAX_PLAYERS) Then Exit;
+ 
+ Game.Players[SafePlayerIndex].Action := Action;
  Case Action of
   ACTION_FOLD: Begin
-   Game.Players[PlayerIndex].IsFolded := True;
+   If (SafePlayerIndex >= 0) And (SafePlayerIndex < MAX_PLAYERS) Then
+    Game.Players[SafePlayerIndex].IsFolded := True;
   End;
   ACTION_CALL: Begin
-   If Game.CurrentBet > Game.Players[PlayerIndex].Bet Then
-    PlaceBet(PlayerIndex, Game.CurrentBet - Game.Players[PlayerIndex].Bet);
+   If (SafePlayerIndex >= 0) And (SafePlayerIndex < MAX_PLAYERS) Then Begin
+    If Game.CurrentBet > Game.Players[SafePlayerIndex].Bet Then
+     PlaceBet(SafePlayerIndex, Game.CurrentBet - Game.Players[SafePlayerIndex].Bet);
+   End;
   End;
   ACTION_RAISE: Begin
-   If Game.CurrentBet > Game.Players[PlayerIndex].Bet Then
-    PlaceBet(PlayerIndex, Game.CurrentBet - Game.Players[PlayerIndex].Bet);
-   PlaceBet(PlayerIndex, MIN_RAISE);
+   If (SafePlayerIndex >= 0) And (SafePlayerIndex < MAX_PLAYERS) Then Begin
+    If Game.CurrentBet > Game.Players[SafePlayerIndex].Bet Then
+     PlaceBet(SafePlayerIndex, Game.CurrentBet - Game.Players[SafePlayerIndex].Bet);
+    PlaceBet(SafePlayerIndex, MIN_RAISE);
+   End;
   End;
   ACTION_CHECK: Begin
    { Rien à faire }
@@ -948,10 +994,21 @@ Var
  AllCalled: Boolean;
 Begin
  AllCalled := True;
+ If (Game.PlayerCount <= 0) Or (Game.PlayerCount > MAX_PLAYERS) Then Begin
+  IsBettingRoundComplete := True;
+  Exit;
+ End;
+ 
  For I := 0 to Game.PlayerCount - 1 Do Begin
   If (I >= 0) And (I < Game.PlayerCount) And (I < MAX_PLAYERS) Then Begin
    If Game.Players[I].IsActive And Not Game.Players[I].IsFolded Then Begin
-    If Game.Players[I].Bet <> Game.CurrentBet Then Begin
+    If (Game.Players[I].Bet >= 0) And (Game.CurrentBet >= 0) Then Begin
+     If Game.Players[I].Bet <> Game.CurrentBet Then Begin
+      AllCalled := False;
+      Break;
+     End;
+    End
+    Else Begin
      AllCalled := False;
      Break;
     End;
@@ -1063,22 +1120,25 @@ Var
  HandStrength:Integer;
  Score:Integer;
 Begin
- If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or (PlayerIndex >= MAX_PLAYERS) Then Begin
+ If (PlayerIndex < 0) Or (PlayerIndex >= Game.PlayerCount) Or 
+    (PlayerIndex >= MAX_PLAYERS) Or (Game.PlayerCount <= 0) Then Begin
   GetComputerAction := ACTION_FOLD;
   Exit;
  End;
  
  Score := EvaluateBadugiHand(PlayerIndex);
-  { �valuer la force de la main }
+ If Score < 0 Then Score := 0;
+ 
+  { Évaluer la force de la main }
  If Score >= 40000 Then HandStrength := 3 Else { Badugi }
  If Score >= 30000 Then HandStrength := 2 Else { Tri }
  If Score >= 20000 Then HandStrength := 1  { Paire }
                    Else HandStrength := 0;  { Carte haute }
- { Strat�gie simple basée sur la force de la main }
+ { Stratégie simple basée sur la force de la main }
  If HandStrength >= 2 Then GetComputerAction := ACTION_RAISE Else
  If HandStrength >= 1 Then GetComputerAction := ACTION_CALL Else
- If Game.CurrentBet <= BIG_BLIND Then GetComputerAction := ACTION_CALL
-                                 Else GetComputerAction := ACTION_FOLD;
+ If (Game.CurrentBet >= 0) And (Game.CurrentBet <= BIG_BLIND) Then GetComputerAction := ACTION_CALL
+                                                             Else GetComputerAction := ACTION_FOLD;
 End;
 
 Procedure GetComputerDrawDecision(PlayerIndex: Integer);
@@ -1101,7 +1161,8 @@ Begin
    TempSuit := Game.Players[PlayerIndex].Hand[I].Suit;
    TempValue := Game.Players[PlayerIndex].Hand[I].Value;
    If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) Then Begin
-    If (TempSuit >= 0) And (TempSuit <= 3) And (TempValue >= 1) And (TempValue <= 13) And
+    If (I >= 0) And (I <= 3) And (TempSuit >= 0) And (TempSuit <= 3) And 
+       (TempValue >= 1) And (TempValue <= 13) And
        (Not UsedSuits[TempSuit]) And (Not UsedValues[TempValue]) Then Begin
      KeepCard[I] := True;
      UsedSuits[TempSuit] := True;
@@ -1193,11 +1254,15 @@ Begin
    End;
    'c', 'C': Begin
     If (Game.GamePhase = GAME_BETTING) And (Game.CurrentPlayer = 0) And 
-       (Game.PlayerCount > 0) And (0 >= 0) And (0 < MAX_PLAYERS) Then Begin
-     If Game.CurrentBet > Game.Players[0].Bet Then
-      HandlePlayerAction(0, ACTION_CALL)
-     Else
-      HandlePlayerAction(0, ACTION_CHECK);
+       (Game.PlayerCount > 0) And (Game.PlayerCount <= MAX_PLAYERS) And
+       (0 >= 0) And (0 < Game.PlayerCount) And (0 < MAX_PLAYERS) And
+       (Game.Players[0].IsActive) And (Not Game.Players[0].IsFolded) Then Begin
+     If (Game.CurrentBet >= 0) And (Game.Players[0].Bet >= 0) Then Begin
+      If Game.CurrentBet > Game.Players[0].Bet Then
+       HandlePlayerAction(0, ACTION_CALL)
+      Else
+       HandlePlayerAction(0, ACTION_CHECK);
+     End;
     End;
    End;
    'r', 'R': Begin
