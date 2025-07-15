@@ -28,8 +28,17 @@ Type
   PropertyType: Integer; { 0=Property, 1=Railroad, 2=Utility, 3=Special }
  End;
 
+ TPlayer = Record
+  Name: String[20];
+  Money: Integer;
+  Icon: Integer; { 0=Fer, 1=Dé, 2=Voiture, 3=Chapeau }
+  IsHuman: Boolean;
+  Position: Integer;
+ End;
+
 Var
  Properties: Array[0..39] of TProperty;
+ Players: Array[1..4] of TPlayer;
  Dice1, Dice2: Integer;
 
 Procedure InitScreen;
@@ -265,6 +274,124 @@ Begin
  Properties[39].Color := Blue;
  Properties[39].PropertyType := 0;
  Properties[39].Price := 400;
+End;
+
+Procedure InitPlayers;
+Begin
+ { Joueur 1 - Humain }
+ Players[1].Name := 'Joueur Humain';
+ Players[1].Money := 1500;
+ Players[1].Icon := 0; { Fer à repasser }
+ Players[1].IsHuman := True;
+ Players[1].Position := 0;
+
+ { Joueur 2 - Ordinateur }
+ Players[2].Name := 'Ordinateur 1';
+ Players[2].Money := 1500;
+ Players[2].Icon := 1; { Dé à coudre }
+ Players[2].IsHuman := False;
+ Players[2].Position := 0;
+
+ { Joueur 3 - Ordinateur }
+ Players[3].Name := 'Ordinateur 2';
+ Players[3].Money := 1500;
+ Players[3].Icon := 2; { Voiture }
+ Players[3].IsHuman := False;
+ Players[3].Position := 0;
+
+ { Joueur 4 - Ordinateur }
+ Players[4].Name := 'Ordinateur 3';
+ Players[4].Money := 1500;
+ Players[4].Icon := 3; { Chapeau }
+ Players[4].IsHuman := False;
+ Players[4].Position := 0;
+End;
+
+Procedure DrawPlayerIcon(X, Y, IconType: Integer);
+Begin
+ SetColor(Black);
+ Case IconType of
+  0: Begin { Fer à repasser }
+   SetFillStyle(SolidFill, LightGray);
+   Bar(X + 2, Y + 8, X + 14, Y + 12);
+   Bar(X + 4, Y + 4, X + 12, Y + 8);
+   SetColor(Black);
+   Rectangle(X + 2, Y + 8, X + 14, Y + 12);
+   Rectangle(X + 4, Y + 4, X + 12, Y + 8);
+   Line(X + 8, Y + 4, X + 8, Y + 2);
+  End;
+  
+  1: Begin { Dé à coudre }
+   SetFillStyle(SolidFill, Yellow);
+   Bar(X + 4, Y + 2, X + 12, Y + 14);
+   SetColor(Black);
+   Rectangle(X + 4, Y + 2, X + 12, Y + 14);
+   { Petits trous }
+   SetColor(Black);
+   Circle(X + 6, Y + 5, 1);
+   Circle(X + 10, Y + 5, 1);
+   Circle(X + 6, Y + 8, 1);
+   Circle(X + 10, Y + 8, 1);
+   Circle(X + 6, Y + 11, 1);
+   Circle(X + 10, Y + 11, 1);
+  End;
+  
+  2: Begin { Voiture }
+   SetFillStyle(SolidFill, Red);
+   Bar(X + 2, Y + 8, X + 14, Y + 12);
+   Bar(X + 4, Y + 4, X + 12, Y + 8);
+   SetColor(Black);
+   Rectangle(X + 2, Y + 8, X + 14, Y + 12);
+   Rectangle(X + 4, Y + 4, X + 12, Y + 8);
+   { Roues }
+   SetColor(Black);
+   Circle(X + 4, Y + 12, 2);
+   Circle(X + 12, Y + 12, 2);
+  End;
+  
+  3: Begin { Chapeau }
+   SetFillStyle(SolidFill, Brown);
+   Bar(X + 2, Y + 12, X + 14, Y + 14);
+   Bar(X + 6, Y + 4, X + 10, Y + 12);
+   SetColor(Black);
+   Rectangle(X + 2, Y + 12, X + 14, Y + 14);
+   Rectangle(X + 6, Y + 4, X + 10, Y + 12);
+  End;
+ End;
+End;
+
+Procedure DrawPlayersInfo;
+Var
+ I: Integer;
+ MoneyStr: String;
+Begin
+ { Dessiner la zone des joueurs }
+ SetColor(Black);
+ SetFillStyle(SolidFill, DarkGray);
+ Bar(420, 300, 580, 450);
+ Rectangle(420, 300, 580, 450);
+ 
+ { Titre }
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(470, 310, 'JOUEURS');
+ 
+ { Afficher chaque joueur }
+ For I := 1 to 4 Do Begin
+  { Icône du joueur }
+  DrawPlayerIcon(430, 320 + (I - 1) * 30, Players[I].Icon);
+  
+  { Nom du joueur }
+  SetColor(White);
+  If Players[I].IsHuman Then
+   SetColor(Yellow);
+  OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
+  
+  { Montant d'argent }
+  SetColor(LightGreen);
+  Str(Players[I].Money, MoneyStr);
+  OutTextXY(520, 325 + (I - 1) * 30, MoneyStr + 'F');
+ End;
 End;
 
 Procedure DrawDice(X, Y, Value: Integer);
@@ -524,6 +651,9 @@ Begin
  
  { Dessiner la zone des dés }
  DrawDiceArea;
+ 
+ { Dessiner les informations des joueurs }
+ DrawPlayersInfo;
 End;
 
 Procedure DrawSpecialSymbols;
@@ -552,6 +682,7 @@ BEGIN
  
  InitScreen;
  InitProperties;
+ InitPlayers;
  DrawBoard;
  DrawSpecialSymbols;
  
