@@ -1,7 +1,23 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @created: 2025
   @website(https://www.gladir.com/7iles)
-  @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
+  Properties Properties[6].N Propertie Properties[9].Name := 'Avenue Connecticut';
+ Properties[9].Color := LightBlue;
+ Properties[9].PropertyType := 0;
+ Properties[9].Price := 120;
+ Properties[9].Rent := 18;.Name := 'Avenue Vermont';
+ Properties[8].Color := LightBlue;
+ Properties[8].PropertyType := 0;
+ Properties[8].Price := 100;
+ Properties[8].Rent := 15;:= 'Avenue Oriental';
+ Properties[6].Color := LightBlue;
+ Properties[6].PropertyType := 0;
+ Properties[6].Price := 100;
+ Properties[6].Rent := 15;Name := 'Gare Montparnasse';
+ Properties[5].Color := Black;
+ Properties[5].PropertyType := 1;
+ Properties[5].Price := 200;
+ Properties[5].Rent := 25;stract(Target: Turbo Pascal 7, Free Pascal 3.2)
   @description: MONOPOLY - Jeu de plateau graphique
   Plateau de Monopoly avec propriétés authentiques et couleurs originales
 }
@@ -26,6 +42,7 @@ Type
   Price: Integer;
   Rent: Integer;
   PropertyType: Integer; { 0=Property, 1=Railroad, 2=Utility, 3=Special }
+  Owner: Integer; { 0=Personne, 1-4=Joueur propriétaire }
  End;
 
  TPlayer = Record
@@ -34,6 +51,8 @@ Type
   Icon: Integer; { 0=Fer, 1=Dé, 2=Voiture, 3=Chapeau }
   IsHuman: Boolean;
   Position: Integer;
+  InJail: Boolean;
+  JailTurns: Integer;
  End;
 
 Var
@@ -41,6 +60,7 @@ Var
  Players: Array[1..4] of TPlayer;
  Dice1, Dice2: Integer;
  CurrentPlayer: Integer; { Joueur actuel (1-4) }
+ ActionMessage: String; { Message d'action en cours }
 
 Procedure InitScreen;
 Var
@@ -63,59 +83,77 @@ Begin
 End;
 
 Procedure InitProperties;
+Var
+ I: Integer;
 Begin
+ { Initialiser tous les propriétaires à 0 et tous les loyers à 0 }
+ For I := 0 to 39 Do Begin
+  Properties[I].Owner := 0;
+  Properties[I].Rent := 0;
+ End;
+
  { Coin inférieur droit - GO }
  Properties[0].Name := 'GO';
  Properties[0].Color := LightGreen;
  Properties[0].PropertyType := 3;
  Properties[0].Price := 0;
+ Properties[0].Owner := 0;
 
  { Côté bas - Groupe Marron }
  Properties[1].Name := 'Avenue Méditerranée';
  Properties[1].Color := Brown;
  Properties[1].PropertyType := 0;
  Properties[1].Price := 60;
+ Properties[1].Rent := 10;
 
  Properties[2].Name := 'Caisse Communauté';
  Properties[2].Color := LightBlue;
  Properties[2].PropertyType := 3;
  Properties[2].Price := 0;
+ Properties[2].Rent := 0;
 
  Properties[3].Name := 'Avenue Baltique';
  Properties[3].Color := Brown;
  Properties[3].PropertyType := 0;
  Properties[3].Price := 60;
+ Properties[3].Rent := 10;
 
  Properties[4].Name := 'Impôt sur Revenu';
  Properties[4].Color := White;
  Properties[4].PropertyType := 3;
  Properties[4].Price := 0;
+ Properties[4].Rent := 0;
 
  Properties[5].Name := 'Gare de Montparnasse';
  Properties[5].Color := Black;
  Properties[5].PropertyType := 1;
  Properties[5].Price := 200;
+ Properties[5].Rent := 25;
 
  { Groupe Bleu clair }
  Properties[6].Name := 'Avenue Orient';
  Properties[6].Color := LightCyan;
  Properties[6].PropertyType := 0;
  Properties[6].Price := 100;
+ Properties[6].Rent := 15;
 
  Properties[7].Name := 'Chance';
  Properties[7].Color := Red;
  Properties[7].PropertyType := 3;
  Properties[7].Price := 0;
+ Properties[7].Rent := 0;
 
  Properties[8].Name := 'Avenue Vermont';
  Properties[8].Color := LightCyan;
  Properties[8].PropertyType := 0;
  Properties[8].Price := 100;
+ Properties[8].Rent := 15;
 
  Properties[9].Name := 'Avenue Connecticut';
  Properties[9].Color := LightCyan;
  Properties[9].PropertyType := 0;
  Properties[9].Price := 120;
+ Properties[9].Rent := 18;
 
  { Coin inférieur gauche - Jail }
  Properties[10].Name := 'Prison';
@@ -285,6 +323,8 @@ Begin
  Players[1].Icon := 0; { Fer à repasser }
  Players[1].IsHuman := True;
  Players[1].Position := 0;
+ Players[1].InJail := False;
+ Players[1].JailTurns := 0;
 
  { Joueur 2 - Ordinateur }
  Players[2].Name := 'Ordinateur 1';
@@ -292,6 +332,8 @@ Begin
  Players[2].Icon := 1; { Dé à coudre }
  Players[2].IsHuman := False;
  Players[2].Position := 0;
+ Players[2].InJail := False;
+ Players[2].JailTurns := 0;
 
  { Joueur 3 - Ordinateur }
  Players[3].Name := 'Ordinateur 2';
@@ -299,6 +341,8 @@ Begin
  Players[3].Icon := 2; { Voiture }
  Players[3].IsHuman := False;
  Players[3].Position := 0;
+ Players[3].InJail := False;
+ Players[3].JailTurns := 0;
 
  { Joueur 4 - Ordinateur }
  Players[4].Name := 'Ordinateur 3';
@@ -306,6 +350,8 @@ Begin
  Players[4].Icon := 3; { Chapeau }
  Players[4].IsHuman := False;
  Players[4].Position := 0;
+ Players[4].InJail := False;
+ Players[4].JailTurns := 0;
 End;
 
 Procedure DrawPlayerIcon(X, Y, IconType: Integer);
@@ -521,6 +567,117 @@ Begin
  End;
 End;
 
+Procedure Wait2Seconds;
+Var
+ I, J: Integer;
+Begin
+ { Créer un délai d'environ 2 secondes }
+ For I := 1 to 200 Do Begin
+  For J := 1 to 300 Do Begin
+   { Boucle vide pour créer le délai }
+  End;
+ End;
+End;
+
+Procedure DrawActionMessage;
+Begin
+ { Dessiner la zone des messages d'action }
+ SetColor(Black);
+ SetFillStyle(SolidFill, DarkGray);
+ Bar(420, 70, 630, 140);
+ Rectangle(420, 70, 630, 140);
+ 
+ { Titre }
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(500, 80, 'ACTION');
+ 
+ { Message d'action }
+ SetColor(Yellow);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(430, 100, ActionMessage);
+End;
+
+Function ProcessPlayerAction(PlayerIndex: Integer): String;
+Var
+ PropertyIndex: Integer;
+ ActionMsg: String;
+ RentStr: String;
+Begin
+ PropertyIndex := Players[PlayerIndex].Position;
+ ActionMsg := '';
+ 
+ { Vérifier le type de case }
+ Case PropertyIndex of
+  0: Begin { GO }
+   Players[PlayerIndex].Money := Players[PlayerIndex].Money + 200;
+   ActionMsg := Players[PlayerIndex].Name + ' passe par GO: +200$';
+  End;
+  
+  2, 17, 33: Begin { Caisse Communauté }
+   ActionMsg := Players[PlayerIndex].Name + ' tire une carte Caisse';
+  End;
+  
+  7, 22, 36: Begin { Chance }
+   ActionMsg := Players[PlayerIndex].Name + ' tire une carte Chance';
+  End;
+  
+  4: Begin { Impôt sur revenu }
+   Players[PlayerIndex].Money := Players[PlayerIndex].Money - 200;
+   ActionMsg := Players[PlayerIndex].Name + ' paie impôt: -200$';
+  End;
+  
+  38: Begin { Taxe de luxe }
+   Players[PlayerIndex].Money := Players[PlayerIndex].Money - 100;
+   ActionMsg := Players[PlayerIndex].Name + ' paie taxe luxe: -100$';
+  End;
+  
+  10: Begin { Prison - visite }
+   ActionMsg := Players[PlayerIndex].Name + ' visite la prison';
+  End;
+  
+  20: Begin { Parc gratuit }
+   ActionMsg := Players[PlayerIndex].Name + ' se repose au parc';
+  End;
+  
+  30: Begin { Allez en prison }
+   Players[PlayerIndex].Position := 10;
+   Players[PlayerIndex].InJail := True;
+   Players[PlayerIndex].JailTurns := 0;
+   ActionMsg := Players[PlayerIndex].Name + ' va en prison!';
+  End;
+  
+  Else Begin
+   { Propriété normale }
+   If (Properties[PropertyIndex].PropertyType = 0) Or 
+      (Properties[PropertyIndex].PropertyType = 1) Or 
+      (Properties[PropertyIndex].PropertyType = 2) Then Begin
+    
+    If Properties[PropertyIndex].Owner = 0 Then Begin
+     { Propriété libre - acheter }
+     If Players[PlayerIndex].Money >= Properties[PropertyIndex].Price Then Begin
+      Players[PlayerIndex].Money := Players[PlayerIndex].Money - Properties[PropertyIndex].Price;
+      Properties[PropertyIndex].Owner := PlayerIndex;
+      ActionMsg := Players[PlayerIndex].Name + ' achète ' + Properties[PropertyIndex].Name;
+     End Else Begin
+      ActionMsg := Players[PlayerIndex].Name + ' ne peut pas acheter ' + Properties[PropertyIndex].Name;
+     End;
+    End Else If Properties[PropertyIndex].Owner <> PlayerIndex Then Begin
+     { Propriété appartient à un autre joueur - payer loyer }
+     Players[PlayerIndex].Money := Players[PlayerIndex].Money - Properties[PropertyIndex].Rent;
+     Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + Properties[PropertyIndex].Rent;
+     Str(Properties[PropertyIndex].Rent, RentStr);
+     ActionMsg := Players[PlayerIndex].Name + ' paie loyer: -' + RentStr + '$';
+    End Else Begin
+     ActionMsg := Players[PlayerIndex].Name + ' sur sa propriété';
+    End;
+   End;
+  End;
+ End;
+ 
+ ProcessPlayerAction := ActionMsg;
+End;
+
 Procedure DrawPlayersOnBoard;
 Var
  I, X, Y: Integer;
@@ -686,6 +843,9 @@ Begin
  { Dessiner la zone des dés }
  DrawDiceArea;
  
+ { Dessiner la zone d'action }
+ DrawActionMessage;
+ 
  { Dessiner les informations des joueurs }
  DrawPlayersInfo;
  
@@ -711,14 +871,7 @@ Begin
 End;
 
 Procedure PlayComputerTurn(PlayerIndex: Integer);
-Var
- I: Integer;
 Begin
- { Simuler un petit délai pour l'ordinateur }
- For I := 1 to 30000 Do Begin
-  { Boucle vide pour créer un délai }
- End;
- 
  { Lancer les dés }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
@@ -726,11 +879,16 @@ Begin
  { Déplacer le joueur ordinateur }
  Players[PlayerIndex].Position := (Players[PlayerIndex].Position + Dice1 + Dice2) Mod 40;
  
+ { Traiter l'action sur la case }
+ ActionMessage := ProcessPlayerAction(PlayerIndex);
+ 
  { Redessiner le plateau }
  DrawBoard;
  DrawSpecialSymbols;
+ 
+ { Attendre 2 secondes }
+ Wait2Seconds;
 End;
-
 
 BEGIN
  Randomize;
@@ -741,6 +899,9 @@ BEGIN
  
  { Initialiser le joueur actuel }
  CurrentPlayer := 1;
+ 
+ { Initialiser le message d'action }
+ ActionMessage := 'Appuyez ESPACE pour commencer';
  
  InitScreen;
  InitProperties;
@@ -760,6 +921,9 @@ BEGIN
      
      { Déplacer le joueur humain }
      Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
+     
+     { Gérer l'action du joueur sur la case }
+     ActionMessage := ProcessPlayerAction(CurrentPlayer);
      
      { Passer au joueur suivant }
      CurrentPlayer := (CurrentPlayer Mod 4) + 1;
