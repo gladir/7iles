@@ -40,6 +40,7 @@ Var
  Properties: Array[0..39] of TProperty;
  Players: Array[1..4] of TPlayer;
  Dice1, Dice2: Integer;
+ CurrentPlayer: Integer; { Joueur actuel (1-4) }
 
 Procedure InitScreen;
 Var
@@ -385,7 +386,18 @@ Begin
   SetColor(White);
   If Players[I].IsHuman Then
    SetColor(Yellow);
+  
+  { Mettre en évidence le joueur actuel }
+  If I = CurrentPlayer Then
+   SetColor(LightRed);
+   
   OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
+  
+  { Afficher "A TON TOUR" pour le joueur actuel }
+  If I = CurrentPlayer Then Begin
+   SetColor(LightRed);
+   OutTextXY(450, 335 + (I - 1) * 30, 'A TON TOUR');
+  End;
   
   { Montant d'argent - déplacé de 50 pixels }
   SetColor(LightGreen);
@@ -698,6 +710,27 @@ Begin
  Rectangle(85, 285, 105, 295);
 End;
 
+Procedure PlayComputerTurn(PlayerIndex: Integer);
+Var
+ I: Integer;
+Begin
+ { Simuler un petit délai pour l'ordinateur }
+ For I := 1 to 30000 Do Begin
+  { Boucle vide pour créer un délai }
+ End;
+ 
+ { Lancer les dés }
+ Dice1 := Random(6) + 1;
+ Dice2 := Random(6) + 1;
+ 
+ { Déplacer le joueur ordinateur }
+ Players[PlayerIndex].Position := (Players[PlayerIndex].Position + Dice1 + Dice2) Mod 40;
+ 
+ { Redessiner le plateau }
+ DrawBoard;
+ DrawSpecialSymbols;
+End;
+
 
 BEGIN
  Randomize;
@@ -705,6 +738,9 @@ BEGIN
  { Initialiser les dés }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
+ 
+ { Initialiser le joueur actuel }
+ CurrentPlayer := 1;
  
  InitScreen;
  InitProperties;
@@ -714,20 +750,32 @@ BEGIN
  
  { Boucle principale }
  Repeat
-  Case ReadKey of
-   ' ': Begin
-    { Lancer les dés }
-    Dice1 := Random(6) + 1;
-    Dice2 := Random(6) + 1;
-    
-    { Déplacer le joueur humain }
-    Players[1].Position := (Players[1].Position + Dice1 + Dice2) Mod 40;
-    
-    { Redessiner le plateau complet }
-    DrawBoard;
-    DrawSpecialSymbols;
+  If Players[CurrentPlayer].IsHuman Then Begin
+   { Tour du joueur humain - attendre l'appui sur ESPACE }
+   Case ReadKey of
+    ' ': Begin
+     { Lancer les dés }
+     Dice1 := Random(6) + 1;
+     Dice2 := Random(6) + 1;
+     
+     { Déplacer le joueur humain }
+     Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
+     
+     { Passer au joueur suivant }
+     CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+     
+     { Redessiner le plateau complet }
+     DrawBoard;
+     DrawSpecialSymbols;
+    End;
+    #27: Break; { Escape pour quitter }
    End;
-   #27: Break; { Escape pour quitter }
+  End Else Begin
+   { Tour de l'ordinateur - jouer automatiquement }
+   PlayComputerTurn(CurrentPlayer);
+   
+   { Passer au joueur suivant }
+   CurrentPlayer := (CurrentPlayer Mod 4) + 1;
   End;
  Until False;
  
