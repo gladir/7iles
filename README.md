@@ -293,6 +293,12 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>CHECKERS.PAS</b></td>
         <td><b>Checkers (Jeu de dame)</b>
         <td>Ce fichier contient le jeu de dames ou Checkers en anglais.</td>
+    </tr>
+    <tr>
+        <td><b>CRAPS.PAS</b></td>
+        <td><b>Craps</b></td>
+        <td>Ce fichier contient le jeu de dés Craps.</td>
+    </tr>
     <tr>
         <td><b>CSI.PAS</b></td>
         <td><b>Color Space Invaders</b></td>
