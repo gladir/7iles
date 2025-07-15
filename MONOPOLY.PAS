@@ -446,30 +446,37 @@ Begin
  
  { Afficher chaque joueur }
  For I := 1 to 4 Do Begin
-  { Icône du joueur }
-  DrawPlayerIcon(430, 320 + (I - 1) * 30, Players[I].Icon);
-  
-  { Nom du joueur }
-  SetColor(White);
-  If Players[I].IsHuman Then
-   SetColor(Yellow);
-  
-  { Mettre en évidence le joueur actuel }
-  If I = CurrentPlayer Then
-   SetColor(LightRed);
+  { Ne pas afficher les joueurs en faillite }
+  If Players[I].Money >= 0 Then Begin
+   { Icône du joueur }
+   DrawPlayerIcon(430, 320 + (I - 1) * 30, Players[I].Icon);
    
-  OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
-  
-  { Afficher "A TON TOUR" pour le joueur actuel }
-  If I = CurrentPlayer Then Begin
-   SetColor(LightRed);
-   OutTextXY(450, 335 + (I - 1) * 30, 'A TON TOUR');
+   { Nom du joueur }
+   SetColor(White);
+   If Players[I].IsHuman Then
+    SetColor(Yellow);
+   
+   { Mettre en évidence le joueur actuel }
+   If I = CurrentPlayer Then
+    SetColor(LightRed);
+    
+   OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
+   
+   { Afficher "A TON TOUR" pour le joueur actuel }
+   If I = CurrentPlayer Then Begin
+    SetColor(LightRed);
+    OutTextXY(450, 335 + (I - 1) * 30, 'A TON TOUR');
+   End;
+   
+   { Montant d'argent - déplacé de 50 pixels }
+   SetColor(LightGreen);
+   Str(Players[I].Money, MoneyStr);
+   OutTextXY(570, 325 + (I - 1) * 30, MoneyStr + '$');
+  End Else Begin
+   { Joueur en faillite - afficher en rouge }
+   SetColor(Red);
+   OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
   End;
-  
-  { Montant d'argent - déplacé de 50 pixels }
-  SetColor(LightGreen);
-  Str(Players[I].Money, MoneyStr);
-  OutTextXY(570, 325 + (I - 1) * 30, MoneyStr + '$');
  End;
 End;
 
@@ -597,6 +604,131 @@ Begin
  End;
 End;
 
+Function GetPlayerAssetValue(PlayerIndex: Integer): Integer;
+Var
+ I, TotalValue: Integer;
+Begin
+ TotalValue := Players[PlayerIndex].Money;
+ 
+ { Ajouter la valeur des propriétés }
+ For I := 0 to 39 Do Begin
+  If Properties[I].Owner = PlayerIndex Then Begin
+   TotalValue := TotalValue + (Properties[I].Price Div 2); { Valeur de revente = 50% du prix }
+   
+   { Ajouter la valeur des maisons (50% du prix) }
+   If Properties[I].PropertyType = 0 Then Begin
+    TotalValue := TotalValue + (Properties[I].Houses * Properties[I].HousePrice Div 2);
+    
+    { Ajouter la valeur de l'hôtel (50% du prix) }
+    If Properties[I].HasHotel Then
+     TotalValue := TotalValue + (Properties[I].HousePrice Div 2);
+   End;
+  End;
+ End;
+ 
+ GetPlayerAssetValue := TotalValue;
+End;
+
+Function CanPayDebt(PlayerIndex, DebtAmount: Integer): Boolean;
+Begin
+ CanPayDebt := GetPlayerAssetValue(PlayerIndex) >= DebtAmount;
+End;
+
+Procedure SellBuildings(PlayerIndex: Integer; NeededAmount: Integer);
+Var
+ I, SoldAmount: Integer;
+Begin
+ SoldAmount := 0;
+ 
+ { Vendre d'abord les hôtels }
+ For I := 0 to 39 Do Begin
+  If (Properties[I].Owner = PlayerIndex) And Properties[I].HasHotel And (SoldAmount < NeededAmount) Then Begin
+   Properties[I].HasHotel := False;
+   Properties[I].Houses := 4; { Retour à 4 maisons }
+   Players[PlayerIndex].Money := Players[PlayerIndex].Money + (Properties[I].HousePrice Div 2);
+   SoldAmount := SoldAmount + (Properties[I].HousePrice Div 2);
+  End;
+ End;
+ 
+ { Puis vendre les maisons }
+ While SoldAmount < NeededAmount Do Begin
+  For I := 0 to 39 Do Begin
+   If (Properties[I].Owner = PlayerIndex) And (Properties[I].Houses > 0) And (SoldAmount < NeededAmount) Then Begin
+    Dec(Properties[I].Houses);
+    Players[PlayerIndex].Money := Players[PlayerIndex].Money + (Properties[I].HousePrice Div 2);
+    SoldAmount := SoldAmount + (Properties[I].HousePrice Div 2);
+   End;
+  End;
+ End;
+End;
+
+Procedure SellProperties(PlayerIndex: Integer; NeededAmount: Integer);
+Var
+ I, SoldAmount: Integer;
+Begin
+ SoldAmount := 0;
+ 
+ { Vendre les propriétés (50% du prix d'achat) }
+ For I := 0 to 39 Do Begin
+  If (Properties[I].Owner = PlayerIndex) And (SoldAmount < NeededAmount) Then Begin
+   Properties[I].Owner := 0; { Remettre la propriété sur le marché }
+   Properties[I].Houses := 0;
+   Properties[I].HasHotel := False;
+   Players[PlayerIndex].Money := Players[PlayerIndex].Money + (Properties[I].Price Div 2);
+   SoldAmount := SoldAmount + (Properties[I].Price Div 2);
+  End;
+ End;
+End;
+
+Function HandleDebt(PlayerIndex, DebtAmount: Integer): Boolean;
+Var
+ NeededAmount: Integer;
+Begin
+ { Si le joueur a assez d'argent, pas de problème }
+ If Players[PlayerIndex].Money >= DebtAmount Then Begin
+  HandleDebt := True;
+  Exit;
+ End;
+ 
+ NeededAmount := DebtAmount - Players[PlayerIndex].Money;
+ 
+ { Vérifier si le joueur peut payer en vendant ses biens }
+ If Not CanPayDebt(PlayerIndex, DebtAmount) Then Begin
+  { Faillite - le joueur ne peut pas payer même en vendant tout }
+  HandleDebt := False;
+  Exit;
+ End;
+ 
+ { Vendre des bâtiments d'abord }
+ SellBuildings(PlayerIndex, NeededAmount);
+ 
+ { Si pas encore assez, vendre des propriétés }
+ If Players[PlayerIndex].Money < DebtAmount Then Begin
+  NeededAmount := DebtAmount - Players[PlayerIndex].Money;
+  SellProperties(PlayerIndex, NeededAmount);
+ End;
+ 
+ HandleDebt := True;
+End;
+
+Procedure EliminatePlayer(PlayerIndex: Integer);
+Var
+ I: Integer;
+Begin
+ { Libérer toutes les propriétés du joueur }
+ For I := 0 to 39 Do Begin
+  If Properties[I].Owner = PlayerIndex Then Begin
+   Properties[I].Owner := 0;
+   Properties[I].Houses := 0;
+   Properties[I].HasHotel := False;
+  End;
+ End;
+ 
+ { Marquer le joueur comme éliminé }
+ Players[PlayerIndex].Money := -1; { Indicateur de faillite }
+ Players[PlayerIndex].Name := Players[PlayerIndex].Name + ' (FAILLITE)';
+End;
+
 Function IntToStr(Value: Integer): String;
 Var
  S: String;
@@ -656,6 +788,9 @@ Begin
 End;
 
 Procedure DrawActionMessage;
+Var
+ Line1, Line2: String;
+ MaxWidth: Integer;
 Begin
  { Dessiner la zone des messages d'action }
  SetColor(Black);
@@ -668,10 +803,32 @@ Begin
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(500, 80, 'ACTION');
  
- { Message d'action }
+ { Message d'action sur deux lignes si nécessaire }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 1);
- OutTextXY(430, 100, ActionMessage);
+ 
+ MaxWidth := 25; { Largeur maximale en caractères }
+ 
+ If Length(ActionMessage) <= MaxWidth Then Begin
+  { Message court - une seule ligne }
+  OutTextXY(430, 110, ActionMessage);
+ End Else Begin
+  { Message long - diviser en deux lignes }
+  { Chercher un espace pour couper naturellement }
+  If Pos(' ', Copy(ActionMessage, MaxWidth - 5, 10)) > 0 Then Begin
+   { Couper au dernier espace avant la limite }
+   Line1 := Copy(ActionMessage, 1, MaxWidth - 5 + Pos(' ', Copy(ActionMessage, MaxWidth - 5, 10)) - 1);
+   Line2 := Copy(ActionMessage, Length(Line1) + 2, Length(ActionMessage));
+  End Else Begin
+   { Couper brutalement à la limite }
+   Line1 := Copy(ActionMessage, 1, MaxWidth);
+   Line2 := Copy(ActionMessage, MaxWidth + 1, Length(ActionMessage));
+  End;
+  
+  { Afficher les deux lignes }
+  OutTextXY(430, 100, Line1);
+  OutTextXY(430, 115, Line2);
+ End;
 End;
 
 Function ProcessPlayerAction(PlayerIndex: Integer): String;
@@ -700,13 +857,23 @@ Begin
   End;
   
   4: Begin { Impôt sur revenu }
-   Players[PlayerIndex].Money := Players[PlayerIndex].Money - 200;
-   ActionMsg := Players[PlayerIndex].Name + ' paie impôt: -200$';
+   If HandleDebt(PlayerIndex, 200) Then Begin
+    Players[PlayerIndex].Money := Players[PlayerIndex].Money - 200;
+    ActionMsg := Players[PlayerIndex].Name + ' paie impôt: -200$';
+   End Else Begin
+    EliminatePlayer(PlayerIndex);
+    ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur impôt!';
+   End;
   End;
   
   38: Begin { Taxe de luxe }
-   Players[PlayerIndex].Money := Players[PlayerIndex].Money - 100;
-   ActionMsg := Players[PlayerIndex].Name + ' paie taxe luxe: -100$';
+   If HandleDebt(PlayerIndex, 100) Then Begin
+    Players[PlayerIndex].Money := Players[PlayerIndex].Money - 100;
+    ActionMsg := Players[PlayerIndex].Name + ' paie taxe luxe: -100$';
+   End Else Begin
+    EliminatePlayer(PlayerIndex);
+    ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur taxe!';
+   End;
   End;
   
   10: Begin { Prison - visite }
@@ -763,10 +930,18 @@ Begin
        RentAmount := RentAmount * (Properties[PropertyIndex].Houses + 1);
      End;
      
-     Players[PlayerIndex].Money := Players[PlayerIndex].Money - RentAmount;
-     Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + RentAmount;
-     Str(RentAmount, RentStr);
-     ActionMsg := Players[PlayerIndex].Name + ' paie loyer: -' + RentStr + '$';
+     { Vérifier si le joueur peut payer le loyer }
+     If HandleDebt(PlayerIndex, RentAmount) Then Begin
+      Players[PlayerIndex].Money := Players[PlayerIndex].Money - RentAmount;
+      Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + RentAmount;
+      Str(RentAmount, RentStr);
+      ActionMsg := Players[PlayerIndex].Name + ' paie loyer: -' + RentStr + '$';
+     End Else Begin
+      { Faillite - transférer tous les biens au créancier }
+      EliminatePlayer(PlayerIndex);
+      Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + Players[PlayerIndex].Money;
+      ActionMsg := Players[PlayerIndex].Name + ' fait faillite! Biens transférés.';
+     End;
     End Else Begin
      ActionMsg := Players[PlayerIndex].Name + ' sur sa propriété';
      
@@ -1088,6 +1263,46 @@ Begin
  Rectangle(85, 285, 105, 295);
 End;
 
+Function GetNextActivePlayer(CurrentPlayerIndex: Integer): Integer;
+Var
+ NextPlayer, StartPlayer: Integer;
+Begin
+ NextPlayer := (CurrentPlayerIndex Mod 4) + 1;
+ StartPlayer := NextPlayer;
+ 
+ { Chercher le prochain joueur actif (non en faillite) }
+ While (Players[NextPlayer].Money < 0) And (NextPlayer <> StartPlayer) Do Begin
+  NextPlayer := (NextPlayer Mod 4) + 1;
+ End;
+ 
+ GetNextActivePlayer := NextPlayer;
+End;
+
+Function CountActivePlayers: Integer;
+Var
+ I, Count: Integer;
+Begin
+ Count := 0;
+ For I := 1 to 4 Do Begin
+  If Players[I].Money >= 0 Then
+   Inc(Count);
+ End;
+ CountActivePlayers := Count;
+End;
+
+Function GetWinner: Integer;
+Var
+ I: Integer;
+Begin
+ GetWinner := 0;
+ For I := 1 to 4 Do Begin
+  If Players[I].Money >= 0 Then Begin
+   GetWinner := I;
+   Exit;
+  End;
+ End;
+End;
+
 Procedure PlayComputerTurn(PlayerIndex: Integer);
 Begin
  { Lancer les dés }
@@ -1134,6 +1349,22 @@ BEGIN
  
  { Boucle principale }
  Repeat
+  { Vérifier s'il ne reste qu'un joueur (fin du jeu) }
+  If CountActivePlayers <= 1 Then Begin
+   If CountActivePlayers = 1 Then Begin
+    ActionMessage := Players[GetWinner].Name + ' a gagné la partie!';
+    DrawBoard;
+    DrawSpecialSymbols;
+    ReadKey;
+   End;
+   Break;
+  End;
+  
+  { Passer les joueurs en faillite }
+  While Players[CurrentPlayer].Money < 0 Do Begin
+   CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
+  End;
+  
   If Players[CurrentPlayer].IsHuman Then Begin
    { Tour du joueur humain }
    Case ReadKey of
@@ -1151,7 +1382,7 @@ BEGIN
       
       { Si pas de demande d'achat/construction, passer au joueur suivant }
       If GameState = 0 Then Begin
-       CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+       CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
        ContextualMessage := 'Appuyez ESPACE pour continuer';
       End;
       
@@ -1160,7 +1391,7 @@ BEGIN
       DrawSpecialSymbols;
      End Else Begin
       { Continuer après achat/construction }
-      CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+      CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
       ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
       DrawBoard;
       DrawSpecialSymbols;
@@ -1211,10 +1442,12 @@ BEGIN
    End;
   End Else Begin
    { Tour de l'ordinateur - jouer automatiquement }
-   PlayComputerTurn(CurrentPlayer);
+   If Players[CurrentPlayer].Money >= 0 Then Begin
+    PlayComputerTurn(CurrentPlayer);
+   End;
    
    { Passer au joueur suivant }
-   CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+   CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
    ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
   End;
  Until False;
