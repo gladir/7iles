@@ -30,6 +30,7 @@ Type
 
 Var
  Properties: Array[0..39] of TProperty;
+ Dice1, Dice2: Integer;
 
 Procedure InitScreen;
 Var
@@ -60,33 +61,33 @@ Begin
  Properties[0].Price := 0;
 
  { Côté bas - Groupe Marron }
- Properties[1].Name := 'Mediterranean Ave';
+ Properties[1].Name := 'Avenue Méditerranée';
  Properties[1].Color := Brown;
  Properties[1].PropertyType := 0;
  Properties[1].Price := 60;
 
- Properties[2].Name := 'Community Chest';
+ Properties[2].Name := 'Caisse Communauté';
  Properties[2].Color := LightBlue;
  Properties[2].PropertyType := 3;
  Properties[2].Price := 0;
 
- Properties[3].Name := 'Baltic Ave';
+ Properties[3].Name := 'Avenue Baltique';
  Properties[3].Color := Brown;
  Properties[3].PropertyType := 0;
  Properties[3].Price := 60;
 
- Properties[4].Name := 'Income Tax';
+ Properties[4].Name := 'Impôt sur Revenu';
  Properties[4].Color := White;
  Properties[4].PropertyType := 3;
  Properties[4].Price := 0;
 
- Properties[5].Name := 'Reading Railroad';
+ Properties[5].Name := 'Gare de Montparnasse';
  Properties[5].Color := Black;
  Properties[5].PropertyType := 1;
  Properties[5].Price := 200;
 
  { Groupe Bleu clair }
- Properties[6].Name := 'Oriental Ave';
+ Properties[6].Name := 'Avenue Orient';
  Properties[6].Color := LightCyan;
  Properties[6].PropertyType := 0;
  Properties[6].Price := 100;
@@ -96,77 +97,77 @@ Begin
  Properties[7].PropertyType := 3;
  Properties[7].Price := 0;
 
- Properties[8].Name := 'Vermont Ave';
+ Properties[8].Name := 'Avenue Vermont';
  Properties[8].Color := LightCyan;
  Properties[8].PropertyType := 0;
  Properties[8].Price := 100;
 
- Properties[9].Name := 'Connecticut Ave';
+ Properties[9].Name := 'Avenue Connecticut';
  Properties[9].Color := LightCyan;
  Properties[9].PropertyType := 0;
  Properties[9].Price := 120;
 
  { Coin inférieur gauche - Jail }
- Properties[10].Name := 'Jail';
+ Properties[10].Name := 'Prison';
  Properties[10].Color := LightGray;
  Properties[10].PropertyType := 3;
  Properties[10].Price := 0;
 
  { Côté gauche - Groupe Rose }
- Properties[11].Name := 'St. Charles Place';
+ Properties[11].Name := 'Place St Charles';
  Properties[11].Color := Magenta;
  Properties[11].PropertyType := 0;
  Properties[11].Price := 140;
 
- Properties[12].Name := 'Electric Company';
+ Properties[12].Name := 'Compagnie Électrique';
  Properties[12].Color := Yellow;
  Properties[12].PropertyType := 2;
  Properties[12].Price := 150;
 
- Properties[13].Name := 'States Ave';
+ Properties[13].Name := 'Avenue États';
  Properties[13].Color := Magenta;
  Properties[13].PropertyType := 0;
  Properties[13].Price := 140;
 
- Properties[14].Name := 'Virginia Ave';
+ Properties[14].Name := 'Avenue Virginie';
  Properties[14].Color := Magenta;
  Properties[14].PropertyType := 0;
  Properties[14].Price := 160;
 
- Properties[15].Name := 'Pennsylvania RR';
+ Properties[15].Name := 'Gare du Nord';
  Properties[15].Color := Black;
  Properties[15].PropertyType := 1;
  Properties[15].Price := 200;
 
  { Groupe Orange }
- Properties[16].Name := 'St. James Place';
+ Properties[16].Name := 'Place St James';
  Properties[16].Color := Red;
  Properties[16].PropertyType := 0;
  Properties[16].Price := 180;
 
- Properties[17].Name := 'Community Chest';
+ Properties[17].Name := 'Caisse Communauté';
  Properties[17].Color := LightBlue;
  Properties[17].PropertyType := 3;
  Properties[17].Price := 0;
 
- Properties[18].Name := 'Tennessee Ave';
+ Properties[18].Name := 'Avenue Tennessee';
  Properties[18].Color := Red;
  Properties[18].PropertyType := 0;
  Properties[18].Price := 180;
 
- Properties[19].Name := 'New York Ave';
+ Properties[19].Name := 'Avenue New York';
  Properties[19].Color := Red;
  Properties[19].PropertyType := 0;
  Properties[19].Price := 200;
 
  { Coin supérieur gauche - Free Parking }
- Properties[20].Name := 'Free Parking';
+ Properties[20].Name := 'Parc Gratuit';
  Properties[20].Color := LightRed;
  Properties[20].PropertyType := 3;
  Properties[20].Price := 0;
 
  { Côté haut - Groupe Rouge }
- Properties[21].Name := 'Kentucky Ave';
+ Properties[21].Name := 'Avenue Kentucky';
  Properties[21].Color := Red;
  Properties[21].PropertyType := 0;
  Properties[21].Price := 220;
@@ -176,70 +177,70 @@ Begin
  Properties[22].PropertyType := 3;
  Properties[22].Price := 0;
 
- Properties[23].Name := 'Indiana Ave';
+ Properties[23].Name := 'Avenue Indiana';
  Properties[23].Color := Red;
  Properties[23].PropertyType := 0;
  Properties[23].Price := 220;
 
- Properties[24].Name := 'Illinois Ave';
+ Properties[24].Name := 'Avenue Illinois';
  Properties[24].Color := Red;
  Properties[24].PropertyType := 0;
  Properties[24].Price := 240;
 
- Properties[25].Name := 'B. & O. Railroad';
+ Properties[25].Name := 'Gare de Lyon';
  Properties[25].Color := Black;
  Properties[25].PropertyType := 1;
  Properties[25].Price := 200;
 
  { Groupe Jaune }
- Properties[26].Name := 'Atlantic Ave';
+ Properties[26].Name := 'Avenue Atlantique';
  Properties[26].Color := Yellow;
  Properties[26].PropertyType := 0;
  Properties[26].Price := 260;
 
- Properties[27].Name := 'Ventnor Ave';
+ Properties[27].Name := 'Avenue Ventnor';
  Properties[27].Color := Yellow;
  Properties[27].PropertyType := 0;
  Properties[27].Price := 260;
 
- Properties[28].Name := 'Water Works';
+ Properties[28].Name := 'Compagnie des Eaux';
  Properties[28].Color := Cyan;
  Properties[28].PropertyType := 2;
  Properties[28].Price := 150;
 
- Properties[29].Name := 'Marvin Gardens';
+ Properties[29].Name := 'Jardins Marvin';
  Properties[29].Color := Yellow;
  Properties[29].PropertyType := 0;
  Properties[29].Price := 280;
 
  { Coin supérieur droit - Go to Jail }
- Properties[30].Name := 'Go to Jail';
+ Properties[30].Name := 'Allez en Prison';
  Properties[30].Color := LightGray;
  Properties[30].PropertyType := 3;
  Properties[30].Price := 0;
 
  { Côté droit - Groupe Vert }
- Properties[31].Name := 'Pacific Ave';
+ Properties[31].Name := 'Avenue Pacifique';
  Properties[31].Color := Green;
  Properties[31].PropertyType := 0;
  Properties[31].Price := 300;
 
- Properties[32].Name := 'North Carolina Ave';
+ Properties[32].Name := 'Avenue Caroline N.';
  Properties[32].Color := Green;
  Properties[32].PropertyType := 0;
  Properties[32].Price := 300;
 
- Properties[33].Name := 'Community Chest';
+ Properties[33].Name := 'Caisse Communauté';
  Properties[33].Color := LightBlue;
  Properties[33].PropertyType := 3;
  Properties[33].Price := 0;
 
- Properties[34].Name := 'Pennsylvania Ave';
+ Properties[34].Name := 'Avenue Pennsylvanie';
  Properties[34].Color := Green;
  Properties[34].PropertyType := 0;
  Properties[34].Price := 320;
 
- Properties[35].Name := 'Short Line';
+ Properties[35].Name := 'Gare Saint-Lazare';
  Properties[35].Color := Black;
  Properties[35].PropertyType := 1;
  Properties[35].Price := 200;
@@ -250,20 +251,113 @@ Begin
  Properties[36].Price := 0;
 
  { Groupe Bleu foncé }
- Properties[37].Name := 'Park Place';
+ Properties[37].Name := 'Place du Parc';
  Properties[37].Color := Blue;
  Properties[37].PropertyType := 0;
  Properties[37].Price := 350;
 
- Properties[38].Name := 'Luxury Tax';
+ Properties[38].Name := 'Taxe de Luxe';
  Properties[38].Color := White;
  Properties[38].PropertyType := 3;
  Properties[38].Price := 0;
 
- Properties[39].Name := 'Boardwalk';
+ Properties[39].Name := 'Promenade';
  Properties[39].Color := Blue;
  Properties[39].PropertyType := 0;
  Properties[39].Price := 400;
+End;
+
+Procedure DrawDice(X, Y, Value: Integer);
+Var
+ I, J, DotX, DotY: Integer;
+Begin
+ { Dessiner le fond du dé }
+ SetColor(Black);
+ SetFillStyle(SolidFill, White);
+ Bar(X, Y, X + 50, Y + 50);
+ Rectangle(X, Y, X + 50, Y + 50);
+ 
+ { Dessiner les points selon la valeur }
+ SetColor(Black);
+ SetFillStyle(SolidFill, Black);
+ 
+ Case Value of
+  1: Begin
+   { Centre }
+   FillEllipse(X + 25, Y + 25, 4, 4);
+  End;
+  
+  2: Begin
+   { Diagonal }
+   FillEllipse(X + 15, Y + 15, 4, 4);
+   FillEllipse(X + 35, Y + 35, 4, 4);
+  End;
+  
+  3: Begin
+   { Diagonal + centre }
+   FillEllipse(X + 15, Y + 15, 4, 4);
+   FillEllipse(X + 25, Y + 25, 4, 4);
+   FillEllipse(X + 35, Y + 35, 4, 4);
+  End;
+  
+  4: Begin
+   { Quatre coins }
+   FillEllipse(X + 15, Y + 15, 4, 4);
+   FillEllipse(X + 35, Y + 15, 4, 4);
+   FillEllipse(X + 15, Y + 35, 4, 4);
+   FillEllipse(X + 35, Y + 35, 4, 4);
+  End;
+  
+  5: Begin
+   { Quatre coins + centre }
+   FillEllipse(X + 15, Y + 15, 4, 4);
+   FillEllipse(X + 35, Y + 15, 4, 4);
+   FillEllipse(X + 25, Y + 25, 4, 4);
+   FillEllipse(X + 15, Y + 35, 4, 4);
+   FillEllipse(X + 35, Y + 35, 4, 4);
+  End;
+  
+  6: Begin
+   { Deux colonnes de trois }
+   FillEllipse(X + 15, Y + 12, 4, 4);
+   FillEllipse(X + 15, Y + 25, 4, 4);
+   FillEllipse(X + 15, Y + 38, 4, 4);
+   FillEllipse(X + 35, Y + 12, 4, 4);
+   FillEllipse(X + 35, Y + 25, 4, 4);
+   FillEllipse(X + 35, Y + 38, 4, 4);
+  End;
+ End;
+End;
+
+Procedure DrawDiceArea;
+Var
+ SumStr: String;
+Begin
+ { Dessiner la zone des dés }
+ SetColor(Black);
+ SetFillStyle(SolidFill, DarkGray);
+ Bar(420, 150, 580, 280);
+ Rectangle(420, 150, 580, 280);
+ 
+ { Titre }
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(460, 160, 'LANCER DES');
+ 
+ { Dessiner les deux dés }
+ DrawDice(440, 180, Dice1);
+ DrawDice(500, 180, Dice2);
+ 
+ { Afficher la somme }
+ SetColor(Yellow);
+ SetTextStyle(DefaultFont, HorizDir, 2);
+ Str(Dice1 + Dice2, SumStr);
+ OutTextXY(470, 240, SumStr);
+ 
+ { Instructions }
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(420, 260, 'Appuyez ESPACE pour lancer');
 End;
 
 Procedure GetCellPosition(Index: Integer; Var X, Y: Integer);
@@ -351,7 +445,7 @@ Begin
  If Properties[Index].Price > 0 Then Begin
   Str(Properties[Index].Price, PriceStr);
   SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(X + 5, Y + 30, '$' + PriceStr);
+  OutTextXY(X + 5, Y + 30, PriceStr + 'F');
  End;
 End;
 
@@ -364,34 +458,34 @@ Begin
  Rectangle(360, 360, 400, 400);
  SetColor(Black);
  SetTextStyle(DefaultFont, HorizDir, 1);
- OutTextXY(370, 370, 'GO');
- OutTextXY(365, 385, 'Collect');
- OutTextXY(368, 395, '$200');
+ OutTextXY(370, 370, 'DEPART');
+ OutTextXY(365, 385, 'Touchez');
+ OutTextXY(368, 395, '200F');
  
  { Coin JAIL (10) }
  SetFillStyle(SolidFill, LightGray);
  Bar(0, 360, 40, 400);
  Rectangle(0, 360, 40, 400);
  SetColor(Black);
- OutTextXY(8, 370, 'JAIL');
- OutTextXY(5, 385, 'Just');
- OutTextXY(3, 395, 'Visiting');
+ OutTextXY(8, 370, 'PRISON');
+ OutTextXY(5, 385, 'Simple');
+ OutTextXY(3, 395, 'Visite');
  
  { Coin FREE PARKING (20) }
  SetFillStyle(SolidFill, LightRed);
  Bar(0, 0, 40, 40);
  Rectangle(0, 0, 40, 40);
  SetColor(Black);
- OutTextXY(5, 10, 'FREE');
- OutTextXY(3, 25, 'PARKING');
+ OutTextXY(5, 10, 'PARC');
+ OutTextXY(3, 25, 'GRATUIT');
  
  { Coin GO TO JAIL (30) }
  SetFillStyle(SolidFill, LightGray);
  Bar(360, 0, 400, 40);
  Rectangle(360, 0, 400, 40);
  SetColor(Black);
- OutTextXY(365, 10, 'GO TO');
- OutTextXY(370, 25, 'JAIL');
+ OutTextXY(365, 10, 'ALLEZ');
+ OutTextXY(363, 25, 'PRISON');
 End;
 
 Procedure DrawBoard;
@@ -415,9 +509,9 @@ Begin
  { Logo au centre }
  SetColor(Red);
  SetTextStyle(DefaultFont, HorizDir, 1);
- OutTextXY(170, 180, 'The Fast-Dealing');
- OutTextXY(165, 195, 'Property Trading');
- OutTextXY(190, 210, 'Game');
+ OutTextXY(170, 180, 'Le Jeu de Plateau');
+ OutTextXY(165, 195, 'des Affaires et');
+ OutTextXY(175, 210, 'Propriétés');
  
  { Dessiner les coins spéciaux }
  DrawCorners;
@@ -427,6 +521,9 @@ Begin
   If (I <> 10) And (I <> 20) And (I <> 30) Then
    DrawProperty(I);
  End;
+ 
+ { Dessiner la zone des dés }
+ DrawDiceArea;
 End;
 
 Procedure DrawSpecialSymbols;
@@ -448,12 +545,28 @@ End;
 
 BEGIN
  Randomize;
+ 
+ { Initialiser les dés }
+ Dice1 := Random(6) + 1;
+ Dice2 := Random(6) + 1;
+ 
  InitScreen;
  InitProperties;
  DrawBoard;
  DrawSpecialSymbols;
  
- { Attendre une touche }
- ReadKey;
+ { Boucle principale }
+ Repeat
+  Case ReadKey of
+   ' ': Begin
+    { Lancer les dés }
+    Dice1 := Random(6) + 1;
+    Dice2 := Random(6) + 1;
+    DrawDiceArea;
+   End;
+   #27: Break; { Escape pour quitter }
+  End;
+ Until False;
+ 
  CloseGraph;
 END.
