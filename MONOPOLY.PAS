@@ -365,16 +365,16 @@ Var
  I: Integer;
  MoneyStr: String;
 Begin
- { Dessiner la zone des joueurs }
+ { Dessiner la zone des joueurs - élargie de 50 pixels }
  SetColor(Black);
  SetFillStyle(SolidFill, DarkGray);
- Bar(420, 300, 580, 450);
- Rectangle(420, 300, 580, 450);
+ Bar(420, 300, 630, 450);
+ Rectangle(420, 300, 630, 450);
  
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
- OutTextXY(470, 310, 'JOUEURS');
+ OutTextXY(520, 310, 'JOUEURS');
  
  { Afficher chaque joueur }
  For I := 1 to 4 Do Begin
@@ -387,10 +387,10 @@ Begin
    SetColor(Yellow);
   OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
   
-  { Montant d'argent }
+  { Montant d'argent - déplacé de 50 pixels }
   SetColor(LightGreen);
   Str(Players[I].Money, MoneyStr);
-  OutTextXY(520, 325 + (I - 1) * 30, MoneyStr + 'F');
+  OutTextXY(570, 325 + (I - 1) * 30, MoneyStr + '$');
  End;
 End;
 
@@ -460,11 +460,11 @@ Procedure DrawDiceArea;
 Var
  SumStr: String;
 Begin
- { Dessiner la zone des dés }
+ { Dessiner la zone des dés - élargie de 50 pixels }
  SetColor(Black);
  SetFillStyle(SolidFill, DarkGray);
- Bar(420, 150, 580, 280);
- Rectangle(420, 150, 580, 280);
+ Bar(420, 150, 630, 280);
+ Rectangle(420, 150, 630, 280);
  
  { Titre }
  SetColor(White);
@@ -472,14 +472,14 @@ Begin
  OutTextXY(460, 160, 'LANCER DES');
  
  { Dessiner les deux dés }
- DrawDice(440, 180, Dice1);
- DrawDice(500, 180, Dice2);
+ DrawDice(465, 180, Dice1);
+ DrawDice(525, 180, Dice2);
  
  { Afficher la somme }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 2);
  Str(Dice1 + Dice2, SumStr);
- OutTextXY(470, 240, SumStr);
+ OutTextXY(520, 240, SumStr);
  
  { Instructions }
  SetColor(White);
@@ -572,7 +572,7 @@ Begin
  If Properties[Index].Price > 0 Then Begin
   Str(Properties[Index].Price, PriceStr);
   SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(X + 5, Y + 30, PriceStr + 'F');
+  OutTextXY(X + 5, Y + 30, PriceStr + '$');
  End;
 End;
 
@@ -587,7 +587,7 @@ Begin
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(370, 370, 'DEPART');
  OutTextXY(365, 385, 'Touchez');
- OutTextXY(368, 395, '200F');
+ OutTextXY(368, 395, '200$');
  
  { Coin JAIL (10) }
  SetFillStyle(SolidFill, LightGray);
