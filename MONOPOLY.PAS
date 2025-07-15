@@ -790,7 +790,7 @@ End;
 Procedure DrawActionMessage;
 Var
  Line1, Line2: String;
- MaxWidth: Integer;
+ MaxWidth, I, LastSpace: Integer;
 Begin
  { Dessiner la zone des messages d'action }
  SetColor(Black);
@@ -814,11 +814,17 @@ Begin
   OutTextXY(430, 110, ActionMessage);
  End Else Begin
   { Message long - diviser en deux lignes }
-  { Chercher un espace pour couper naturellement }
-  If Pos(' ', Copy(ActionMessage, MaxWidth - 5, 10)) > 0 Then Begin
-   { Couper au dernier espace avant la limite }
-   Line1 := Copy(ActionMessage, 1, MaxWidth - 5 + Pos(' ', Copy(ActionMessage, MaxWidth - 5, 10)) - 1);
-   Line2 := Copy(ActionMessage, Length(Line1) + 2, Length(ActionMessage));
+  { Chercher le dernier espace avant la limite }
+  LastSpace := 0;
+  For I := 1 to MaxWidth Do Begin
+   If (I <= Length(ActionMessage)) And (ActionMessage[I] = ' ') Then
+    LastSpace := I;
+  End;
+  
+  If LastSpace > 0 Then Begin
+   { Couper au dernier espace trouvé }
+   Line1 := Copy(ActionMessage, 1, LastSpace - 1);
+   Line2 := Copy(ActionMessage, LastSpace + 1, Length(ActionMessage));
   End Else Begin
    { Couper brutalement à la limite }
    Line1 := Copy(ActionMessage, 1, MaxWidth);
