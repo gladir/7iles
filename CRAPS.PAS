@@ -10,7 +10,7 @@
 Program GameCraps;
 
 Uses {$IFDEF FPC}
-      PtcGraph,PtcCrt,PtcMouse
+      PtcCrt,PtcGraph,PtcMouse
      {$ELSE}
       Graph,Crt
      {$ENDIF};
@@ -266,12 +266,12 @@ Begin
  
  { Afficher le total }
  Str(Game.Total, TotalText);
- OutTextXY(300, 280, 'Total: ' + TotalText);
+ OutTextXY(300, 330, 'Total: ' + TotalText);
  
  { Afficher le point s'il y en a un }
  If Game.Point > 0 Then Begin
   Str(Game.Point, PointText);
-  OutTextXY(300, 300, 'Point: ' + PointText);
+  OutTextXY(300, 350, 'Point: ' + PointText);
  End;
  
  { Afficher les crédits et mise }
@@ -295,7 +295,13 @@ End;
 
 Procedure DrawMessages;
 Begin
- SetColor(Yellow);
+ { Choisir la couleur selon la phase du jeu }
+ Case Game.GamePhase of
+  GAME_WON: SetColor(Green);     { Messages de victoire en vert }
+  GAME_LOST: SetColor(Red);      { Messages de défaite en rouge }
+  Else SetColor(Yellow);         { Messages normaux en jaune }
+ End;
+ 
  SetTextStyle(DefaultFont, HorizDir, 1);
  
  { Message principal }
@@ -335,46 +341,100 @@ Begin
  SetColor(DarkGreen);
  SetFillStyle(SolidFill, DarkGreen);
  
- { Corps principal de la table - largeur et hauteur doublées }
- Bar(120, 120, 530, 360);
+ { Corps principal de la table - largeur augmentée de 50 pixels }
+ Bar(95, 140, 555, 340);
  
  { Coins arrondis - gauche }
- FillEllipse(120, 140, 20, 20);
- FillEllipse(120, 340, 20, 20);
- Bar(100, 140, 120, 340);
+ FillEllipse(95, 160, 20, 20);
+ FillEllipse(95, 320, 20, 20);
+ Bar(75, 160, 95, 320);
  
  { Coins arrondis - droite }
- FillEllipse(530, 140, 20, 20);
- FillEllipse(530, 340, 20, 20);
- Bar(530, 140, 550, 340);
+ FillEllipse(555, 160, 20, 20);
+ FillEllipse(555, 320, 20, 20);
+ Bar(555, 160, 575, 320);
  
  { Bordure verte de la table }
  SetColor(Green);
  SetLineStyle(SolidLn, 0, ThickWidth);
  
  { Bordures droites }
- Line(120, 120, 530, 120); { Haut }
- Line(120, 360, 530, 360); { Bas }
- Line(100, 140, 100, 340); { Gauche }
- Line(550, 140, 550, 340); { Droite }
+ Line(95, 140, 555, 140); { Haut }
+ Line(95, 340, 555, 340); { Bas }
+ Line(75, 160, 75, 320); { Gauche }
+ Line(575, 160, 575, 320); { Droite }
  
  { Bordures courbes }
- Arc(120, 140, 90, 180, 20);  { Coin haut-gauche }
- Arc(120, 340, 180, 270, 20); { Coin bas-gauche }
- Arc(530, 140, 0, 90, 20);    { Coin haut-droite }
- Arc(530, 340, 270, 360, 20); { Coin bas-droite }
+ Arc(95, 160, 90, 180, 20);  { Coin haut-gauche }
+ Arc(95, 320, 180, 270, 20); { Coin bas-gauche }
+ Arc(555, 160, 0, 90, 20);    { Coin haut-droite }
+ Arc(555, 320, 270, 360, 20); { Coin bas-droite }
  
  { Ligne centrale de la table }
  SetColor(White);
  SetLineStyle(SolidLn, 0, NormWidth);
- Line(325, 140, 325, 340);
+ Line(325, 160, 325, 320);
+ 
+ { Lignes blanches pour délimiter les zones de paris }
+ { Ligne horizontale pour séparer PASS/DON'T PASS }
+ Line(95, 240, 555, 240);
+ 
+ { Lignes verticales pour délimiter les sections }
+ Line(200, 160, 200, 320); { Sépare la zone gauche }
+ Line(450, 160, 450, 320); { Sépare la zone droite }
+ 
+ { Lignes pour les zones de nombres }
+ Line(115, 180, 185, 180); { Ligne au-dessus de PASS }
+ Line(115, 200, 185, 200); { Ligne en dessous de PASS }
+ Line(115, 280, 185, 280); { Ligne au-dessus de DON'T PASS }
+ Line(115, 300, 185, 300); { Ligne en dessous de DON'T PASS }
+ 
+ Line(340, 180, 435, 180); { Ligne au-dessus de COME }
+ Line(340, 200, 435, 200); { Ligne en dessous de COME }
+ Line(340, 280, 435, 280); { Ligne au-dessus de DON'T COME }
+ Line(340, 300, 435, 300); { Ligne en dessous de DON'T COME }
+ 
+ { Lignes pour délimiter les zones de nombres de points }
+ Line(220, 160, 220, 200); { Sépare 4 }
+ Line(240, 160, 240, 200); { Sépare 5 }
+ Line(260, 160, 260, 200); { Sépare SIX }
+ Line(290, 160, 290, 200); { Sépare 8 }
+ Line(310, 160, 310, 200); { Sépare NINE }
+ Line(335, 160, 335, 200); { Sépare 10 }
+ 
+ Line(220, 280, 220, 320); { Sépare 4 (bas) }
+ Line(240, 280, 240, 320); { Sépare 5 (bas) }
+ Line(260, 280, 260, 320); { Sépare SIX (bas) }
+ Line(290, 280, 290, 320); { Sépare 8 (bas) }
+ Line(310, 280, 310, 320); { Sépare NINE (bas) }
+ Line(335, 280, 335, 320); { Sépare 10 (bas) }
  
  { Zones de paris simplifiées }
- SetColor(LightGray);
- OutTextXY(140, 150, 'PASS');
- OutTextXY(140, 320, 'DON''T PASS');
- OutTextXY(380, 150, 'COME');
- OutTextXY(380, 320, 'DON''T COME');
+ SetColor(Yellow);
+ OutTextXY(115, 170, 'PASS');
+ OutTextXY(115, 300, 'DON''T PASS');
+ SetColor(Red);
+ OutTextXY(405, 170, 'COME');
+ OutTextXY(405, 300, 'DON''T COME');
+ 
+ { Zones de nombres de points - rangée supérieure }
+ SetColor(White);
+ OutTextXY(225, 170, '4');
+ OutTextXY(245, 170, '5');
+ OutTextXY(265, 170, 'SIX');
+ OutTextXY(295, 170, '8');
+ OutTextXY(315, 170, 'NINE');
+ OutTextXY(340, 170, '10');
+ 
+ { Zones de nombres de points - rangée inférieure }
+ OutTextXY(225, 300, '4');
+ OutTextXY(245, 300, '5');
+ OutTextXY(265, 300, 'SIX');
+ OutTextXY(295, 300, '8');
+ OutTextXY(315, 300, 'NINE');
+ OutTextXY(340, 300, '10');
+ 
+ SetColor(Yellow);
 End;
 
 Procedure DrawScreen;
@@ -478,9 +538,10 @@ End;
 
 Procedure InitGame;
 Begin
- Game.Die1.Value := 1;
- Game.Die2.Value := 1;
- Game.Total := 2;
+ { Initialiser les dés avec des valeurs aléatoires }
+ Game.Die1.Value := Random(6) + 1;
+ Game.Die2.Value := Random(6) + 1;
+ Game.Total := Game.Die1.Value + Game.Die2.Value;
  Game.Point := 0;
  Game.GamePhase := GAME_COME_OUT;
  Game.Message := 'Appuyez sur ESPACE pour commencer';
@@ -493,6 +554,10 @@ End;
 
 Procedure NewGame;
 Begin
+ { Réinitialiser les dés avec des valeurs aléatoires }
+ Game.Die1.Value := Random(6) + 1;
+ Game.Die2.Value := Random(6) + 1;
+ Game.Total := Game.Die1.Value + Game.Die2.Value;
  Game.Point := 0;
  Game.GamePhase := GAME_COME_OUT;
  Game.Message := 'Nouvelle partie - Appuyez sur ESPACE';
