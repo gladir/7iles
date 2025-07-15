@@ -1,25 +1,7 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @created: 2025
   @website(https://www.gladir.com/7iles)
-  Properties Properties[6].N Propertie Properties[9].Name := 'Avenue Connecticut';
- Properties[9].Color := LightBlue;
- Properties[9].PropertyType := 0;
- Properties[9].Price := 120;
- Properties[9].Rent := 18;.Name := 'Avenue Vermont';
- Properties[8].Color := LightBlue;
- Properties[8].PropertyType := 0;
- Properties[8].Price := 100;
- Properties[8].Rent := 15;:= 'Avenue Oriental';
- Properties[6].Color := LightBlue;
- Properties[6].PropertyType := 0;
- Properties[6].Price := 100;
- Properties[6].Rent := 15;Name := 'Gare Montparnasse';
- Properties[5].Color := Black;
- Properties[5].PropertyType := 1;
- Properties[5].Price := 200;
- Properties[5].Rent := 25;stract(Target: Turbo Pascal 7, Free Pascal 3.2)
-  @description: MONOPOLY - Jeu de plateau graphique
-  Plateau de Monopoly avec propriétés authentiques et couleurs originales
+  @description: MONOPOLY - Jeu de propri�t�s
 }
 
 Program MonopolyBoard;
@@ -388,7 +370,7 @@ Begin
    Rectangle(X + 4, Y + 4, X + 12, Y + 8);
    Line(X + 8, Y + 4, X + 8, Y + 2);
   End;
-  
+
   1: Begin { Dé à coudre }
    SetFillStyle(SolidFill, Yellow);
    Bar(X + 4, Y + 2, X + 12, Y + 14);
@@ -403,7 +385,7 @@ Begin
    Circle(X + 6, Y + 11, 1);
    Circle(X + 10, Y + 11, 1);
   End;
-  
+
   2: Begin { Voiture }
    SetFillStyle(SolidFill, Red);
    Bar(X + 2, Y + 8, X + 14, Y + 12);
@@ -416,7 +398,7 @@ Begin
    Circle(X + 4, Y + 12, 2);
    Circle(X + 12, Y + 12, 2);
   End;
-  
+
   3: Begin { Chapeau }
    SetFillStyle(SolidFill, Brown);
    Bar(X + 2, Y + 12, X + 14, Y + 14);
@@ -438,36 +420,36 @@ Begin
  SetFillStyle(SolidFill, DarkGray);
  Bar(420, 300, 630, 450);
  Rectangle(420, 300, 630, 450);
- 
+
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(520, 310, 'JOUEURS');
- 
+
  { Afficher chaque joueur }
  For I := 1 to 4 Do Begin
   { Ne pas afficher les joueurs en faillite }
   If Players[I].Money >= 0 Then Begin
    { Icône du joueur }
    DrawPlayerIcon(430, 320 + (I - 1) * 30, Players[I].Icon);
-   
+
    { Nom du joueur }
    SetColor(White);
    If Players[I].IsHuman Then
     SetColor(Yellow);
-   
+
    { Mettre en évidence le joueur actuel }
    If I = CurrentPlayer Then
     SetColor(LightRed);
-    
+
    OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
-   
+
    { Afficher "A TON TOUR" pour le joueur actuel }
    If I = CurrentPlayer Then Begin
     SetColor(LightRed);
     OutTextXY(450, 335 + (I - 1) * 30, 'A TON TOUR');
    End;
-   
+
    { Montant d'argent - déplacé de 50 pixels }
    SetColor(LightGreen);
    Str(Players[I].Money, MoneyStr);
@@ -489,30 +471,30 @@ Begin
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + 50, Y + 50);
  Rectangle(X, Y, X + 50, Y + 50);
- 
+
  { Dessiner les points selon la valeur }
  SetColor(Black);
  SetFillStyle(SolidFill, Black);
- 
+
  Case Value of
   1: Begin
    { Centre }
    FillEllipse(X + 25, Y + 25, 4, 4);
   End;
-  
+
   2: Begin
    { Diagonal }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-  
+
   3: Begin
    { Diagonal + centre }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 25, Y + 25, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-  
+
   4: Begin
    { Quatre coins }
    FillEllipse(X + 15, Y + 15, 4, 4);
@@ -520,7 +502,7 @@ Begin
    FillEllipse(X + 15, Y + 35, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-  
+
   5: Begin
    { Quatre coins + centre }
    FillEllipse(X + 15, Y + 15, 4, 4);
@@ -529,7 +511,7 @@ Begin
    FillEllipse(X + 15, Y + 35, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-  
+
   6: Begin
    { Deux colonnes de trois }
    FillEllipse(X + 15, Y + 12, 4, 4);
@@ -551,26 +533,26 @@ Begin
  SetFillStyle(SolidFill, DarkGray);
  Bar(420, 150, 630, 280);
  Rectangle(420, 150, 630, 280);
- 
+
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(460, 160, 'LANCER DES');
- 
+
  { Dessiner les deux dés }
  DrawDice(465, 180, Dice1);
  DrawDice(525, 180, Dice2);
- 
+
  { Afficher la somme }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 2);
  Str(Dice1 + Dice2, SumStr);
  OutTextXY(520, 240, SumStr);
- 
+
  { Instructions contextuelles }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
- 
+
  Case GameState of
   0: OutTextXY(420, 260, ContextualMessage);
   1: Begin
@@ -609,23 +591,23 @@ Var
  I, TotalValue: Integer;
 Begin
  TotalValue := Players[PlayerIndex].Money;
- 
+
  { Ajouter la valeur des propriétés }
  For I := 0 to 39 Do Begin
   If Properties[I].Owner = PlayerIndex Then Begin
    TotalValue := TotalValue + (Properties[I].Price Div 2); { Valeur de revente = 50% du prix }
-   
+
    { Ajouter la valeur des maisons (50% du prix) }
    If Properties[I].PropertyType = 0 Then Begin
     TotalValue := TotalValue + (Properties[I].Houses * Properties[I].HousePrice Div 2);
-    
+
     { Ajouter la valeur de l'hôtel (50% du prix) }
     If Properties[I].HasHotel Then
      TotalValue := TotalValue + (Properties[I].HousePrice Div 2);
    End;
   End;
  End;
- 
+
  GetPlayerAssetValue := TotalValue;
 End;
 
@@ -639,7 +621,7 @@ Var
  I, SoldAmount: Integer;
 Begin
  SoldAmount := 0;
- 
+
  { Vendre d'abord les hôtels }
  For I := 0 to 39 Do Begin
   If (Properties[I].Owner = PlayerIndex) And Properties[I].HasHotel And (SoldAmount < NeededAmount) Then Begin
@@ -649,7 +631,7 @@ Begin
    SoldAmount := SoldAmount + (Properties[I].HousePrice Div 2);
   End;
  End;
- 
+
  { Puis vendre les maisons }
  While SoldAmount < NeededAmount Do Begin
   For I := 0 to 39 Do Begin
@@ -667,7 +649,7 @@ Var
  I, SoldAmount: Integer;
 Begin
  SoldAmount := 0;
- 
+
  { Vendre les propriétés (50% du prix d'achat) }
  For I := 0 to 39 Do Begin
   If (Properties[I].Owner = PlayerIndex) And (SoldAmount < NeededAmount) Then Begin
@@ -689,25 +671,25 @@ Begin
   HandleDebt := True;
   Exit;
  End;
- 
+
  NeededAmount := DebtAmount - Players[PlayerIndex].Money;
- 
+
  { Vérifier si le joueur peut payer en vendant ses biens }
  If Not CanPayDebt(PlayerIndex, DebtAmount) Then Begin
   { Faillite - le joueur ne peut pas payer même en vendant tout }
   HandleDebt := False;
   Exit;
  End;
- 
+
  { Vendre des bâtiments d'abord }
  SellBuildings(PlayerIndex, NeededAmount);
- 
+
  { Si pas encore assez, vendre des propriétés }
  If Players[PlayerIndex].Money < DebtAmount Then Begin
   NeededAmount := DebtAmount - Players[PlayerIndex].Money;
   SellProperties(PlayerIndex, NeededAmount);
  End;
- 
+
  HandleDebt := True;
 End;
 
@@ -723,7 +705,7 @@ Begin
    Properties[I].HasHotel := False;
   End;
  End;
- 
+
  { Marquer le joueur comme éliminé }
  Players[PlayerIndex].Money := -1; { Indicateur de faillite }
  Players[PlayerIndex].Name := Players[PlayerIndex].Name + ' (FAILLITE)';
@@ -743,7 +725,7 @@ Var
 Begin
  Count := 0;
  Total := 0;
- 
+
  { Compter les propriétés du groupe }
  For I := 0 to 39 Do Begin
   If Properties[I].Group = GroupNum Then Begin
@@ -752,7 +734,7 @@ Begin
     Inc(Count);
   End;
  End;
- 
+
  HasCompleteGroup := (Count = Total) And (Total > 0);
 End;
 
@@ -797,18 +779,18 @@ Begin
  SetFillStyle(SolidFill, DarkGray);
  Bar(420, 70, 630, 140);
  Rectangle(420, 70, 630, 140);
- 
+
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(500, 80, 'ACTION');
- 
+
  { Message d'action sur deux lignes si nécessaire }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 1);
- 
+
  MaxWidth := 25; { Largeur maximale en caractères }
- 
+
  If Length(ActionMessage) <= MaxWidth Then Begin
   { Message court - une seule ligne }
   OutTextXY(430, 110, ActionMessage);
@@ -820,7 +802,7 @@ Begin
    If (I <= Length(ActionMessage)) And (ActionMessage[I] = ' ') Then
     LastSpace := I;
   End;
-  
+
   If LastSpace > 0 Then Begin
    { Couper au dernier espace trouvé }
    Line1 := Copy(ActionMessage, 1, LastSpace - 1);
@@ -830,7 +812,7 @@ Begin
    Line1 := Copy(ActionMessage, 1, MaxWidth);
    Line2 := Copy(ActionMessage, MaxWidth + 1, Length(ActionMessage));
   End;
-  
+
   { Afficher les deux lignes }
   OutTextXY(430, 100, Line1);
   OutTextXY(430, 115, Line2);
@@ -846,22 +828,22 @@ Var
 Begin
  PropertyIndex := Players[PlayerIndex].Position;
  ActionMsg := '';
- 
+
  { Vérifier le type de case }
  Case PropertyIndex of
   0: Begin { GO }
    Players[PlayerIndex].Money := Players[PlayerIndex].Money + 200;
    ActionMsg := Players[PlayerIndex].Name + ' passe par GO: +200$';
   End;
-  
+
   2, 17, 33: Begin { Caisse Communauté }
    ActionMsg := Players[PlayerIndex].Name + ' tire une carte Caisse';
   End;
-  
+
   7, 22, 36: Begin { Chance }
    ActionMsg := Players[PlayerIndex].Name + ' tire une carte Chance';
   End;
-  
+
   4: Begin { Impôt sur revenu }
    If HandleDebt(PlayerIndex, 200) Then Begin
     Players[PlayerIndex].Money := Players[PlayerIndex].Money - 200;
@@ -871,7 +853,7 @@ Begin
     ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur impôt!';
    End;
   End;
-  
+
   38: Begin { Taxe de luxe }
    If HandleDebt(PlayerIndex, 100) Then Begin
     Players[PlayerIndex].Money := Players[PlayerIndex].Money - 100;
@@ -881,28 +863,28 @@ Begin
     ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur taxe!';
    End;
   End;
-  
+
   10: Begin { Prison - visite }
    ActionMsg := Players[PlayerIndex].Name + ' visite la prison';
   End;
-  
+
   20: Begin { Parc gratuit }
    ActionMsg := Players[PlayerIndex].Name + ' se repose au parc';
   End;
-  
+
   30: Begin { Allez en prison }
    Players[PlayerIndex].Position := 10;
    Players[PlayerIndex].InJail := True;
    Players[PlayerIndex].JailTurns := 0;
    ActionMsg := Players[PlayerIndex].Name + ' va en prison!';
   End;
-  
+
   Else Begin
    { Propriété normale }
-   If (Properties[PropertyIndex].PropertyType = 0) Or 
-      (Properties[PropertyIndex].PropertyType = 1) Or 
+   If (Properties[PropertyIndex].PropertyType = 0) Or
+      (Properties[PropertyIndex].PropertyType = 1) Or
       (Properties[PropertyIndex].PropertyType = 2) Then Begin
-    
+
     If Properties[PropertyIndex].Owner = 0 Then Begin
      { Propriété libre }
      If Players[PlayerIndex].IsHuman Then Begin
@@ -927,7 +909,7 @@ Begin
     End Else If Properties[PropertyIndex].Owner <> PlayerIndex Then Begin
      { Propriété appartient à un autre joueur - payer loyer }
      RentAmount := Properties[PropertyIndex].Rent;
-     
+
      { Calcul du loyer avec maisons/hôtels }
      If Properties[PropertyIndex].PropertyType = 0 Then Begin
       If Properties[PropertyIndex].HasHotel Then
@@ -935,7 +917,7 @@ Begin
       Else If Properties[PropertyIndex].Houses > 0 Then
        RentAmount := RentAmount * (Properties[PropertyIndex].Houses + 1);
      End;
-     
+
      { Vérifier si le joueur peut payer le loyer }
      If HandleDebt(PlayerIndex, RentAmount) Then Begin
       Players[PlayerIndex].Money := Players[PlayerIndex].Money - RentAmount;
@@ -945,12 +927,13 @@ Begin
      End Else Begin
       { Faillite - transférer tous les biens au créancier }
       EliminatePlayer(PlayerIndex);
-      Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + Players[PlayerIndex].Money;
+      Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money +
+                                                        Players[PlayerIndex].Money;
       ActionMsg := Players[PlayerIndex].Name + ' fait faillite! Biens transférés.';
      End;
     End Else Begin
      ActionMsg := Players[PlayerIndex].Name + ' sur sa propriété';
-     
+
      { Proposer la construction pour le joueur humain }
      If Players[PlayerIndex].IsHuman And (Properties[PropertyIndex].PropertyType = 0) Then Begin
       If CanBuildHouses(PlayerIndex, PropertyIndex) Or CanBuildHotel(PlayerIndex, PropertyIndex) Then Begin
@@ -962,7 +945,7 @@ Begin
    End;
   End;
  End;
- 
+
  ProcessPlayerAction := ActionMsg;
 End;
 
@@ -975,7 +958,7 @@ Begin
  End Else Begin
   ActionMessage := Players[CurrentPlayer].Name + ' refuse d''acheter ' + Properties[PropertyToBuy].Name;
  End;
- 
+
  GameState := 0;
  ContextualMessage := 'Appuyez ESPACE pour continuer';
 End;
@@ -986,7 +969,7 @@ Var
  PriceStr: String;
 Begin
  PropertyIndex := Players[CurrentPlayer].Position;
- 
+
  Case BuildType of
   'M', 'm': Begin { Maison }
    If CanBuildHouses(CurrentPlayer, PropertyIndex) Then Begin
@@ -998,7 +981,7 @@ Begin
     ActionMessage := 'Impossible de construire une maison';
    End;
   End;
-  
+
   'H', 'h': Begin { Hôtel }
    If CanBuildHotel(CurrentPlayer, PropertyIndex) Then Begin
     Players[CurrentPlayer].Money := Players[CurrentPlayer].Money - Properties[PropertyIndex].HousePrice;
@@ -1010,12 +993,12 @@ Begin
     ActionMessage := 'Impossible de construire un hôtel';
    End;
   End;
-  
+
   'Q', 'q': Begin { Quitter }
    ActionMessage := Players[CurrentPlayer].Name + ' termine la construction';
   End;
  End;
- 
+
  If (BuildType = 'Q') Or (BuildType = 'q') Then Begin
   GameState := 0;
   ContextualMessage := 'Appuyez ESPACE pour continuer';
@@ -1030,7 +1013,7 @@ Begin
  { Dessiner chaque joueur sur sa position actuelle }
  For I := 1 to 4 Do Begin
   GetCellPosition(Players[I].Position, X, Y);
-  
+
   { Calculer l'offset pour éviter la superposition des joueurs }
   Case I of
    1: Begin OffsetX := 2; OffsetY := 2; End;    { Joueur 1 - coin haut-gauche }
@@ -1038,7 +1021,7 @@ Begin
    3: Begin OffsetX := 2; OffsetY := 22; End;   { Joueur 3 - coin bas-gauche }
    4: Begin OffsetX := 22; OffsetY := 22; End;  { Joueur 4 - coin bas-droit }
   End;
-  
+
   { Dessiner l'icône du joueur à sa position }
   DrawPlayerIcon(X + OffsetX, Y + OffsetY, Players[I].Icon);
  End;
@@ -1049,13 +1032,13 @@ Var
  X, Y, I: Integer;
 Begin
  If Properties[Index].PropertyType <> 0 Then Exit;
- 
+
  GetCellPosition(Index, X, Y);
- 
+
  { Dessiner les maisons }
  SetColor(Green);
  SetFillStyle(SolidFill, Green);
- 
+
  For I := 1 to Properties[Index].Houses Do Begin
   If Index <= 10 Then Begin
    { Côté bas }
@@ -1071,7 +1054,7 @@ Begin
    Bar(X + 15, Y + 15 + (I - 1) * 5, X + 20, Y + 18 + (I - 1) * 5);
   End;
  End;
- 
+
  { Dessiner l'hôtel }
  If Properties[Index].HasHotel Then Begin
   SetColor(Red);
@@ -1102,13 +1085,13 @@ Var
  PriceStr: String;
 Begin
  GetCellPosition(Index, X, Y);
- 
+
  { Dessiner la cellule de base }
  SetColor(Black);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + CELL_SIZE, Y + CELL_SIZE);
  Rectangle(X, Y, X + CELL_SIZE, Y + CELL_SIZE);
- 
+
  { Dessiner la bande de couleur pour les propriétés }
  If Properties[Index].PropertyType = 0 Then Begin
   SetFillStyle(SolidFill, Properties[Index].Color);
@@ -1123,11 +1106,11 @@ Begin
     Bar(X + 1, Y + CELL_SIZE - PROPERTY_HEIGHT, X + CELL_SIZE - 1, Y + CELL_SIZE - 1);
   End;
  End;
- 
+
  { Dessiner le texte du nom }
  SetColor(Black);
  SetTextStyle(DefaultFont, HorizDir, 1);
- 
+
  { Ajuster le texte selon la position }
  If Index <= 10 Then Begin
   { Côté bas - texte vertical }
@@ -1154,14 +1137,14 @@ Begin
   Else
    OutTextXY(X + 12, Y + 15, Properties[Index].Name);
  End;
- 
+
  { Afficher le prix pour les propriétés }
  If Properties[Index].Price > 0 Then Begin
   Str(Properties[Index].Price, PriceStr);
   SetTextStyle(DefaultFont, HorizDir, 1);
   OutTextXY(X + 5, Y + 30, PriceStr + '$');
  End;
- 
+
  { Dessiner les maisons et hôtels }
  DrawHousesAndHotels(Index);
 End;
@@ -1178,7 +1161,7 @@ Begin
  OutTextXY(370, 370, 'DEPART');
  OutTextXY(365, 385, 'Touchez');
  OutTextXY(368, 395, '200$');
- 
+
  { Coin JAIL (10) }
  SetFillStyle(SolidFill, LightGray);
  Bar(0, 360, 40, 400);
@@ -1187,7 +1170,7 @@ Begin
  OutTextXY(8, 370, 'PRISON');
  OutTextXY(5, 385, 'Simple');
  OutTextXY(3, 395, 'Visite');
- 
+
  { Coin FREE PARKING (20) }
  SetFillStyle(SolidFill, LightRed);
  Bar(0, 0, 40, 40);
@@ -1195,7 +1178,7 @@ Begin
  SetColor(Black);
  OutTextXY(5, 10, 'PARC');
  OutTextXY(3, 25, 'GRATUIT');
- 
+
  { Coin GO TO JAIL (30) }
  SetFillStyle(SolidFill, LightGray);
  Bar(360, 0, 400, 40);
@@ -1213,55 +1196,83 @@ Begin
  SetColor(Black);
  SetFillStyle(SolidFill, Black);
  Bar(0, 0, 640, 480);
- 
+
  { Centre du plateau }
  SetFillStyle(SolidFill, Green);
  Bar(40, 40, 360, 360);
- 
+
  { Titre au centre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 2);
  OutTextXY(150, 150, 'MONOPOLY');
- 
+
  { Logo au centre }
  SetColor(Red);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(170, 180, 'Le Jeu de Plateau');
  OutTextXY(165, 195, 'des Affaires et');
  OutTextXY(175, 210, 'Propriétés');
- 
+
  { Dessiner les coins spéciaux }
  DrawCorners;
- 
+
  { Dessiner toutes les propriétés }
  For I := 1 to 39 Do Begin
   If (I <> 10) And (I <> 20) And (I <> 30) Then
    DrawProperty(I);
  End;
- 
+
  { Dessiner la zone des dés }
  DrawDiceArea;
- 
+
  { Dessiner la zone d'action }
  DrawActionMessage;
- 
+
  { Dessiner les informations des joueurs }
  DrawPlayersInfo;
- 
+
  { Dessiner les joueurs sur le plateau }
  DrawPlayersOnBoard;
+End;
+
+Procedure DrawCardStack(X, Y: Integer);
+Begin
+ { Dessiner une pile de 3 cartes avec effet de profondeur }
+ { Carte du fond (la plus éloignée) }
+ SetColor(DarkGray);
+ SetFillStyle(SolidFill, DarkGray);
+ Bar(X + 4, Y + 4, X + 24, Y + 34);
+ SetColor(Black);
+ Rectangle(X + 4, Y + 4, X + 24, Y + 34);
+
+ { Carte du milieu }
+ SetColor(LightGray);
+ SetFillStyle(SolidFill, LightGray);
+ Bar(X + 2, Y + 2, X + 22, Y + 32);
+ SetColor(Black);
+ Rectangle(X + 2, Y + 2, X + 22, Y + 32);
+
+ { Carte du dessus (la plus proche) }
+ SetColor(White);
+ SetFillStyle(SolidFill, White);
+ Bar(X, Y, X + 20, Y + 30);
+ SetColor(Black);
+ Rectangle(X, Y, X + 20, Y + 30);
+
+ { Ajouter un motif sur la carte du dessus }
+ SetColor(Red);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+ OutTextXY(X + 8, Y + 12, '?');
 End;
 
 Procedure DrawSpecialSymbols;
 Begin
  { Dessiner des symboles spéciaux }
- SetColor(White);
- 
- { Chance - point d'interrogation }
- SetTextStyle(DefaultFont, HorizDir, 2);
- OutTextXY(100, 100, '?');
- OutTextXY(250, 250, '?');
- 
+
+ { Chance - pile de cartes }
+ DrawCardStack(100, 100);
+ DrawCardStack(250, 250);
+
  { Community Chest - coffre }
  SetColor(Yellow);
  Rectangle(80, 280, 110, 300);
@@ -1275,12 +1286,12 @@ Var
 Begin
  NextPlayer := (CurrentPlayerIndex Mod 4) + 1;
  StartPlayer := NextPlayer;
- 
+
  { Chercher le prochain joueur actif (non en faillite) }
  While (Players[NextPlayer].Money < 0) And (NextPlayer <> StartPlayer) Do Begin
   NextPlayer := (NextPlayer Mod 4) + 1;
  End;
- 
+
  GetNextActivePlayer := NextPlayer;
 End;
 
@@ -1314,45 +1325,45 @@ Begin
  { Lancer les dés }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
- 
+
  { Déplacer le joueur ordinateur }
  Players[PlayerIndex].Position := (Players[PlayerIndex].Position + Dice1 + Dice2) Mod 40;
- 
+
  { Traiter l'action sur la case }
  ActionMessage := ProcessPlayerAction(PlayerIndex);
- 
+
  { Redessiner le plateau }
  DrawBoard;
  DrawSpecialSymbols;
- 
+
  { Attendre 2 secondes }
  Wait2Seconds;
 End;
 
 BEGIN
  Randomize;
- 
+
  { Initialiser les dés }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
- 
+
  { Initialiser le joueur actuel }
  CurrentPlayer := 1;
- 
+
  { Initialiser les états du jeu }
  GameState := 0;
  PropertyToBuy := 0;
- 
+
  { Initialiser les messages }
  ActionMessage := 'Appuyez ESPACE pour commencer';
  ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
- 
+
  InitScreen;
  InitProperties;
  InitPlayers;
  DrawBoard;
  DrawSpecialSymbols;
- 
+
  { Boucle principale }
  Repeat
   { Vérifier s'il ne reste qu'un joueur (fin du jeu) }
@@ -1365,12 +1376,12 @@ BEGIN
    End;
    Break;
   End;
-  
+
   { Passer les joueurs en faillite }
   While Players[CurrentPlayer].Money < 0 Do Begin
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
   End;
-  
+
   If Players[CurrentPlayer].IsHuman Then Begin
    { Tour du joueur humain }
    Case ReadKey of
@@ -1379,19 +1390,19 @@ BEGIN
       { Lancer les dés }
       Dice1 := Random(6) + 1;
       Dice2 := Random(6) + 1;
-      
+
       { Déplacer le joueur humain }
       Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
-      
+
       { Gérer l'action du joueur sur la case }
       ActionMessage := ProcessPlayerAction(CurrentPlayer);
-      
+
       { Si pas de demande d'achat/construction, passer au joueur suivant }
       If GameState = 0 Then Begin
        CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
        ContextualMessage := 'Appuyez ESPACE pour continuer';
       End;
-      
+
       { Redessiner le plateau complet }
       DrawBoard;
       DrawSpecialSymbols;
@@ -1403,7 +1414,7 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-    
+
     'O', 'o': Begin
      If GameState = 1 Then Begin
       HandlePurchase(True);
@@ -1411,7 +1422,7 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-    
+
     'N', 'n': Begin
      If GameState = 1 Then Begin
       HandlePurchase(False);
@@ -1419,7 +1430,7 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-    
+
     'M', 'm': Begin
      If GameState = 2 Then Begin
       HandleConstruction('M');
@@ -1427,7 +1438,7 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-    
+
     'H', 'h': Begin
      If GameState = 2 Then Begin
       HandleConstruction('H');
@@ -1435,7 +1446,7 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-    
+
     'Q', 'q': Begin
      If GameState = 2 Then Begin
       HandleConstruction('Q');
@@ -1443,7 +1454,7 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-    
+
     #27: Break; { Escape pour quitter }
    End;
   End Else Begin
@@ -1451,12 +1462,12 @@ BEGIN
    If Players[CurrentPlayer].Money >= 0 Then Begin
     PlayComputerTurn(CurrentPlayer);
    End;
-   
+
    { Passer au joueur suivant }
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
    ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
   End;
  Until False;
- 
+
  CloseGraph;
 END.
