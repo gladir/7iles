@@ -509,6 +509,28 @@ Begin
  End;
 End;
 
+Procedure DrawPlayersOnBoard;
+Var
+ I, X, Y: Integer;
+ OffsetX, OffsetY: Integer;
+Begin
+ { Dessiner chaque joueur sur sa position actuelle }
+ For I := 1 to 4 Do Begin
+  GetCellPosition(Players[I].Position, X, Y);
+  
+  { Calculer l'offset pour éviter la superposition des joueurs }
+  Case I of
+   1: Begin OffsetX := 2; OffsetY := 2; End;    { Joueur 1 - coin haut-gauche }
+   2: Begin OffsetX := 22; OffsetY := 2; End;   { Joueur 2 - coin haut-droit }
+   3: Begin OffsetX := 2; OffsetY := 22; End;   { Joueur 3 - coin bas-gauche }
+   4: Begin OffsetX := 22; OffsetY := 22; End;  { Joueur 4 - coin bas-droit }
+  End;
+  
+  { Dessiner l'icône du joueur à sa position }
+  DrawPlayerIcon(X + OffsetX, Y + OffsetY, Players[I].Icon);
+ End;
+End;
+
 Procedure DrawProperty(Index: Integer);
 Var
  X, Y: Integer;
@@ -654,6 +676,9 @@ Begin
  
  { Dessiner les informations des joueurs }
  DrawPlayersInfo;
+ 
+ { Dessiner les joueurs sur le plateau }
+ DrawPlayersOnBoard;
 End;
 
 Procedure DrawSpecialSymbols;
@@ -672,6 +697,7 @@ Begin
  SetColor(Brown);
  Rectangle(85, 285, 105, 295);
 End;
+
 
 BEGIN
  Randomize;
@@ -693,7 +719,13 @@ BEGIN
     { Lancer les dés }
     Dice1 := Random(6) + 1;
     Dice2 := Random(6) + 1;
-    DrawDiceArea;
+    
+    { Déplacer le joueur humain }
+    Players[1].Position := (Players[1].Position + Dice1 + Dice2) Mod 40;
+    
+    { Redessiner le plateau complet }
+    DrawBoard;
+    DrawSpecialSymbols;
    End;
    #27: Break; { Escape pour quitter }
   End;
