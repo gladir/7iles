@@ -2,9 +2,9 @@
   @created: 2025
   @website(https://www.gladir.com/7iles)
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
-  @description: CRAPS - Jeu de d√©s de casino
-  R√®gles: Premier lancer - 7 ou 11 = gagn√©, 2,3,12 = perdu
-  Autres nombres deviennent le "point" - relancer jusqu'√† obtenir le point (gagn√©) ou 7 (perdu)
+  @description: CRAPS - Jeu de dÇs de casino
+  Rägles: Premier lancer - 7 ou 11 = gagnÇ, 2,3,12 = perdu
+  Autres nombres deviennent le "point" - relancer jusqu'Ö obtenir le point (gagnÇ) ou 7 (perdu)
 }
 
 Program GameCraps;
@@ -12,28 +12,28 @@ Program GameCraps;
 Uses {$IFDEF FPC}
       PtcCrt,PtcGraph,PtcMouse
      {$ELSE}
-      Graph,Crt
+      DOS,Graph,Crt
      {$ENDIF};
 
 Const
  SCREEN_WIDTH = 640;
  SCREEN_HEIGHT = 480;
  DIE_SIZE = 60;
- 
- { Couleurs personnalis√©es }
+
+ { Couleurs personnalisÇes }
  Green = 2;
  DarkGreen = 1;
- 
+
  { √âtats du jeu }
  GAME_COME_OUT = 0;  { Premier lancer }
  GAME_POINT = 1;     { Phase point }
- GAME_WON = 2;       { Gagn√© }
+ GAME_WON = 2;       { GagnÇ }
  GAME_LOST = 3;      { Perdu }
- 
+
  { R√©sultats possibles }
  RESULT_NATURAL = 0;    { 7 ou 11 au premier lancer }
  RESULT_CRAPS = 1;      { 2, 3 ou 12 au premier lancer }
- RESULT_POINT = 2;      { Point √©tabli }
+ RESULT_POINT = 2;      { Point Çtabli }
  RESULT_SEVEN_OUT = 3;  { 7 en phase point }
  RESULT_POINT_MADE = 4; { Point refait }
 
@@ -95,12 +95,12 @@ Var
 
  Procedure ShowMouse;
  Begin
-  { Pas d'impl√©mentation pour Free Pascal }
+  { Pas d'implÇmentation pour Free Pascal }
  End;
 
  Procedure GetMouseState(Var X, Y, Button: LongInt);
  Begin
-  { Impl√©mentation basique pour Free Pascal }
+  { ImplÇmentation basique pour Free Pascal }
   X := 0; Y := 0; Button := 0;
  End;
 {$ENDIF}
@@ -125,45 +125,41 @@ Begin
  End;
 End;
 
-Procedure DrawDie(X, Y: Integer; Value: Integer);
-Begin
- { Fond du d√© }
+Procedure DrawDie(X,Y:Integer;Value:Integer);Begin
+ { Fond du dÇ }
  SetColor(White);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + DIE_SIZE, Y + DIE_SIZE);
- 
  { Bordure }
  SetColor(Black);
  Rectangle(X, Y, X + DIE_SIZE, Y + DIE_SIZE);
- 
  { Dessiner les points selon la valeur }
  SetColor(Black);
  SetFillStyle(SolidFill, Black);
- 
  Case Value of
-  1: Begin
+  1:Begin
    { Centre }
    FillEllipse(X + DIE_SIZE Div 2, Y + DIE_SIZE Div 2, 4, 4);
   End;
-  2: Begin
+  2:Begin
    { Diagonale }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 45, Y + 45, 4, 4);
   End;
-  3: Begin
+  3:Begin
    { Diagonale + centre }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + DIE_SIZE Div 2, Y + DIE_SIZE Div 2, 4, 4);
    FillEllipse(X + 45, Y + 45, 4, 4);
   End;
-  4: Begin
+  4:Begin
    { Quatre coins }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 45, Y + 15, 4, 4);
    FillEllipse(X + 15, Y + 45, 4, 4);
    FillEllipse(X + 45, Y + 45, 4, 4);
   End;
-  5: Begin
+  5:Begin
    { Quatre coins + centre }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 45, Y + 15, 4, 4);
@@ -171,7 +167,7 @@ Begin
    FillEllipse(X + 15, Y + 45, 4, 4);
    FillEllipse(X + 45, Y + 45, 4, 4);
   End;
-  6: Begin
+  6:Begin
    { Deux colonnes }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 45, Y + 15, 4, 4);
@@ -183,24 +179,22 @@ Begin
  End;
 End;
 
-Procedure DrawDice;
-Begin
- { Positionner les d√©s au centre }
+Procedure DrawDice;Begin
+ { Positionner les dÇs au centre }
  Game.Die1.X := 250;
  Game.Die1.Y := 200;
  Game.Die2.X := 330;
  Game.Die2.Y := 200;
- 
  DrawDie(Game.Die1.X, Game.Die1.Y, Game.Die1.Value);
  DrawDie(Game.Die2.X, Game.Die2.Y, Game.Die2.Value);
 End;
 
 Procedure DrawTokens;
 Var
- I, TokenCount: Integer;
- X, Y: Integer;
+ I,TokenCount:Integer;
+ X,Y:Integer;
 Begin
- { D√©terminer le nombre de jetons selon la mise }
+ { DÇterminer le nombre de jetons selon la mise }
  Case Game.Bet of
   5: TokenCount := 1;
   10: TokenCount := 2;
@@ -209,44 +203,39 @@ Begin
   100: TokenCount := 5;
   Else TokenCount := 0;
  End;
- 
- { Position des jetons dans le coin sup√©rieur droit }
+  { Position des jetons dans le coin supÇrieur droit }
  X := 550;
  Y := 70;
- 
- { Dessiner les jetons empil√©s }
+  { Dessiner les jetons empilÇs }
  For I := 1 to TokenCount Do Begin
   { Ombre du jeton }
   SetColor(DarkGray);
   SetFillStyle(SolidFill, DarkGray);
   FillEllipse(X + 2, Y - (I-1) * 3 + 2, 15, 15);
-  
-  { Jeton principal - alterner entre bleu fonc√© et rouge }
+  { Jeton principal - alterner entre bleu foncÇ et rouge }
   If I Mod 2 = 1 Then Begin
-   { Jeton bleu fonc√© (jetons impairs) }
+   { Jeton bleu foncÇ (jetons impairs) }
    SetColor(Blue);
    SetFillStyle(SolidFill, Blue);
-  End Else Begin
+  End
+   Else
+  Begin
    { Jeton rouge (jetons pairs) }
    SetColor(Red);
    SetFillStyle(SolidFill, Red);
   End;
   FillEllipse(X, Y - (I-1) * 3, 15, 15);
-  
-  { Bordure du jeton }
+   { Bordure du jeton }
   SetColor(White);
   Circle(X, Y - (I-1) * 3, 15);
-  
-  { Cercle int√©rieur pour l'effet 3D }
+   { Cercle intÇrieur pour l'effet 3D }
   SetColor(Black);
   Circle(X, Y - (I-1) * 3, 12);
-  
-  { Point central }
+   { Point central }
   SetColor(White);
   FillEllipse(X, Y - (I-1) * 3, 3, 3);
  End;
- 
- { Afficher le texte "MISE" }
+  { Afficher le texte "MISE" }
  If TokenCount > 0 Then Begin
   SetColor(White);
   SetTextStyle(DefaultFont, HorizDir, 1);
@@ -256,35 +245,29 @@ End;
 
 Procedure DrawGameInfo;
 Var
- TotalText, PointText, CreditsText, BetText, RollText: String;
+ TotalText,PointText,CreditsText,BetText,RollText:String;
 Begin
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 2);
  OutTextXY(250, 20, 'CRAPS');
- 
  SetTextStyle(DefaultFont, HorizDir, 1);
- 
- { Afficher le total }
+  { Afficher le total }
  Str(Game.Total, TotalText);
  OutTextXY(300, 330, 'Total: ' + TotalText);
- 
- { Afficher le point s'il y en a un }
+  { Afficher le point s'il y en a un }
  If Game.Point > 0 Then Begin
   Str(Game.Point, PointText);
   OutTextXY(300, 350, 'Point: ' + PointText);
  End;
- 
- { Afficher les cr√©dits et mise }
+  { Afficher les crÇdits et mise }
  Str(Game.Credits, CreditsText);
  Str(Game.Bet, BetText);
  OutTextXY(50, 50, 'Credits: ' + CreditsText);
  OutTextXY(50, 70, 'Mise: ' + BetText);
- 
- { Afficher le nombre de lancers }
+  { Afficher le nombre de lancers }
  Str(Game.RollCount, RollText);
  OutTextXY(50, 90, 'Lancers: ' + RollText);
- 
- { Afficher la phase de jeu }
+  { Afficher la phase de jeu }
  Case Game.GamePhase of
   GAME_COME_OUT: OutTextXY(50, 110, 'Phase: Come Out');
   GAME_POINT: OutTextXY(50, 110, 'Phase: Point');
@@ -293,131 +276,106 @@ Begin
  End;
 End;
 
-Procedure DrawMessages;
-Begin
+Procedure DrawMessages;Begin
  { Choisir la couleur selon la phase du jeu }
  Case Game.GamePhase of
   GAME_WON: SetColor(Green);     { Messages de victoire en vert }
-  GAME_LOST: SetColor(Red);      { Messages de d√©faite en rouge }
+  GAME_LOST: SetColor(Red);      { Messages de dÇfaite en rouge }
   Else SetColor(Yellow);         { Messages normaux en jaune }
  End;
- 
  SetTextStyle(DefaultFont, HorizDir, 1);
- 
- { Message principal }
+  { Message principal }
  OutTextXY(50, 350, Game.Message);
- 
- { Sous-message }
- If Game.SubMessage <> '' Then Begin
+  { Sous-message }
+ If Game.SubMessage<>''Then Begin
   OutTextXY(50, 370, Game.SubMessage);
  End;
 End;
 
-Procedure DrawInstructions;
-Begin
+Procedure DrawInstructions;Begin
  SetColor(LightGray);
  SetTextStyle(DefaultFont, HorizDir, 1);
- 
  OutTextXY(400, 350, 'Instructions:');
  OutTextXY(400, 370, 'ESPACE - Lancer les des');
  OutTextXY(400, 390, 'N - Nouvelle partie');
  OutTextXY(400, 410, 'ESC - Quitter');
- 
- { Afficher les boutons de mise avec d√©tails }
+  { Afficher les boutons de mise avec d√©tails }
  OutTextXY(400, 430, 'Mises: 1=5  2=10  3=25  4=50  5=100');
 End;
 
-Procedure DrawBackground;
-Begin
+Procedure DrawBackground;Begin
  SetColor(Black);
  SetFillStyle(SolidFill, Black);
  Bar(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
- 
- { Cadre principal }
+  { Cadre principal }
  SetColor(White);
  Rectangle(10, 10, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10);
- 
- { Table de craps avec coins arrondis - √©largie de 2 fois }
+  { Table de craps avec coins arrondis - Çlargie de 2 fois }
  SetColor(DarkGreen);
  SetFillStyle(SolidFill, DarkGreen);
- 
- { Corps principal de la table - largeur augment√©e de 50 pixels }
+  { Corps principal de la table - largeur augment√©e de 50 pixels }
  Bar(95, 140, 555, 340);
- 
- { Coins arrondis - gauche }
+  { Coins arrondis - gauche }
  FillEllipse(95, 160, 20, 20);
  FillEllipse(95, 320, 20, 20);
  Bar(75, 160, 95, 320);
- 
- { Coins arrondis - droite }
+  { Coins arrondis - droite }
  FillEllipse(555, 160, 20, 20);
  FillEllipse(555, 320, 20, 20);
  Bar(555, 160, 575, 320);
- 
- { Bordure verte de la table }
+  { Bordure verte de la table }
  SetColor(Green);
  SetLineStyle(SolidLn, 0, ThickWidth);
- 
- { Bordures droites }
+  { Bordures droites }
  Line(95, 140, 555, 140); { Haut }
  Line(95, 340, 555, 340); { Bas }
  Line(75, 160, 75, 320); { Gauche }
  Line(575, 160, 575, 320); { Droite }
- 
- { Bordures courbes }
+  { Bordures courbes }
  Arc(95, 160, 90, 180, 20);  { Coin haut-gauche }
  Arc(95, 320, 180, 270, 20); { Coin bas-gauche }
  Arc(555, 160, 0, 90, 20);    { Coin haut-droite }
  Arc(555, 320, 270, 360, 20); { Coin bas-droite }
- 
- { Ligne centrale de la table }
+  { Ligne centrale de la table }
  SetColor(White);
  SetLineStyle(SolidLn, 0, NormWidth);
  Line(325, 160, 325, 320);
- 
- { Lignes blanches pour d√©limiter les zones de paris }
- { Ligne horizontale pour s√©parer PASS/DON'T PASS }
+  { Lignes blanches pour dÇlimiter les zones de paris }
+  { Ligne horizontale pour sÇparer PASS/DON'T PASS }
  Line(95, 240, 555, 240);
- 
- { Lignes verticales pour d√©limiter les sections }
- Line(200, 160, 200, 320); { S√©pare la zone gauche }
- Line(450, 160, 450, 320); { S√©pare la zone droite }
- 
- { Lignes pour les zones de nombres }
+  { Lignes verticales pour dÇlimiter les sections }
+ Line(200, 160, 200, 320); { SÇpare la zone gauche }
+ Line(450, 160, 450, 320); { SÇpare la zone droite }
+  { Lignes pour les zones de nombres }
  Line(115, 180, 185, 180); { Ligne au-dessus de PASS }
  Line(115, 200, 185, 200); { Ligne en dessous de PASS }
  Line(115, 280, 185, 280); { Ligne au-dessus de DON'T PASS }
  Line(115, 300, 185, 300); { Ligne en dessous de DON'T PASS }
- 
- Line(340, 180, 435, 180); { Ligne au-dessus de COME }
+  Line(340, 180, 435, 180); { Ligne au-dessus de COME }
  Line(340, 200, 435, 200); { Ligne en dessous de COME }
  Line(340, 280, 435, 280); { Ligne au-dessus de DON'T COME }
  Line(340, 300, 435, 300); { Ligne en dessous de DON'T COME }
- 
- { Lignes pour d√©limiter les zones de nombres de points }
- Line(220, 160, 220, 200); { S√©pare 4 }
- Line(240, 160, 240, 200); { S√©pare 5 }
- Line(260, 160, 260, 200); { S√©pare SIX }
- Line(290, 160, 290, 200); { S√©pare 8 }
- Line(310, 160, 310, 200); { S√©pare NINE }
- Line(335, 160, 335, 200); { S√©pare 10 }
- 
- Line(220, 280, 220, 320); { S√©pare 4 (bas) }
- Line(240, 280, 240, 320); { S√©pare 5 (bas) }
- Line(260, 280, 260, 320); { S√©pare SIX (bas) }
- Line(290, 280, 290, 320); { S√©pare 8 (bas) }
- Line(310, 280, 310, 320); { S√©pare NINE (bas) }
- Line(335, 280, 335, 320); { S√©pare 10 (bas) }
- 
- { Zones de paris simplifi√©es }
+   { Lignes pour d√©limiter les zones de nombres de points }
+ Line(220, 160, 220, 200); { SÇpare 4 }
+ Line(240, 160, 240, 200); { SÇpare 5 }
+ Line(260, 160, 260, 200); { SÇpare SIX }
+ Line(290, 160, 290, 200); { SÇpare 8 }
+ Line(310, 160, 310, 200); { SÇpare NINE }
+ Line(335, 160, 335, 200); { SÇpare 10 }
+ Line(220, 280, 220, 320); { SÇpare 4 (bas) }
+ Line(240, 280, 240, 320); { SÇpare 5 (bas) }
+ Line(260, 280, 260, 320); { SÇpare SIX (bas) }
+ Line(290, 280, 290, 320); { SÇpare 8 (bas) }
+ Line(310, 280, 310, 320); { SÇpare NINE (bas) }
+ Line(335, 280, 335, 320); { SÇpare 10 (bas) }
+ { Zones de paris simplifiÇes }
  SetColor(Yellow);
  OutTextXY(115, 170, 'PASS');
  OutTextXY(115, 300, 'DON''T PASS');
  SetColor(Red);
  OutTextXY(405, 170, 'COME');
  OutTextXY(405, 300, 'DON''T COME');
- 
- { Zones de nombres de points - rang√©e sup√©rieure }
+ { Zones de nombres de points - rangÇe supÇrieure }
  SetColor(White);
  OutTextXY(225, 170, '4');
  OutTextXY(245, 170, '5');
@@ -425,20 +383,17 @@ Begin
  OutTextXY(295, 170, '8');
  OutTextXY(315, 170, 'NINE');
  OutTextXY(340, 170, '10');
- 
- { Zones de nombres de points - rang√©e inf√©rieure }
+ { Zones de nombres de points - rangÇe infÇrieure }
  OutTextXY(225, 300, '4');
  OutTextXY(245, 300, '5');
  OutTextXY(265, 300, 'SIX');
  OutTextXY(295, 300, '8');
  OutTextXY(315, 300, 'NINE');
  OutTextXY(340, 300, '10');
- 
  SetColor(Yellow);
 End;
 
-Procedure DrawScreen;
-Begin
+Procedure DrawScreen;Begin
  DrawBackground;
  DrawDice;
  DrawTokens;
@@ -447,29 +402,22 @@ Begin
  DrawInstructions;
 End;
 
-Function EvaluateRoll: Integer;
-Begin
+Function EvaluateRoll:Integer;Begin
  Case Game.Total of
-  7, 11: Begin
-   If Game.GamePhase = GAME_COME_OUT Then
-    EvaluateRoll := RESULT_NATURAL
-   Else
-    EvaluateRoll := RESULT_SEVEN_OUT;
+  7, 11:Begin
+   If Game.GamePhase = GAME_COME_OUT Then EvaluateRoll := RESULT_NATURAL
+                                     Else EvaluateRoll := RESULT_SEVEN_OUT;
   End;
-  2, 3, 12: Begin
-   If Game.GamePhase = GAME_COME_OUT Then
-    EvaluateRoll := RESULT_CRAPS
-   Else
-    EvaluateRoll := RESULT_POINT;
+  2, 3, 12:Begin
+   If Game.GamePhase = GAME_COME_OUT Then EvaluateRoll := RESULT_CRAPS
+                                     Else EvaluateRoll := RESULT_POINT;
   End;
   Else Begin
    If Game.GamePhase = GAME_COME_OUT Then
     EvaluateRoll := RESULT_POINT
    Else Begin
-    If Game.Total = Game.Point Then
-     EvaluateRoll := RESULT_POINT_MADE
-    Else
-     EvaluateRoll := RESULT_POINT;
+    If Game.Total = Game.Point Then EvaluateRoll := RESULT_POINT_MADE
+                               Else EvaluateRoll := RESULT_POINT;
    End;
   End;
  End;
@@ -480,15 +428,13 @@ Var
  Result: Integer;
  PointText: String;
 Begin
- { Lancer les d√©s }
+ { Lancer les dÇs }
  Game.Die1.Value := Random(6) + 1;
  Game.Die2.Value := Random(6) + 1;
  Game.Total := Game.Die1.Value + Game.Die2.Value;
  Inc(Game.RollCount);
- 
- { √âvaluer le r√©sultat }
+ { êvaluer le rÇsultat }
  Result := EvaluateRoll;
- 
  Case Result of
   RESULT_NATURAL: Begin
    Game.Message := 'NATURAL! Vous avez gagne!';
@@ -496,14 +442,12 @@ Begin
    Game.Credits := Game.Credits + Game.Bet;
    Game.GamePhase := GAME_WON;
   End;
-  
   RESULT_CRAPS: Begin
    Game.Message := 'CRAPS! Vous avez perdu!';
    Game.SubMessage := 'Vous perdez votre mise';
    Game.Credits := Game.Credits - Game.Bet;
    Game.GamePhase := GAME_LOST;
   End;
-  
   RESULT_POINT: Begin
    If Game.GamePhase = GAME_COME_OUT Then Begin
     Game.Point := Game.Total;
@@ -517,14 +461,12 @@ Begin
     Game.SubMessage := 'Il faut obtenir ' + PointText + ' avant le 7';
    End;
   End;
-  
   RESULT_SEVEN_OUT: Begin
    Game.Message := 'SEVEN OUT! Vous avez perdu!';
    Game.SubMessage := 'Vous perdez votre mise';
    Game.Credits := Game.Credits - Game.Bet;
    Game.GamePhase := GAME_LOST;
   End;
-  
   RESULT_POINT_MADE: Begin
    Game.Message := 'POINT MADE! Vous avez gagne!';
    Game.SubMessage := 'Vous remportez votre mise';
@@ -532,13 +474,11 @@ Begin
    Game.GamePhase := GAME_WON;
   End;
  End;
- 
  Game.NeedRedraw := True;
 End;
 
-Procedure InitGame;
-Begin
- { Initialiser les d√©s avec des valeurs al√©atoires }
+Procedure InitGame;Begin
+ { Initialiser les dÇs avec des valeurs alÇatoires }
  Game.Die1.Value := Random(6) + 1;
  Game.Die2.Value := Random(6) + 1;
  Game.Total := Game.Die1.Value + Game.Die2.Value;
@@ -552,9 +492,8 @@ Begin
  Game.RollCount := 0;
 End;
 
-Procedure NewGame;
-Begin
- { R√©initialiser les d√©s avec des valeurs al√©atoires }
+Procedure NewGame;Begin
+ { R√©initialiser les dÇs avec des valeurs alÇatoires }
  Game.Die1.Value := Random(6) + 1;
  Game.Die2.Value := Random(6) + 1;
  Game.Total := Game.Die1.Value + Game.Die2.Value;
@@ -584,32 +523,26 @@ Begin
      End;
     End;
    End;
-   
    '1': Begin { Mise 5 }
     Game.Bet := 5;
     Game.NeedRedraw := True;
    End;
-   
    '2': Begin { Mise 10 }
     Game.Bet := 10;
     Game.NeedRedraw := True;
    End;
-   
    '3': Begin { Mise 25 }
     Game.Bet := 25;
     Game.NeedRedraw := True;
    End;
-   
    '4': Begin { Mise 50 }
     Game.Bet := 50;
     Game.NeedRedraw := True;
    End;
-   
    '5': Begin { Mise 100 }
     Game.Bet := 100;
     Game.NeedRedraw := True;
    End;
-   
    'n', 'N': Begin { Nouvelle partie }
     If (Game.GamePhase = GAME_WON) Or (Game.GamePhase = GAME_LOST) Then Begin
      NewGame;
@@ -617,7 +550,6 @@ Begin
      InitGame;
     End;
    End;
-   
    #27: Begin { Escape - Quitter }
     CloseGraph;
     Halt;
@@ -630,18 +562,14 @@ BEGIN
  Randomize;
  InitScreen;
  If MouseDriverFound Then ShowMouse;
- 
  InitGame;
- 
- { Boucle principale }
+  { Boucle principale }
  Repeat
   If Game.NeedRedraw Then Begin
    DrawScreen;
    Game.NeedRedraw := False;
   End;
-  
   HandleInput;
-  
   Delay(50);
  Until False;
 END.
