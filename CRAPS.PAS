@@ -22,6 +22,7 @@ Const
  
  { Couleurs personnalisées }
  Green = 2;
+ DarkGreen = 1;
  
  { États du jeu }
  GAME_COME_OUT = 0;  { Premier lancer }
@@ -211,7 +212,7 @@ Begin
  
  { Position des jetons dans le coin supérieur droit }
  X := 550;
- Y := 50;
+ Y := 70;
  
  { Dessiner les jetons empilés }
  For I := 1 to TokenCount Do Begin
@@ -220,9 +221,16 @@ Begin
   SetFillStyle(SolidFill, DarkGray);
   FillEllipse(X + 2, Y - (I-1) * 3 + 2, 15, 15);
   
-  { Jeton principal }
-  SetColor(LightGray);
-  SetFillStyle(SolidFill, LightGray);
+  { Jeton principal - alterner entre bleu foncé et rouge }
+  If I Mod 2 = 1 Then Begin
+   { Jeton bleu foncé (jetons impairs) }
+   SetColor(Blue);
+   SetFillStyle(SolidFill, Blue);
+  End Else Begin
+   { Jeton rouge (jetons pairs) }
+   SetColor(Red);
+   SetFillStyle(SolidFill, Red);
+  End;
   FillEllipse(X, Y - (I-1) * 3, 15, 15);
   
   { Bordure du jeton }
@@ -230,7 +238,7 @@ Begin
   Circle(X, Y - (I-1) * 3, 15);
   
   { Cercle intérieur pour l'effet 3D }
-  SetColor(DarkGray);
+  SetColor(Black);
   Circle(X, Y - (I-1) * 3, 12);
   
   { Point central }
@@ -242,7 +250,7 @@ Begin
  If TokenCount > 0 Then Begin
   SetColor(White);
   SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(X - 10, Y + 20, 'MISE');
+  OutTextXY(X - 10, Y + 40, 'MISE');
  End;
 End;
 
@@ -323,50 +331,50 @@ Begin
  SetColor(White);
  Rectangle(10, 10, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10);
  
- { Table de craps avec coins arrondis }
- SetColor(DarkGray);
- SetFillStyle(SolidFill, DarkGray);
+ { Table de craps avec coins arrondis - élargie de 2 fois }
+ SetColor(DarkGreen);
+ SetFillStyle(SolidFill, DarkGreen);
  
- { Corps principal de la table }
- Bar(220, 160, 430, 320);
+ { Corps principal de la table - largeur et hauteur doublées }
+ Bar(120, 120, 530, 360);
  
  { Coins arrondis - gauche }
- FillEllipse(220, 170, 10, 10);
- FillEllipse(220, 310, 10, 10);
- Bar(210, 170, 220, 310);
+ FillEllipse(120, 140, 20, 20);
+ FillEllipse(120, 340, 20, 20);
+ Bar(100, 140, 120, 340);
  
  { Coins arrondis - droite }
- FillEllipse(430, 170, 10, 10);
- FillEllipse(430, 310, 10, 10);
- Bar(430, 170, 440, 310);
+ FillEllipse(530, 140, 20, 20);
+ FillEllipse(530, 340, 20, 20);
+ Bar(530, 140, 550, 340);
  
  { Bordure verte de la table }
  SetColor(Green);
  SetLineStyle(SolidLn, 0, ThickWidth);
  
  { Bordures droites }
- Line(220, 160, 430, 160); { Haut }
- Line(220, 320, 430, 320); { Bas }
- Line(210, 170, 210, 310); { Gauche }
- Line(440, 170, 440, 310); { Droite }
+ Line(120, 120, 530, 120); { Haut }
+ Line(120, 360, 530, 360); { Bas }
+ Line(100, 140, 100, 340); { Gauche }
+ Line(550, 140, 550, 340); { Droite }
  
  { Bordures courbes }
- Arc(220, 170, 90, 180, 10);  { Coin haut-gauche }
- Arc(220, 310, 180, 270, 10); { Coin bas-gauche }
- Arc(430, 170, 0, 90, 10);    { Coin haut-droite }
- Arc(430, 310, 270, 360, 10); { Coin bas-droite }
+ Arc(120, 140, 90, 180, 20);  { Coin haut-gauche }
+ Arc(120, 340, 180, 270, 20); { Coin bas-gauche }
+ Arc(530, 140, 0, 90, 20);    { Coin haut-droite }
+ Arc(530, 340, 270, 360, 20); { Coin bas-droite }
  
  { Ligne centrale de la table }
  SetColor(White);
  SetLineStyle(SolidLn, 0, NormWidth);
- Line(325, 170, 325, 310);
+ Line(325, 140, 325, 340);
  
  { Zones de paris simplifiées }
  SetColor(LightGray);
- OutTextXY(230, 180, 'PASS');
- OutTextXY(230, 290, 'DON''T PASS');
- OutTextXY(350, 180, 'COME');
- OutTextXY(350, 290, 'DON''T COME');
+ OutTextXY(140, 150, 'PASS');
+ OutTextXY(140, 320, 'DON''T PASS');
+ OutTextXY(380, 150, 'COME');
+ OutTextXY(380, 320, 'DON''T COME');
 End;
 
 Procedure DrawScreen;
