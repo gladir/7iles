@@ -1,7 +1,7 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @created: 2025
   @website(https://www.gladir.com/7iles)
-  @description: MONOPOLY - Jeu de propri�t�s
+  @description: MONOPOLY - Jeu de propri�t�s
 }
 
 Program MonopolyBoard;
@@ -1109,40 +1109,54 @@ Begin
 
  { Dessiner le texte du nom }
  SetColor(Black);
- SetTextStyle(DefaultFont, HorizDir, 1);
 
  { Ajuster le texte selon la position }
  If Index <= 10 Then Begin
-  { Côté bas - texte vertical }
+  { Côté bas - texte horizontal }
+  SetTextStyle(DefaultFont, HorizDir, 1);
   If Length(Properties[Index].Name) > 8 Then
    OutTextXY(X + 5, Y + 12, Copy(Properties[Index].Name, 1, 8))
   Else
    OutTextXY(X + 5, Y + 12, Properties[Index].Name);
  End Else If Index <= 20 Then Begin
-  { Côté gauche - texte horizontal }
+  { Côté gauche - texte vertical }
+  SetTextStyle(DefaultFont, VertDir, 1);
   If Length(Properties[Index].Name) > 6 Then
-   OutTextXY(X + 12, Y + 15, Copy(Properties[Index].Name, 1, 6))
+   OutTextXY(X + 25, Y + 35, Copy(Properties[Index].Name, 1, 6))
   Else
-   OutTextXY(X + 12, Y + 15, Properties[Index].Name);
+   OutTextXY(X + 25, Y + 35, Properties[Index].Name);
  End Else If Index <= 30 Then Begin
-  { Côté haut - texte vertical }
+  { Côté haut - texte horizontal }
+  SetTextStyle(DefaultFont, HorizDir, 1);
   If Length(Properties[Index].Name) > 8 Then
    OutTextXY(X + 5, Y + 25, Copy(Properties[Index].Name, 1, 8))
   Else
    OutTextXY(X + 5, Y + 25, Properties[Index].Name);
  End Else Begin
-  { Côté droit - texte horizontal }
+  { Côté droit - texte vertical }
+  SetTextStyle(DefaultFont, VertDir, 1);
   If Length(Properties[Index].Name) > 6 Then
-   OutTextXY(X + 12, Y + 15, Copy(Properties[Index].Name, 1, 6))
+   OutTextXY(X + 15, Y + 5, Copy(Properties[Index].Name, 1, 6))
   Else
-   OutTextXY(X + 12, Y + 15, Properties[Index].Name);
+   OutTextXY(X + 15, Y + 5, Properties[Index].Name);
  End;
 
  { Afficher le prix pour les propriétés }
  If Properties[Index].Price > 0 Then Begin
   Str(Properties[Index].Price, PriceStr);
-  SetTextStyle(DefaultFont, HorizDir, 1);
-  OutTextXY(X + 5, Y + 30, PriceStr + '$');
+  If (Index <= 10) Or ((Index > 20) And (Index <= 30)) Then Begin
+   { Côtés bas et haut - prix horizontal }
+   SetTextStyle(DefaultFont, HorizDir, 1);
+   OutTextXY(X + 5, Y + 30, PriceStr + '$');
+  End Else If Index <= 20 Then Begin
+   { Côté gauche - prix vertical }
+   SetTextStyle(DefaultFont, VertDir, 1);
+   OutTextXY(X + 15, Y + 35, PriceStr + '$');
+  End Else Begin
+   { Côté droit - prix vertical (décalé de 10 pixels vers la droite) }
+   SetTextStyle(DefaultFont, VertDir, 1);
+   OutTextXY(X + 25, Y + 25, PriceStr + '$');
+  End;
  End;
 
  { Dessiner les maisons et hôtels }
