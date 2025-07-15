@@ -43,6 +43,10 @@ Type
   Rent: Integer;
   PropertyType: Integer; { 0=Property, 1=Railroad, 2=Utility, 3=Special }
   Owner: Integer; { 0=Personne, 1-4=Joueur propriétaire }
+  Houses: Integer; { Nombre de maisons (0-4) }
+  HasHotel: Boolean; { Vrai si hôtel construit }
+  HousePrice: Integer; { Prix d'une maison }
+  Group: Integer; { Groupe de couleur (1-8) }
  End;
 
  TPlayer = Record
@@ -61,6 +65,9 @@ Var
  Dice1, Dice2: Integer;
  CurrentPlayer: Integer; { Joueur actuel (1-4) }
  ActionMessage: String; { Message d'action en cours }
+ GameState: Integer; { 0=Normal, 1=Demande achat, 2=Menu construction }
+ PropertyToBuy: Integer; { Index de la propriété à acheter }
+ ContextualMessage: String; { Message contextuel pour les actions }
 
 Procedure InitScreen;
 Var
@@ -90,6 +97,10 @@ Begin
  For I := 0 to 39 Do Begin
   Properties[I].Owner := 0;
   Properties[I].Rent := 0;
+  Properties[I].Houses := 0;
+  Properties[I].HasHotel := False;
+  Properties[I].HousePrice := 0;
+  Properties[I].Group := 0;
  End;
 
  { Coin inférieur droit - GO }
@@ -105,6 +116,8 @@ Begin
  Properties[1].PropertyType := 0;
  Properties[1].Price := 60;
  Properties[1].Rent := 10;
+ Properties[1].Group := 1;
+ Properties[1].HousePrice := 50;
 
  Properties[2].Name := 'Caisse Communauté';
  Properties[2].Color := LightBlue;
@@ -117,6 +130,8 @@ Begin
  Properties[3].PropertyType := 0;
  Properties[3].Price := 60;
  Properties[3].Rent := 10;
+ Properties[3].Group := 1;
+ Properties[3].HousePrice := 50;
 
  Properties[4].Name := 'Impôt sur Revenu';
  Properties[4].Color := White;
@@ -136,6 +151,8 @@ Begin
  Properties[6].PropertyType := 0;
  Properties[6].Price := 100;
  Properties[6].Rent := 15;
+ Properties[6].Group := 2;
+ Properties[6].HousePrice := 50;
 
  Properties[7].Name := 'Chance';
  Properties[7].Color := Red;
@@ -148,12 +165,16 @@ Begin
  Properties[8].PropertyType := 0;
  Properties[8].Price := 100;
  Properties[8].Rent := 15;
+ Properties[8].Group := 2;
+ Properties[8].HousePrice := 50;
 
  Properties[9].Name := 'Avenue Connecticut';
  Properties[9].Color := LightCyan;
  Properties[9].PropertyType := 0;
  Properties[9].Price := 120;
  Properties[9].Rent := 18;
+ Properties[9].Group := 2;
+ Properties[9].HousePrice := 50;
 
  { Coin inférieur gauche - Jail }
  Properties[10].Name := 'Prison';
@@ -539,10 +560,19 @@ Begin
  Str(Dice1 + Dice2, SumStr);
  OutTextXY(520, 240, SumStr);
  
- { Instructions }
+ { Instructions contextuelles }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
- OutTextXY(420, 260, 'Appuyez ESPACE pour lancer');
+ 
+ Case GameState of
+  0: OutTextXY(420, 260, ContextualMessage);
+  1: Begin
+   OutTextXY(420, 260, 'O=Oui, N=Non pour acheter');
+  End;
+  2: Begin
+   OutTextXY(420, 260, 'M=Maison, H=Hotel, Q=Quitter');
+  End;
+ End;
 End;
 
 Procedure GetCellPosition(Index: Integer; Var X, Y: Integer);
@@ -565,6 +595,52 @@ Begin
   X := 360;
   Y := (Index - 30) * CELL_SIZE;
  End;
+End;
+
+Function IntToStr(Value: Integer): String;
+Var
+ S: String;
+Begin
+ Str(Value, S);
+ IntToStr := S;
+End;
+
+Function HasCompleteGroup(PlayerIndex, GroupNum: Integer): Boolean;
+Var
+ I, Count, Total: Integer;
+Begin
+ Count := 0;
+ Total := 0;
+ 
+ { Compter les propriétés du groupe }
+ For I := 0 to 39 Do Begin
+  If Properties[I].Group = GroupNum Then Begin
+   Inc(Total);
+   If Properties[I].Owner = PlayerIndex Then
+    Inc(Count);
+  End;
+ End;
+ 
+ HasCompleteGroup := (Count = Total) And (Total > 0);
+End;
+
+Function CanBuildHouses(PlayerIndex, PropertyIndex: Integer): Boolean;
+Begin
+ CanBuildHouses := (Properties[PropertyIndex].Owner = PlayerIndex) And
+                   (Properties[PropertyIndex].PropertyType = 0) And
+                   (Properties[PropertyIndex].Houses < 4) And
+                   (Not Properties[PropertyIndex].HasHotel) And
+                   HasCompleteGroup(PlayerIndex, Properties[PropertyIndex].Group) And
+                   (Players[PlayerIndex].Money >= Properties[PropertyIndex].HousePrice);
+End;
+
+Function CanBuildHotel(PlayerIndex, PropertyIndex: Integer): Boolean;
+Begin
+ CanBuildHotel := (Properties[PropertyIndex].Owner = PlayerIndex) And
+                  (Properties[PropertyIndex].PropertyType = 0) And
+                  (Properties[PropertyIndex].Houses = 4) And
+                  (Not Properties[PropertyIndex].HasHotel) And
+                  (Players[PlayerIndex].Money >= Properties[PropertyIndex].HousePrice);
 End;
 
 Procedure Wait2Seconds;
@@ -603,6 +679,7 @@ Var
  PropertyIndex: Integer;
  ActionMsg: String;
  RentStr: String;
+ RentAmount: Integer;
 Begin
  PropertyIndex := Players[PlayerIndex].Position;
  ActionMsg := '';
@@ -654,28 +731,114 @@ Begin
       (Properties[PropertyIndex].PropertyType = 2) Then Begin
     
     If Properties[PropertyIndex].Owner = 0 Then Begin
-     { Propriété libre - acheter }
-     If Players[PlayerIndex].Money >= Properties[PropertyIndex].Price Then Begin
-      Players[PlayerIndex].Money := Players[PlayerIndex].Money - Properties[PropertyIndex].Price;
-      Properties[PropertyIndex].Owner := PlayerIndex;
-      ActionMsg := Players[PlayerIndex].Name + ' achète ' + Properties[PropertyIndex].Name;
+     { Propriété libre }
+     If Players[PlayerIndex].IsHuman Then Begin
+      { Demander au joueur humain s'il veut acheter }
+      If Players[PlayerIndex].Money >= Properties[PropertyIndex].Price Then Begin
+       PropertyToBuy := PropertyIndex;
+       GameState := 1;
+       ActionMsg := 'Acheter ' + Properties[PropertyIndex].Name + ' pour ' + IntToStr(Properties[PropertyIndex].Price) + '$?';
+      End Else Begin
+       ActionMsg := Players[PlayerIndex].Name + ' ne peut pas acheter ' + Properties[PropertyIndex].Name;
+      End;
      End Else Begin
-      ActionMsg := Players[PlayerIndex].Name + ' ne peut pas acheter ' + Properties[PropertyIndex].Name;
+      { Joueur ordinateur - acheter automatiquement }
+      If Players[PlayerIndex].Money >= Properties[PropertyIndex].Price Then Begin
+       Players[PlayerIndex].Money := Players[PlayerIndex].Money - Properties[PropertyIndex].Price;
+       Properties[PropertyIndex].Owner := PlayerIndex;
+       ActionMsg := Players[PlayerIndex].Name + ' achète ' + Properties[PropertyIndex].Name;
+      End Else Begin
+       ActionMsg := Players[PlayerIndex].Name + ' ne peut pas acheter ' + Properties[PropertyIndex].Name;
+      End;
      End;
     End Else If Properties[PropertyIndex].Owner <> PlayerIndex Then Begin
      { Propriété appartient à un autre joueur - payer loyer }
-     Players[PlayerIndex].Money := Players[PlayerIndex].Money - Properties[PropertyIndex].Rent;
-     Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + Properties[PropertyIndex].Rent;
-     Str(Properties[PropertyIndex].Rent, RentStr);
+     RentAmount := Properties[PropertyIndex].Rent;
+     
+     { Calcul du loyer avec maisons/hôtels }
+     If Properties[PropertyIndex].PropertyType = 0 Then Begin
+      If Properties[PropertyIndex].HasHotel Then
+       RentAmount := RentAmount * 5
+      Else If Properties[PropertyIndex].Houses > 0 Then
+       RentAmount := RentAmount * (Properties[PropertyIndex].Houses + 1);
+     End;
+     
+     Players[PlayerIndex].Money := Players[PlayerIndex].Money - RentAmount;
+     Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + RentAmount;
+     Str(RentAmount, RentStr);
      ActionMsg := Players[PlayerIndex].Name + ' paie loyer: -' + RentStr + '$';
     End Else Begin
      ActionMsg := Players[PlayerIndex].Name + ' sur sa propriété';
+     
+     { Proposer la construction pour le joueur humain }
+     If Players[PlayerIndex].IsHuman And (Properties[PropertyIndex].PropertyType = 0) Then Begin
+      If CanBuildHouses(PlayerIndex, PropertyIndex) Or CanBuildHotel(PlayerIndex, PropertyIndex) Then Begin
+       GameState := 2;
+       ActionMsg := ActionMsg + ' - Construction possible';
+      End;
+     End;
     End;
    End;
   End;
  End;
  
  ProcessPlayerAction := ActionMsg;
+End;
+
+Procedure HandlePurchase(Accept: Boolean);
+Begin
+ If Accept And (Players[CurrentPlayer].Money >= Properties[PropertyToBuy].Price) Then Begin
+  Players[CurrentPlayer].Money := Players[CurrentPlayer].Money - Properties[PropertyToBuy].Price;
+  Properties[PropertyToBuy].Owner := CurrentPlayer;
+  ActionMessage := Players[CurrentPlayer].Name + ' achète ' + Properties[PropertyToBuy].Name;
+ End Else Begin
+  ActionMessage := Players[CurrentPlayer].Name + ' refuse d''acheter ' + Properties[PropertyToBuy].Name;
+ End;
+ 
+ GameState := 0;
+ ContextualMessage := 'Appuyez ESPACE pour continuer';
+End;
+
+Procedure HandleConstruction(BuildType: Char);
+Var
+ PropertyIndex: Integer;
+ PriceStr: String;
+Begin
+ PropertyIndex := Players[CurrentPlayer].Position;
+ 
+ Case BuildType of
+  'M', 'm': Begin { Maison }
+   If CanBuildHouses(CurrentPlayer, PropertyIndex) Then Begin
+    Players[CurrentPlayer].Money := Players[CurrentPlayer].Money - Properties[PropertyIndex].HousePrice;
+    Inc(Properties[PropertyIndex].Houses);
+    Str(Properties[PropertyIndex].HousePrice, PriceStr);
+    ActionMessage := Players[CurrentPlayer].Name + ' construit une maison: -' + PriceStr + '$';
+   End Else Begin
+    ActionMessage := 'Impossible de construire une maison';
+   End;
+  End;
+  
+  'H', 'h': Begin { Hôtel }
+   If CanBuildHotel(CurrentPlayer, PropertyIndex) Then Begin
+    Players[CurrentPlayer].Money := Players[CurrentPlayer].Money - Properties[PropertyIndex].HousePrice;
+    Properties[PropertyIndex].Houses := 0;
+    Properties[PropertyIndex].HasHotel := True;
+    Str(Properties[PropertyIndex].HousePrice, PriceStr);
+    ActionMessage := Players[CurrentPlayer].Name + ' construit un hôtel: -' + PriceStr + '$';
+   End Else Begin
+    ActionMessage := 'Impossible de construire un hôtel';
+   End;
+  End;
+  
+  'Q', 'q': Begin { Quitter }
+   ActionMessage := Players[CurrentPlayer].Name + ' termine la construction';
+  End;
+ End;
+ 
+ If (BuildType = 'Q') Or (BuildType = 'q') Then Begin
+  GameState := 0;
+  ContextualMessage := 'Appuyez ESPACE pour continuer';
+ End;
 End;
 
 Procedure DrawPlayersOnBoard;
@@ -697,6 +860,58 @@ Begin
   
   { Dessiner l'icône du joueur à sa position }
   DrawPlayerIcon(X + OffsetX, Y + OffsetY, Players[I].Icon);
+ End;
+End;
+
+Procedure DrawHousesAndHotels(Index: Integer);
+Var
+ X, Y, I: Integer;
+Begin
+ If Properties[Index].PropertyType <> 0 Then Exit;
+ 
+ GetCellPosition(Index, X, Y);
+ 
+ { Dessiner les maisons }
+ SetColor(Green);
+ SetFillStyle(SolidFill, Green);
+ 
+ For I := 1 to Properties[Index].Houses Do Begin
+  If Index <= 10 Then Begin
+   { Côté bas }
+   Bar(X + 15 + (I - 1) * 5, Y + 15, X + 18 + (I - 1) * 5, Y + 20);
+  End Else If Index <= 20 Then Begin
+   { Côté gauche }
+   Bar(X + 15, Y + 15 + (I - 1) * 5, X + 20, Y + 18 + (I - 1) * 5);
+  End Else If Index <= 30 Then Begin
+   { Côté haut }
+   Bar(X + 15 + (I - 1) * 5, Y + 15, X + 18 + (I - 1) * 5, Y + 20);
+  End Else Begin
+   { Côté droit }
+   Bar(X + 15, Y + 15 + (I - 1) * 5, X + 20, Y + 18 + (I - 1) * 5);
+  End;
+ End;
+ 
+ { Dessiner l'hôtel }
+ If Properties[Index].HasHotel Then Begin
+  SetColor(Red);
+  SetFillStyle(SolidFill, Red);
+  If Index <= 10 Then Begin
+   Bar(X + 15, Y + 15, X + 25, Y + 25);
+   SetColor(Yellow);
+   OutTextXY(X + 17, Y + 17, 'H');
+  End Else If Index <= 20 Then Begin
+   Bar(X + 15, Y + 15, X + 25, Y + 25);
+   SetColor(Yellow);
+   OutTextXY(X + 17, Y + 17, 'H');
+  End Else If Index <= 30 Then Begin
+   Bar(X + 15, Y + 15, X + 25, Y + 25);
+   SetColor(Yellow);
+   OutTextXY(X + 17, Y + 17, 'H');
+  End Else Begin
+   Bar(X + 15, Y + 15, X + 25, Y + 25);
+   SetColor(Yellow);
+   OutTextXY(X + 17, Y + 17, 'H');
+  End;
  End;
 End;
 
@@ -765,6 +980,9 @@ Begin
   SetTextStyle(DefaultFont, HorizDir, 1);
   OutTextXY(X + 5, Y + 30, PriceStr + '$');
  End;
+ 
+ { Dessiner les maisons et hôtels }
+ DrawHousesAndHotels(Index);
 End;
 
 Procedure DrawCorners;
@@ -900,8 +1118,13 @@ BEGIN
  { Initialiser le joueur actuel }
  CurrentPlayer := 1;
  
- { Initialiser le message d'action }
+ { Initialiser les états du jeu }
+ GameState := 0;
+ PropertyToBuy := 0;
+ 
+ { Initialiser les messages }
  ActionMessage := 'Appuyez ESPACE pour commencer';
+ ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
  
  InitScreen;
  InitProperties;
@@ -912,26 +1135,78 @@ BEGIN
  { Boucle principale }
  Repeat
   If Players[CurrentPlayer].IsHuman Then Begin
-   { Tour du joueur humain - attendre l'appui sur ESPACE }
+   { Tour du joueur humain }
    Case ReadKey of
     ' ': Begin
-     { Lancer les dés }
-     Dice1 := Random(6) + 1;
-     Dice2 := Random(6) + 1;
-     
-     { Déplacer le joueur humain }
-     Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
-     
-     { Gérer l'action du joueur sur la case }
-     ActionMessage := ProcessPlayerAction(CurrentPlayer);
-     
-     { Passer au joueur suivant }
-     CurrentPlayer := (CurrentPlayer Mod 4) + 1;
-     
-     { Redessiner le plateau complet }
-     DrawBoard;
-     DrawSpecialSymbols;
+     If GameState = 0 Then Begin
+      { Lancer les dés }
+      Dice1 := Random(6) + 1;
+      Dice2 := Random(6) + 1;
+      
+      { Déplacer le joueur humain }
+      Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
+      
+      { Gérer l'action du joueur sur la case }
+      ActionMessage := ProcessPlayerAction(CurrentPlayer);
+      
+      { Si pas de demande d'achat/construction, passer au joueur suivant }
+      If GameState = 0 Then Begin
+       CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+       ContextualMessage := 'Appuyez ESPACE pour continuer';
+      End;
+      
+      { Redessiner le plateau complet }
+      DrawBoard;
+      DrawSpecialSymbols;
+     End Else Begin
+      { Continuer après achat/construction }
+      CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+      ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
+      DrawBoard;
+      DrawSpecialSymbols;
+     End;
     End;
+    
+    'O', 'o': Begin
+     If GameState = 1 Then Begin
+      HandlePurchase(True);
+      DrawBoard;
+      DrawSpecialSymbols;
+     End;
+    End;
+    
+    'N', 'n': Begin
+     If GameState = 1 Then Begin
+      HandlePurchase(False);
+      DrawBoard;
+      DrawSpecialSymbols;
+     End;
+    End;
+    
+    'M', 'm': Begin
+     If GameState = 2 Then Begin
+      HandleConstruction('M');
+      DrawBoard;
+      DrawSpecialSymbols;
+     End;
+    End;
+    
+    'H', 'h': Begin
+     If GameState = 2 Then Begin
+      HandleConstruction('H');
+      DrawBoard;
+      DrawSpecialSymbols;
+     End;
+    End;
+    
+    'Q', 'q': Begin
+     If GameState = 2 Then Begin
+      HandleConstruction('Q');
+      DrawBoard;
+      DrawSpecialSymbols;
+     End;
+    End;
+    
     #27: Break; { Escape pour quitter }
    End;
   End Else Begin
@@ -940,6 +1215,7 @@ BEGIN
    
    { Passer au joueur suivant }
    CurrentPlayer := (CurrentPlayer Mod 4) + 1;
+   ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
   End;
  Until False;
  
