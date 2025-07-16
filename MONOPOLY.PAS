@@ -548,20 +548,6 @@ Begin
  SetTextStyle(DefaultFont, HorizDir, 2);
  Str(Dice1 + Dice2, SumStr);
  OutTextXY(520, 240, SumStr);
-
- { Instructions contextuelles }
- SetColor(White);
- SetTextStyle(DefaultFont, HorizDir, 1);
-
- Case GameState of
-  0: OutTextXY(420, 260, ContextualMessage);
-  1: Begin
-   OutTextXY(420, 260, 'O=Oui, N=Non pour acheter');
-  End;
-  2: Begin
-   OutTextXY(420, 260, 'M=Maison, H=Hotel, Q=Quitter');
-  End;
- End;
 End;
 
 Procedure GetCellPosition(Index: Integer; Var X, Y: Integer);
@@ -774,16 +760,16 @@ Var
  Line1, Line2: String;
  MaxWidth, I, LastSpace: Integer;
 Begin
- { Dessiner la zone des messages d'action }
+ { Dessiner la zone des messages d'action - remontée de 20 pixels et augmentée de 20 pixels }
  SetColor(Black);
  SetFillStyle(SolidFill, DarkGray);
- Bar(420, 70, 630, 140);
- Rectangle(420, 70, 630, 140);
+ Bar(420, 50, 630, 140);
+ Rectangle(420, 50, 630, 140);
 
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
- OutTextXY(500, 80, 'ACTION');
+ OutTextXY(500, 60, 'ACTION');
 
  { Message d'action sur deux lignes si nécessaire }
  SetColor(Yellow);
@@ -793,7 +779,7 @@ Begin
 
  If Length(ActionMessage) <= MaxWidth Then Begin
   { Message court - une seule ligne }
-  OutTextXY(430, 110, ActionMessage);
+  OutTextXY(430, 85, ActionMessage);
  End Else Begin
   { Message long - diviser en deux lignes }
   { Chercher le dernier espace avant la limite }
@@ -814,8 +800,22 @@ Begin
   End;
 
   { Afficher les deux lignes }
-  OutTextXY(430, 100, Line1);
-  OutTextXY(430, 115, Line2);
+  OutTextXY(430, 75, Line1);
+  OutTextXY(430, 90, Line2);
+ End;
+
+ { Afficher les instructions contextuelles sous le message d'action }
+ SetColor(White);
+ SetTextStyle(DefaultFont, HorizDir, 1);
+
+ Case GameState of
+  0: OutTextXY(430, 110, ContextualMessage);
+  1: Begin
+   OutTextXY(430, 110, 'O=Oui, N=Non pour acheter');
+  End;
+  2: Begin
+   OutTextXY(430, 110, 'M=Maison, H=Hotel, Q=Quitter');
+  End;
  End;
 End;
 
@@ -1296,17 +1296,24 @@ End;
 
 Function GetNextActivePlayer(CurrentPlayerIndex: Integer): Integer;
 Var
- NextPlayer, StartPlayer: Integer;
+ NextPlayer, StartPlayer, CheckCount: Integer;
 Begin
  NextPlayer := (CurrentPlayerIndex Mod 4) + 1;
  StartPlayer := NextPlayer;
+ CheckCount := 0;
 
  { Chercher le prochain joueur actif (non en faillite) }
- While (Players[NextPlayer].Money < 0) And (NextPlayer <> StartPlayer) Do Begin
+ While (Players[NextPlayer].Money < 0) And (CheckCount < 4) Do Begin
   NextPlayer := (NextPlayer Mod 4) + 1;
+  Inc(CheckCount);
+  If NextPlayer = StartPlayer Then Break;
  End;
 
- GetNextActivePlayer := NextPlayer;
+ { Si tous les joueurs sont en faillite, retourner le joueur actuel }
+ If CheckCount >= 4 Then
+  GetNextActivePlayer := CurrentPlayerIndex
+ Else
+  GetNextActivePlayer := NextPlayer;
 End;
 
 Function CountActivePlayers: Integer;
@@ -1336,6 +1343,9 @@ End;
 
 Procedure PlayComputerTurn(PlayerIndex: Integer);
 Begin
+ { Vérifier si le joueur est encore actif }
+ If Players[PlayerIndex].Money < 0 Then Exit;
+
  { Lancer les dés }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
@@ -1387,6 +1397,11 @@ BEGIN
     DrawBoard;
     DrawSpecialSymbols;
     ReadKey;
+   End Else Begin
+    ActionMessage := 'Aucun joueur actif - Fin du jeu!';
+    DrawBoard;
+    DrawSpecialSymbols;
+    ReadKey;
    End;
    Break;
   End;
@@ -1394,83 +1409,87 @@ BEGIN
   { Passer les joueurs en faillite }
   While Players[CurrentPlayer].Money < 0 Do Begin
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
+   { Sécurité pour éviter une boucle infinie }
+   If CountActivePlayers <= 1 Then Break;
   End;
 
   If Players[CurrentPlayer].IsHuman Then Begin
    { Tour du joueur humain }
-   Case ReadKey of
-    ' ': Begin
-     If GameState = 0 Then Begin
-      { Lancer les dés }
-      Dice1 := Random(6) + 1;
-      Dice2 := Random(6) + 1;
-
-      { Déplacer le joueur humain }
-      Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
-
-      { Gérer l'action du joueur sur la case }
-      ActionMessage := ProcessPlayerAction(CurrentPlayer);
-
-      { Si pas de demande d'achat/construction, passer au joueur suivant }
+   If KeyPressed Then Begin
+    Case ReadKey of
+     ' ': Begin
       If GameState = 0 Then Begin
+       { Lancer les dés }
+       Dice1 := Random(6) + 1;
+       Dice2 := Random(6) + 1;
+
+       { Déplacer le joueur humain }
+       Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
+
+       { Gérer l'action du joueur sur la case }
+       ActionMessage := ProcessPlayerAction(CurrentPlayer);
+
+       { Si pas de demande d'achat/construction, passer au joueur suivant }
+       If GameState = 0 Then Begin
+        CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
+        ContextualMessage := 'Appuyez ESPACE pour continuer';
+       End;
+
+       { Redessiner le plateau complet }
+       DrawBoard;
+       DrawSpecialSymbols;
+      End Else Begin
+       { Continuer après achat/construction }
        CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-       ContextualMessage := 'Appuyez ESPACE pour continuer';
+       ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
+       DrawBoard;
+       DrawSpecialSymbols;
       End;
-
-      { Redessiner le plateau complet }
-      DrawBoard;
-      DrawSpecialSymbols;
-     End Else Begin
-      { Continuer après achat/construction }
-      CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-      ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
-      DrawBoard;
-      DrawSpecialSymbols;
      End;
-    End;
 
-    'O', 'o': Begin
-     If GameState = 1 Then Begin
-      HandlePurchase(True);
-      DrawBoard;
-      DrawSpecialSymbols;
+     'O', 'o': Begin
+      If GameState = 1 Then Begin
+       HandlePurchase(True);
+       DrawBoard;
+       DrawSpecialSymbols;
+      End;
      End;
-    End;
 
-    'N', 'n': Begin
-     If GameState = 1 Then Begin
-      HandlePurchase(False);
-      DrawBoard;
-      DrawSpecialSymbols;
+     'N', 'n': Begin
+      If GameState = 1 Then Begin
+       HandlePurchase(False);
+       DrawBoard;
+       DrawSpecialSymbols;
+      End;
      End;
-    End;
 
-    'M', 'm': Begin
-     If GameState = 2 Then Begin
-      HandleConstruction('M');
-      DrawBoard;
-      DrawSpecialSymbols;
+     'M', 'm': Begin
+      If GameState = 2 Then Begin
+       HandleConstruction('M');
+       DrawBoard;
+       DrawSpecialSymbols;
+      End;
      End;
-    End;
 
-    'H', 'h': Begin
-     If GameState = 2 Then Begin
-      HandleConstruction('H');
-      DrawBoard;
-      DrawSpecialSymbols;
+     'H', 'h': Begin
+      If GameState = 2 Then Begin
+       HandleConstruction('H');
+       DrawBoard;
+       DrawSpecialSymbols;
+      End;
      End;
-    End;
 
-    'Q', 'q': Begin
-     If GameState = 2 Then Begin
-      HandleConstruction('Q');
-      DrawBoard;
-      DrawSpecialSymbols;
+     'Q', 'q': Begin
+      If GameState = 2 Then Begin
+       HandleConstruction('Q');
+       DrawBoard;
+       DrawSpecialSymbols;
+      End;
      End;
-    End;
 
-    #27: Begin
-     Break;
+     #27: Begin
+      Break;
+     End;
     End;
    End;
   End Else Begin
@@ -1487,3 +1506,25 @@ BEGIN
 
  CloseGraph;
 END.
+
+Function KeyPressed: Boolean;
+Begin
+ {$IFDEF FPC}
+  KeyPressed := PtcCrt.KeyPressed;
+ {$ELSE}
+  KeyPressed := Crt.KeyPressed;
+ {$ENDIF}
+End;
+
+Function SafeReadKey: Char;
+Begin
+ If KeyPressed Then Begin
+  {$IFDEF FPC}
+   SafeReadKey := PtcCrt.ReadKey;
+  {$ELSE}
+   SafeReadKey := Crt.ReadKey;
+  {$ENDIF}
+ End Else Begin
+  SafeReadKey := #0;
+ End;
+End;
