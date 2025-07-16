@@ -743,14 +743,39 @@ Begin
                   (Players[PlayerIndex].Money >= Properties[PropertyIndex].HousePrice);
 End;
 
+Function KeyPressed: Boolean;
+Begin
+ {$IFDEF FPC}
+  KeyPressed := PtcCrt.KeyPressed;
+ {$ELSE}
+  KeyPressed := Crt.KeyPressed;
+ {$ENDIF}
+End;
+
+Function SafeReadKey: Char;
+Begin
+ If KeyPressed Then Begin
+  {$IFDEF FPC}
+   SafeReadKey := PtcCrt.ReadKey;
+  {$ELSE}
+   SafeReadKey := Crt.ReadKey;
+  {$ENDIF}
+ End Else Begin
+  SafeReadKey := #0;
+ End;
+End;
+
 Procedure Wait2Seconds;
 Var
  I, J: Integer;
 Begin
- { Créer un délai d'environ 2 secondes }
- For I := 1 to 200 Do Begin
-  For J := 1 to 300 Do Begin
-   { Boucle vide pour créer le délai }
+ { Créer un délai d'environ 2 secondes avec possibilité d'interruption }
+ For I := 1 to 100 Do Begin
+  For J := 1 to 600 Do Begin
+   { Vérifier interruption clavier }
+   If KeyPressed Then Begin
+    If SafeReadKey = #27 Then Exit;
+   End;
   End;
  End;
 End;
@@ -1303,14 +1328,14 @@ Begin
  CheckCount := 0;
 
  { Chercher le prochain joueur actif (non en faillite) }
- While (Players[NextPlayer].Money < 0) And (CheckCount < 4) Do Begin
+ While (Players[NextPlayer].Money < 0) And (CheckCount < 5) Do Begin
   NextPlayer := (NextPlayer Mod 4) + 1;
   Inc(CheckCount);
   If NextPlayer = StartPlayer Then Break;
  End;
 
  { Si tous les joueurs sont en faillite, retourner le joueur actuel }
- If CheckCount >= 4 Then
+ If CheckCount >= 5 Then
   GetNextActivePlayer := CurrentPlayerIndex
  Else
   GetNextActivePlayer := NextPlayer;
@@ -1342,6 +1367,8 @@ Begin
 End;
 
 Procedure PlayComputerTurn(PlayerIndex: Integer);
+Var
+ I, J: Integer;
 Begin
  { Vérifier si le joueur est encore actif }
  If Players[PlayerIndex].Money < 0 Then Exit;
@@ -1360,8 +1387,15 @@ Begin
  DrawBoard;
  DrawSpecialSymbols;
 
- { Attendre 2 secondes }
- Wait2Seconds;
+ { Attendre 2 secondes avec possibilité d'interruption }
+ For I := 1 to 100 Do Begin
+  For J := 1 to 600 Do Begin
+   { Vérifier interruption clavier pendant l'attente }
+   If KeyPressed Then Begin
+    If SafeReadKey = #27 Then Exit;
+   End;
+  End;
+ End;
 End;
 
 BEGIN
@@ -1407,124 +1441,111 @@ BEGIN
   End;
 
   { Passer les joueurs en faillite }
-  While Players[CurrentPlayer].Money < 0 Do Begin
+  While (Players[CurrentPlayer].Money < 0) And (CountActivePlayers > 1) Do Begin
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
    { Sécurité pour éviter une boucle infinie }
    If CountActivePlayers <= 1 Then Break;
   End;
 
   If Players[CurrentPlayer].IsHuman Then Begin
-   { Tour du joueur humain }
-   If KeyPressed Then Begin
-    Case ReadKey of
-     ' ': Begin
+   { Tour du joueur humain - attendre une entrée }
+   Case ReadKey of
+    ' ': Begin
+     If GameState = 0 Then Begin
+      { Lancer les dés }
+      Dice1 := Random(6) + 1;
+      Dice2 := Random(6) + 1;
+
+      { Déplacer le joueur humain }
+      Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
+
+      { Gérer l'action du joueur sur la case }
+      ActionMessage := ProcessPlayerAction(CurrentPlayer);
+
+      { Si pas de demande d'achat/construction, passer au joueur suivant }
       If GameState = 0 Then Begin
-       { Lancer les dés }
-       Dice1 := Random(6) + 1;
-       Dice2 := Random(6) + 1;
-
-       { Déplacer le joueur humain }
-       Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
-
-       { Gérer l'action du joueur sur la case }
-       ActionMessage := ProcessPlayerAction(CurrentPlayer);
-
-       { Si pas de demande d'achat/construction, passer au joueur suivant }
-       If GameState = 0 Then Begin
-        CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-        ContextualMessage := 'Appuyez ESPACE pour continuer';
-       End;
-
-       { Redessiner le plateau complet }
-       DrawBoard;
-       DrawSpecialSymbols;
-      End Else Begin
-       { Continuer après achat/construction }
        CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-       ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
-       DrawBoard;
-       DrawSpecialSymbols;
+       ContextualMessage := 'Appuyez ESPACE pour continuer';
       End;
-     End;
 
-     'O', 'o': Begin
-      If GameState = 1 Then Begin
-       HandlePurchase(True);
-       DrawBoard;
-       DrawSpecialSymbols;
-      End;
+      { Redessiner le plateau complet }
+      DrawBoard;
+      DrawSpecialSymbols;
+     End Else Begin
+      { Continuer après achat/construction }
+      CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
+      ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
+      DrawBoard;
+      DrawSpecialSymbols;
      End;
+    End;
 
-     'N', 'n': Begin
-      If GameState = 1 Then Begin
-       HandlePurchase(False);
-       DrawBoard;
-       DrawSpecialSymbols;
-      End;
+    'O', 'o': Begin
+     If GameState = 1 Then Begin
+      HandlePurchase(True);
+      DrawBoard;
+      DrawSpecialSymbols;
      End;
+    End;
 
-     'M', 'm': Begin
-      If GameState = 2 Then Begin
-       HandleConstruction('M');
-       DrawBoard;
-       DrawSpecialSymbols;
-      End;
+    'N', 'n': Begin
+     If GameState = 1 Then Begin
+      HandlePurchase(False);
+      DrawBoard;
+      DrawSpecialSymbols;
      End;
+    End;
 
-     'H', 'h': Begin
-      If GameState = 2 Then Begin
-       HandleConstruction('H');
-       DrawBoard;
-       DrawSpecialSymbols;
-      End;
+    'M', 'm': Begin
+     If GameState = 2 Then Begin
+      HandleConstruction('M');
+      DrawBoard;
+      DrawSpecialSymbols;
      End;
+    End;
 
-     'Q', 'q': Begin
-      If GameState = 2 Then Begin
-       HandleConstruction('Q');
-       DrawBoard;
-       DrawSpecialSymbols;
-      End;
+    'H', 'h': Begin
+     If GameState = 2 Then Begin
+      HandleConstruction('H');
+      DrawBoard;
+      DrawSpecialSymbols;
      End;
+    End;
 
-     #27: Begin
-      Break;
+    'Q', 'q': Begin
+     If GameState = 2 Then Begin
+      HandleConstruction('Q');
+      DrawBoard;
+      DrawSpecialSymbols;
      End;
+    End;
+
+    #27: Begin
+     Break;
     End;
    End;
   End Else Begin
    { Tour de l'ordinateur - jouer automatiquement }
    If Players[CurrentPlayer].Money >= 0 Then Begin
     PlayComputerTurn(CurrentPlayer);
+    
+    { Vérifier s'il y a eu une interruption clavier }
+    If KeyPressed Then Begin
+     If SafeReadKey = #27 Then Begin { Escape }
+      Break;
+     End;
+    End;
    End;
 
-   { Passer au joueur suivant }
+   { Passer au joueur suivant automatiquement }
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
    ContextualMessage := 'Appuyez ESPACE pour lancer les dés';
+   
+   { Redessiner après changement de joueur }
+   DrawBoard;
+   DrawSpecialSymbols;
   End;
  Until False;
 
  CloseGraph;
 END.
-
-Function KeyPressed: Boolean;
-Begin
- {$IFDEF FPC}
-  KeyPressed := PtcCrt.KeyPressed;
- {$ELSE}
-  KeyPressed := Crt.KeyPressed;
- {$ENDIF}
-End;
-
-Function SafeReadKey: Char;
-Begin
- If KeyPressed Then Begin
-  {$IFDEF FPC}
-   SafeReadKey := PtcCrt.ReadKey;
-  {$ELSE}
-   SafeReadKey := Crt.ReadKey;
-  {$ENDIF}
- End Else Begin
-  SafeReadKey := #0;
- End;
-End;
