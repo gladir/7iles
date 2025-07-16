@@ -1129,7 +1129,7 @@ Begin
   { Côté haut - texte horizontal }
   SetTextStyle(DefaultFont, HorizDir, 1);
   If Length(Properties[Index].Name) > 8 Then
-   OutTextXY(X + 5, Y + 25, Copy(Properties[Index].Name, 1, 8))
+   OutTextXY(X + 5, Y + 15, Copy(Properties[Index].Name, 1, 8))
   Else
    OutTextXY(X + 5, Y + 25, Properties[Index].Name);
  End Else Begin
@@ -1155,7 +1155,7 @@ Begin
   End Else Begin
    { Côté droit - prix vertical (décalé de 10 pixels vers la droite) }
    SetTextStyle(DefaultFont, VertDir, 1);
-   OutTextXY(X + 25, Y + 25, PriceStr + '$');
+   OutTextXY(X + 25, Y + 5, PriceStr + '$');
   End;
  End;
 
@@ -1469,7 +1469,9 @@ BEGIN
      End;
     End;
 
-    #27: Break; { Escape pour quitter }
+    #27: Begin
+     Break;
+    End;
    End;
   End Else Begin
    { Tour de l'ordinateur - jouer automatiquement }
