@@ -418,6 +418,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Missile Command uniquement compatible qu'avec le Turbo Pascal 7.</td>
      </tr>
     <tr>
+        <td><b>MONOPOLY.PAS</b></td>
+        <td><b>Monopoly</b></td>
+        <td>Ce fichier contient le jeu Monopoly.</td>
+    </tr>
+    <tr>
         <td><b>MOUSETRP.PAS</b></td>
         <td><b>Mouse Trap</b></td>
         <td>Ce fichier contient le jeu Mouse Trap.</td>
