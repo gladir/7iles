@@ -1,7 +1,7 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @created: 2025
   @website(https://www.gladir.com/7iles)
-  @description: MONOPOLY - Jeu de propriÔøΩtÔøΩs
+  @description: MONOPOLY - Jeu de propriÇtÇs
 }
 
 Program MonopolyBoard;
@@ -24,9 +24,9 @@ Type
   Price: Integer;
   Rent: Integer;
   PropertyType: Integer; { 0=Property, 1=Railroad, 2=Utility, 3=Special }
-  Owner: Integer; { 0=Personne, 1-4=Joueur propri√©taire }
+  Owner: Integer; { 0=Personne, 1-4=Joueur propriÇtaire }
   Houses: Integer; { Nombre de maisons (0-4) }
-  HasHotel: Boolean; { Vrai si h√¥tel construit }
+  HasHotel: Boolean; { Vrai si hìtel construit }
   HousePrice: Integer; { Prix d'une maison }
   Group: Integer; { Groupe de couleur (1-8) }
  End;
@@ -34,7 +34,7 @@ Type
  TPlayer = Record
   Name: String[20];
   Money: Integer;
-  Icon: Integer; { 0=Fer, 1=D√©, 2=Voiture, 3=Chapeau }
+  Icon: Integer; { 0=Fer, 1=DÇ, 2=Voiture, 3=Chapeau }
   IsHuman: Boolean;
   Position: Integer;
   InJail: Boolean;
@@ -48,7 +48,7 @@ Var
  CurrentPlayer: Integer; { Joueur actuel (1-4) }
  ActionMessage: String; { Message d'action en cours }
  GameState: Integer; { 0=Normal, 1=Demande achat, 2=Menu construction }
- PropertyToBuy: Integer; { Index de la propri√©t√© √† acheter }
+ PropertyToBuy: Integer; { Index de la propriÇtÇ Ö acheter }
  ContextualMessage: String; { Message contextuel pour les actions }
 
 Procedure InitScreen;
@@ -75,7 +75,7 @@ Procedure InitProperties;
 Var
  I: Integer;
 Begin
- { Initialiser tous les propri√©taires √† 0 et tous les loyers √† 0 }
+ { Initialiser tous les propriÇtaires Ö 0 et tous les loyers Ö 0 }
  For I := 0 to 39 Do Begin
   Properties[I].Owner := 0;
   Properties[I].Rent := 0;
@@ -84,16 +84,14 @@ Begin
   Properties[I].HousePrice := 0;
   Properties[I].Group := 0;
  End;
-
- { Coin inf√©rieur droit - GO }
+  { Coin infÇrieur droit - GO }
  Properties[0].Name := 'GO';
  Properties[0].Color := LightGreen;
  Properties[0].PropertyType := 3;
  Properties[0].Price := 0;
  Properties[0].Owner := 0;
-
- { C√¥t√© bas - Groupe Marron }
- Properties[1].Name := 'Avenue M√©diterran√©e';
+  { CìtÇ bas - Groupe Marron }
+ Properties[1].Name := 'Avenue MÇditerranÇe';
  Properties[1].Color := Brown;
  Properties[1].PropertyType := 0;
  Properties[1].Price := 60;
@@ -101,7 +99,7 @@ Begin
  Properties[1].Group := 1;
  Properties[1].HousePrice := 50;
 
- Properties[2].Name := 'Caisse Communaut√©';
+ Properties[2].Name := 'Caisse CommunautÇ';
  Properties[2].Color := LightBlue;
  Properties[2].PropertyType := 3;
  Properties[2].Price := 0;
@@ -115,7 +113,7 @@ Begin
  Properties[3].Group := 1;
  Properties[3].HousePrice := 50;
 
- Properties[4].Name := 'Imp√¥t sur Revenu';
+ Properties[4].Name := 'Impìt sur Revenu';
  Properties[4].Color := White;
  Properties[4].PropertyType := 3;
  Properties[4].Price := 0;
@@ -170,12 +168,12 @@ Begin
  Properties[11].PropertyType := 0;
  Properties[11].Price := 140;
 
- Properties[12].Name := 'Compagnie √âlectrique';
+ Properties[12].Name := 'Compagnie Çlectrique';
  Properties[12].Color := Yellow;
  Properties[12].PropertyType := 2;
  Properties[12].Price := 150;
 
- Properties[13].Name := 'Avenue √âtats';
+ Properties[13].Name := 'Avenue Çtats';
  Properties[13].Color := Magenta;
  Properties[13].PropertyType := 0;
  Properties[13].Price := 140;
@@ -196,7 +194,7 @@ Begin
  Properties[16].PropertyType := 0;
  Properties[16].Price := 180;
 
- Properties[17].Name := 'Caisse Communaut√©';
+ Properties[17].Name := 'Caisse CommunautÇ';
  Properties[17].Color := LightBlue;
  Properties[17].PropertyType := 3;
  Properties[17].Price := 0;
@@ -264,13 +262,13 @@ Begin
  Properties[29].PropertyType := 0;
  Properties[29].Price := 280;
 
- { Coin sup√©rieur droit - Go to Jail }
+ { Coin supÇrieur droit - Go to Jail }
  Properties[30].Name := 'Allez en Prison';
  Properties[30].Color := LightGray;
  Properties[30].PropertyType := 3;
  Properties[30].Price := 0;
 
- { C√¥t√© droit - Groupe Vert }
+ { CìtÇ droit - Groupe Vert }
  Properties[31].Name := 'Avenue Pacifique';
  Properties[31].Color := Green;
  Properties[31].PropertyType := 0;
@@ -281,7 +279,7 @@ Begin
  Properties[32].PropertyType := 0;
  Properties[32].Price := 300;
 
- Properties[33].Name := 'Caisse Communaut√©';
+ Properties[33].Name := 'Caisse CommunautÇ';
  Properties[33].Color := LightBlue;
  Properties[33].PropertyType := 3;
  Properties[33].Price := 0;
@@ -301,7 +299,7 @@ Begin
  Properties[36].PropertyType := 3;
  Properties[36].Price := 0;
 
- { Groupe Bleu fonc√© }
+ { Groupe Bleu foncÇ }
  Properties[37].Name := 'Place du Parc';
  Properties[37].Color := Blue;
  Properties[37].PropertyType := 0;
@@ -318,27 +316,24 @@ Begin
  Properties[39].Price := 400;
 End;
 
-Procedure InitPlayers;
-Begin
- { Joueur 1 - Humain }
+Procedure InitPlayers;Begin
+  { Joueur 1 - Humain }
  Players[1].Name := 'Joueur Humain';
  Players[1].Money := 1500;
- Players[1].Icon := 0; { Fer √† repasser }
+ Players[1].Icon := 0; { Fer Ö repasser }
  Players[1].IsHuman := True;
  Players[1].Position := 0;
  Players[1].InJail := False;
  Players[1].JailTurns := 0;
-
- { Joueur 2 - Ordinateur }
+  { Joueur 2 - Ordinateur }
  Players[2].Name := 'Ordinateur 1';
  Players[2].Money := 1500;
- Players[2].Icon := 1; { D√© √† coudre }
+ Players[2].Icon := 1; { DÇ Ö coudre }
  Players[2].IsHuman := False;
  Players[2].Position := 0;
  Players[2].InJail := False;
  Players[2].JailTurns := 0;
-
- { Joueur 3 - Ordinateur }
+  { Joueur 3 - Ordinateur }
  Players[3].Name := 'Ordinateur 2';
  Players[3].Money := 1500;
  Players[3].Icon := 2; { Voiture }
@@ -346,8 +341,7 @@ Begin
  Players[3].Position := 0;
  Players[3].InJail := False;
  Players[3].JailTurns := 0;
-
- { Joueur 4 - Ordinateur }
+  { Joueur 4 - Ordinateur }
  Players[4].Name := 'Ordinateur 3';
  Players[4].Money := 1500;
  Players[4].Icon := 3; { Chapeau }
@@ -357,11 +351,10 @@ Begin
  Players[4].JailTurns := 0;
 End;
 
-Procedure DrawPlayerIcon(X, Y, IconType: Integer);
-Begin
+Procedure DrawPlayerIcon(X,Y,IconType:Integer);Begin
  SetColor(Black);
  Case IconType of
-  0: Begin { Fer √† repasser }
+  0: Begin { Fer Ö repasser }
    SetFillStyle(SolidFill, LightGray);
    Bar(X + 2, Y + 8, X + 14, Y + 12);
    Bar(X + 4, Y + 4, X + 12, Y + 8);
@@ -370,8 +363,7 @@ Begin
    Rectangle(X + 4, Y + 4, X + 12, Y + 8);
    Line(X + 8, Y + 4, X + 8, Y + 2);
   End;
-
-  1: Begin { D√© √† coudre }
+  1: Begin { DÇ Ö coudre }
    SetFillStyle(SolidFill, Yellow);
    Bar(X + 4, Y + 2, X + 12, Y + 14);
    SetColor(Black);
@@ -385,7 +377,6 @@ Begin
    Circle(X + 6, Y + 11, 1);
    Circle(X + 10, Y + 11, 1);
   End;
-
   2: Begin { Voiture }
    SetFillStyle(SolidFill, Red);
    Bar(X + 2, Y + 8, X + 14, Y + 12);
@@ -398,7 +389,6 @@ Begin
    Circle(X + 4, Y + 12, 2);
    Circle(X + 12, Y + 12, 2);
   End;
-
   3: Begin { Chapeau }
    SetFillStyle(SolidFill, Brown);
    Bar(X + 2, Y + 12, X + 14, Y + 14);
@@ -415,42 +405,33 @@ Var
  I: Integer;
  MoneyStr: String;
 Begin
- { Dessiner la zone des joueurs - √©largie de 50 pixels }
+ { Dessiner la zone des joueurs - Çlargie de 50 pixels }
  SetColor(Black);
  SetFillStyle(SolidFill, DarkGray);
  Bar(420, 300, 630, 450);
  Rectangle(420, 300, 630, 450);
-
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(520, 310, 'JOUEURS');
-
  { Afficher chaque joueur }
  For I := 1 to 4 Do Begin
   { Ne pas afficher les joueurs en faillite }
   If Players[I].Money >= 0 Then Begin
-   { Ic√¥ne du joueur }
+   { Icìne du joueur }
    DrawPlayerIcon(430, 320 + (I - 1) * 30, Players[I].Icon);
-
    { Nom du joueur }
    SetColor(White);
-   If Players[I].IsHuman Then
-    SetColor(Yellow);
-
-   { Mettre en √©vidence le joueur actuel }
-   If I = CurrentPlayer Then
-    SetColor(LightRed);
-
+   If Players[I].IsHuman Then SetColor(Yellow);
+   { Mettre en Çvidence le joueur actuel }
+   If I = CurrentPlayer Then SetColor(LightRed);
    OutTextXY(450, 325 + (I - 1) * 30, Players[I].Name);
-
    { Afficher "A TON TOUR" pour le joueur actuel }
    If I = CurrentPlayer Then Begin
     SetColor(LightRed);
     OutTextXY(450, 335 + (I - 1) * 30, 'A TON TOUR');
    End;
-
-   { Montant d'argent - d√©plac√© de 50 pixels }
+   { Montant d'argent - dÇplacÇ de 50 pixels }
    SetColor(LightGreen);
    Str(Players[I].Money, MoneyStr);
    OutTextXY(570, 325 + (I - 1) * 30, MoneyStr + '$');
@@ -462,39 +443,34 @@ Begin
  End;
 End;
 
-Procedure DrawDice(X, Y, Value: Integer);
+Procedure DrawDice(X,Y,Value:Integer);
 Var
- I, J, DotX, DotY: Integer;
+ I,J,DotX,DotY:Integer;
 Begin
- { Dessiner le fond du d√© }
+ { Dessiner le fond du dÇ }
  SetColor(Black);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + 50, Y + 50);
  Rectangle(X, Y, X + 50, Y + 50);
-
  { Dessiner les points selon la valeur }
  SetColor(Black);
  SetFillStyle(SolidFill, Black);
-
  Case Value of
   1: Begin
    { Centre }
    FillEllipse(X + 25, Y + 25, 4, 4);
   End;
-
   2: Begin
    { Diagonal }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-
   3: Begin
    { Diagonal + centre }
    FillEllipse(X + 15, Y + 15, 4, 4);
    FillEllipse(X + 25, Y + 25, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-
   4: Begin
    { Quatre coins }
    FillEllipse(X + 15, Y + 15, 4, 4);
@@ -502,7 +478,6 @@ Begin
    FillEllipse(X + 15, Y + 35, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-
   5: Begin
    { Quatre coins + centre }
    FillEllipse(X + 15, Y + 15, 4, 4);
@@ -511,7 +486,6 @@ Begin
    FillEllipse(X + 15, Y + 35, 4, 4);
    FillEllipse(X + 35, Y + 35, 4, 4);
   End;
-
   6: Begin
    { Deux colonnes de trois }
    FillEllipse(X + 15, Y + 12, 4, 4);
@@ -528,21 +502,18 @@ Procedure DrawDiceArea;
 Var
  SumStr: String;
 Begin
- { Dessiner la zone des d√©s - √©largie de 50 pixels }
+ { Dessiner la zone des dÇs - Çlargie de 50 pixels }
  SetColor(Black);
  SetFillStyle(SolidFill, DarkGray);
  Bar(420, 150, 630, 280);
  Rectangle(420, 150, 630, 280);
-
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(460, 160, 'LANCER DES');
-
- { Dessiner les deux d√©s }
+ { Dessiner les deux dÇs }
  DrawDice(465, 180, Dice1);
  DrawDice(525, 180, Dice2);
-
  { Afficher la somme }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 2);
@@ -550,65 +521,60 @@ Begin
  OutTextXY(520, 240, SumStr);
 End;
 
-Procedure GetCellPosition(Index: Integer; Var X, Y: Integer);
-Begin
+Procedure GetCellPosition(Index:Integer; Var X,Y:Integer);Begin
  { Calcule la position X,Y d'une cellule selon son index }
  If Index <= 10 Then Begin
-  { C√¥t√© bas - de droite √† gauche }
+  { CìtÇ bas - de droite Ö gauche }
   X := 360 - (Index * CELL_SIZE);
   Y := 360;
- End Else If Index <= 20 Then Begin
-  { C√¥t√© gauche - de bas en haut }
+ End
+  Else
+ If Index <= 20 Then Begin
+  { CìtÇ gauche - de bas en haut }
   X := 0;
   Y := 360 - ((Index - 10) * CELL_SIZE);
  End Else If Index <= 30 Then Begin
-  { C√¥t√© haut - de gauche √† droite }
+  { CìtÇ haut - de gauche Ö droite }
   X := (Index - 20) * CELL_SIZE;
   Y := 0;
  End Else Begin
-  { C√¥t√© droit - de haut en bas }
+  { CìtÇ droit - de haut en bas }
   X := 360;
   Y := (Index - 30) * CELL_SIZE;
  End;
 End;
 
-Function GetPlayerAssetValue(PlayerIndex: Integer): Integer;
+Function GetPlayerAssetValue(PlayerIndex:Integer):Integer;
 Var
- I, TotalValue: Integer;
+ I,TotalValue: Integer;
 Begin
  TotalValue := Players[PlayerIndex].Money;
-
- { Ajouter la valeur des propri√©t√©s }
+  { Ajouter la valeur des propriÇtÇs }
  For I := 0 to 39 Do Begin
   If Properties[I].Owner = PlayerIndex Then Begin
    TotalValue := TotalValue + (Properties[I].Price Div 2); { Valeur de revente = 50% du prix }
-
-   { Ajouter la valeur des maisons (50% du prix) }
+    { Ajouter la valeur des maisons (50% du prix) }
    If Properties[I].PropertyType = 0 Then Begin
     TotalValue := TotalValue + (Properties[I].Houses * Properties[I].HousePrice Div 2);
-
-    { Ajouter la valeur de l'h√¥tel (50% du prix) }
+     { Ajouter la valeur de l'h√¥tel (50% du prix) }
     If Properties[I].HasHotel Then
      TotalValue := TotalValue + (Properties[I].HousePrice Div 2);
    End;
   End;
  End;
-
  GetPlayerAssetValue := TotalValue;
 End;
 
-Function CanPayDebt(PlayerIndex, DebtAmount: Integer): Boolean;
-Begin
+Function CanPayDebt(PlayerIndex,DebtAmount:Integer):Boolean;Begin
  CanPayDebt := GetPlayerAssetValue(PlayerIndex) >= DebtAmount;
 End;
 
 Procedure SellBuildings(PlayerIndex: Integer; NeededAmount: Integer);
 Var
- I, SoldAmount: Integer;
+ I,SoldAmount:Integer;
 Begin
  SoldAmount := 0;
-
- { Vendre d'abord les h√¥tels }
+ { Vendre d'abord les hìtels }
  For I := 0 to 39 Do Begin
   If (Properties[I].Owner = PlayerIndex) And Properties[I].HasHotel And (SoldAmount < NeededAmount) Then Begin
    Properties[I].HasHotel := False;
@@ -617,7 +583,6 @@ Begin
    SoldAmount := SoldAmount + (Properties[I].HousePrice Div 2);
   End;
  End;
-
  { Puis vendre les maisons }
  While SoldAmount < NeededAmount Do Begin
   For I := 0 to 39 Do Begin
@@ -630,16 +595,15 @@ Begin
  End;
 End;
 
-Procedure SellProperties(PlayerIndex: Integer; NeededAmount: Integer);
+Procedure SellProperties(PlayerIndex:Integer;NeededAmount:Integer);
 Var
  I, SoldAmount: Integer;
 Begin
  SoldAmount := 0;
-
- { Vendre les propri√©t√©s (50% du prix d'achat) }
+ { Vendre les propriÇtÇs (50% du prix d'achat) }
  For I := 0 to 39 Do Begin
   If (Properties[I].Owner = PlayerIndex) And (SoldAmount < NeededAmount) Then Begin
-   Properties[I].Owner := 0; { Remettre la propri√©t√© sur le march√© }
+   Properties[I].Owner := 0; { Remettre la propriÇtÇ sur le marchÇ }
    Properties[I].Houses := 0;
    Properties[I].HasHotel := False;
    Players[PlayerIndex].Money := Players[PlayerIndex].Money + (Properties[I].Price Div 2);
@@ -648,42 +612,37 @@ Begin
  End;
 End;
 
-Function HandleDebt(PlayerIndex, DebtAmount: Integer): Boolean;
+Function HandleDebt(PlayerIndex,DebtAmount:Integer):Boolean;
 Var
  NeededAmount: Integer;
 Begin
- { Si le joueur a assez d'argent, pas de probl√®me }
- If Players[PlayerIndex].Money >= DebtAmount Then Begin
-  HandleDebt := True;
+  { Si le joueur a assez d'argent, pas de probläme }
+ If Players[PlayerIndex].Money>=DebtAmount Then Begin
+  HandleDebt:=True;
   Exit;
  End;
-
- NeededAmount := DebtAmount - Players[PlayerIndex].Money;
-
- { V√©rifier si le joueur peut payer en vendant ses biens }
+ NeededAmount:=DebtAmount-Players[PlayerIndex].Money;
+ { VÇrifier si le joueur peut payer en vendant ses biens }
  If Not CanPayDebt(PlayerIndex, DebtAmount) Then Begin
-  { Faillite - le joueur ne peut pas payer m√™me en vendant tout }
+  { Faillite - le joueur ne peut pas payer màme en vendant tout }
   HandleDebt := False;
   Exit;
  End;
-
- { Vendre des b√¢timents d'abord }
+  { Vendre des b√¢timents d'abord }
  SellBuildings(PlayerIndex, NeededAmount);
-
- { Si pas encore assez, vendre des propri√©t√©s }
+  { Si pas encore assez, vendre des propriÇtÇs }
  If Players[PlayerIndex].Money < DebtAmount Then Begin
   NeededAmount := DebtAmount - Players[PlayerIndex].Money;
   SellProperties(PlayerIndex, NeededAmount);
  End;
-
  HandleDebt := True;
 End;
 
-Procedure EliminatePlayer(PlayerIndex: Integer);
+Procedure EliminatePlayer(PlayerIndex:Integer);
 Var
- I: Integer;
+ I:Integer;
 Begin
- { Lib√©rer toutes les propri√©t√©s du joueur }
+ { LibÇrer toutes les propriÇtÇs du joueur }
  For I := 0 to 39 Do Begin
   If Properties[I].Owner = PlayerIndex Then Begin
    Properties[I].Owner := 0;
@@ -691,51 +650,45 @@ Begin
    Properties[I].HasHotel := False;
   End;
  End;
-
- { Marquer le joueur comme √©limin√© }
+  { Marquer le joueur comme ÇliminÇ }
  Players[PlayerIndex].Money := -1; { Indicateur de faillite }
  Players[PlayerIndex].Name := Players[PlayerIndex].Name + ' (FAILLITE)';
 End;
 
 Function IntToStr(Value: Integer): String;
 Var
- S: String;
+ S:String;
 Begin
- Str(Value, S);
- IntToStr := S;
+ Str(Value,S);
+ IntToStr:=S;
 End;
 
-Function HasCompleteGroup(PlayerIndex, GroupNum: Integer): Boolean;
+Function HasCompleteGroup(PlayerIndex,GroupNum:Integer):Boolean;
 Var
- I, Count, Total: Integer;
+ I,Count,Total:Integer;
 Begin
- Count := 0;
- Total := 0;
-
- { Compter les propri√©t√©s du groupe }
+ Count:=0;
+ Total:=0;
+ { Compter les propriÇtÇs du groupe }
  For I := 0 to 39 Do Begin
   If Properties[I].Group = GroupNum Then Begin
    Inc(Total);
-   If Properties[I].Owner = PlayerIndex Then
-    Inc(Count);
+   If Properties[I].Owner = PlayerIndex Then Inc(Count);
   End;
  End;
-
  HasCompleteGroup := (Count = Total) And (Total > 0);
 End;
 
-Function CanBuildHouses(PlayerIndex, PropertyIndex: Integer): Boolean;
-Begin
- CanBuildHouses := (Properties[PropertyIndex].Owner = PlayerIndex) And
-                   (Properties[PropertyIndex].PropertyType = 0) And
-                   (Properties[PropertyIndex].Houses < 4) And
-                   (Not Properties[PropertyIndex].HasHotel) And
-                   HasCompleteGroup(PlayerIndex, Properties[PropertyIndex].Group) And
-                   (Players[PlayerIndex].Money >= Properties[PropertyIndex].HousePrice);
+Function CanBuildHouses(PlayerIndex,PropertyIndex:Integer):Boolean;Begin
+ CanBuildHouses:=(Properties[PropertyIndex].Owner = PlayerIndex) And
+                 (Properties[PropertyIndex].PropertyType = 0) And
+                 (Properties[PropertyIndex].Houses < 4) And
+                 (Not Properties[PropertyIndex].HasHotel) And
+                 HasCompleteGroup(PlayerIndex, Properties[PropertyIndex].Group) And
+                 (Players[PlayerIndex].Money >= Properties[PropertyIndex].HousePrice);
 End;
 
-Function CanBuildHotel(PlayerIndex, PropertyIndex: Integer): Boolean;
-Begin
+Function CanBuildHotel(PlayerIndex, PropertyIndex: Integer): Boolean;Begin
  CanBuildHotel := (Properties[PropertyIndex].Owner = PlayerIndex) And
                   (Properties[PropertyIndex].PropertyType = 0) And
                   (Properties[PropertyIndex].Houses = 4) And
@@ -743,17 +696,16 @@ Begin
                   (Players[PlayerIndex].Money >= Properties[PropertyIndex].HousePrice);
 End;
 
-Function KeyPressed: Boolean;
+Function KeyPressed:Boolean;
 Begin
  {$IFDEF FPC}
-  KeyPressed := PtcCrt.KeyPressed;
+  KeyPressed:=PtcCrt.KeyPressed;
  {$ELSE}
-  KeyPressed := Crt.KeyPressed;
+  KeyPressed:=Crt.KeyPressed;
  {$ENDIF}
 End;
 
-Function SafeReadKey: Char;
-Begin
+Function SafeReadKey:Char;Begin
  If KeyPressed Then Begin
   {$IFDEF FPC}
    SafeReadKey := PtcCrt.ReadKey;
@@ -767,41 +719,48 @@ End;
 
 Procedure Wait2Seconds;
 Var
- I, J: Integer;
+ I,J,DelayCounter:Integer;
+ EscapePressed:Boolean;
 Begin
- { Cr√©er un d√©lai d'environ 2 secondes avec possibilit√© d'interruption }
- For I := 1 to 100 Do Begin
-  For J := 1 to 600 Do Begin
-   { V√©rifier interruption clavier }
-   If KeyPressed Then Begin
-    If SafeReadKey = #27 Then Exit;
+ { CrÇer un dÇlai d'environ 2 secondes avec vÇrification constante }
+ DelayCounter := 0;
+ EscapePressed := False;
+ Repeat
+  { VÇrifier interruption clavier }
+  If KeyPressed Then Begin
+   If SafeReadKey = #27 Then Begin
+    EscapePressed := True;
+    Break;
    End;
   End;
- End;
+  { Petit dÇlai }
+  For I := 1 to 100 Do Begin
+   For J := 1 to 50 Do Begin
+    { Boucle vide pour crÇer le dÇlai }
+   End;
+  End;
+  Inc(DelayCounter);
+ Until (DelayCounter >= 40) Or EscapePressed;
 End;
 
 Procedure DrawActionMessage;
 Var
- Line1, Line2: String;
- MaxWidth, I, LastSpace: Integer;
+ Line1,Line2:String;
+ MaxWidth,I,LastSpace:Integer;
 Begin
- { Dessiner la zone des messages d'action - remont√©e de 20 pixels et augment√©e de 20 pixels }
+ { Dessiner la zone des messages d'action - remontÇe de 20 pixels et augmentÇe de 20 pixels }
  SetColor(Black);
  SetFillStyle(SolidFill, DarkGray);
  Bar(420, 50, 630, 140);
  Rectangle(420, 50, 630, 140);
-
  { Titre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(500, 60, 'ACTION');
-
- { Message d'action sur deux lignes si n√©cessaire }
+ { Message d'action sur deux lignes si nÇcessaire }
  SetColor(Yellow);
  SetTextStyle(DefaultFont, HorizDir, 1);
-
- MaxWidth := 25; { Largeur maximale en caract√®res }
-
+ MaxWidth := 25; { Largeur maximale en caractäres }
  If Length(ActionMessage) <= MaxWidth Then Begin
   { Message court - une seule ligne }
   OutTextXY(430, 85, ActionMessage);
@@ -813,26 +772,24 @@ Begin
    If (I <= Length(ActionMessage)) And (ActionMessage[I] = ' ') Then
     LastSpace := I;
   End;
-
   If LastSpace > 0 Then Begin
-   { Couper au dernier espace trouv√© }
+   { Couper au dernier espace trouvÇ }
    Line1 := Copy(ActionMessage, 1, LastSpace - 1);
    Line2 := Copy(ActionMessage, LastSpace + 1, Length(ActionMessage));
-  End Else Begin
-   { Couper brutalement √† la limite }
+  End
+   Else
+  Begin
+   { Couper brutalement Ö la limite }
    Line1 := Copy(ActionMessage, 1, MaxWidth);
    Line2 := Copy(ActionMessage, MaxWidth + 1, Length(ActionMessage));
   End;
-
   { Afficher les deux lignes }
   OutTextXY(430, 75, Line1);
   OutTextXY(430, 90, Line2);
  End;
-
  { Afficher les instructions contextuelles sous le message d'action }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 1);
-
  Case GameState of
   0: OutTextXY(430, 110, ContextualMessage);
   1: Begin
@@ -844,7 +801,7 @@ Begin
  End;
 End;
 
-Function ProcessPlayerAction(PlayerIndex: Integer): String;
+Function ProcessPlayerAction(PlayerIndex:Integer):String;
 Var
  PropertyIndex: Integer;
  ActionMsg: String;
@@ -853,29 +810,25 @@ Var
 Begin
  PropertyIndex := Players[PlayerIndex].Position;
  ActionMsg := '';
-
- { V√©rifier le type de case }
+ { VÇrifier le type de case }
  Case PropertyIndex of
   0: Begin { GO }
    Players[PlayerIndex].Money := Players[PlayerIndex].Money + 200;
    ActionMsg := Players[PlayerIndex].Name + ' passe par GO: +200$';
   End;
-
   2, 17, 33: Begin { Caisse Communaut√© }
    ActionMsg := Players[PlayerIndex].Name + ' tire une carte Caisse';
   End;
-
   7, 22, 36: Begin { Chance }
    ActionMsg := Players[PlayerIndex].Name + ' tire une carte Chance';
   End;
-
-  4: Begin { Imp√¥t sur revenu }
+  4: Begin { Impìt sur revenu }
    If HandleDebt(PlayerIndex, 200) Then Begin
     Players[PlayerIndex].Money := Players[PlayerIndex].Money - 200;
-    ActionMsg := Players[PlayerIndex].Name + ' paie imp√¥t: -200$';
+    ActionMsg := Players[PlayerIndex].Name + ' paie impìt: -200$';
    End Else Begin
     EliminatePlayer(PlayerIndex);
-    ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur imp√¥t!';
+    ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur impìt!';
    End;
   End;
 
@@ -888,30 +841,25 @@ Begin
     ActionMsg := Players[PlayerIndex].Name + ' fait faillite sur taxe!';
    End;
   End;
-
   10: Begin { Prison - visite }
    ActionMsg := Players[PlayerIndex].Name + ' visite la prison';
   End;
-
   20: Begin { Parc gratuit }
    ActionMsg := Players[PlayerIndex].Name + ' se repose au parc';
   End;
-
   30: Begin { Allez en prison }
    Players[PlayerIndex].Position := 10;
    Players[PlayerIndex].InJail := True;
    Players[PlayerIndex].JailTurns := 0;
    ActionMsg := Players[PlayerIndex].Name + ' va en prison!';
   End;
-
   Else Begin
-   { Propri√©t√© normale }
+   { PropriÇtÇ normale }
    If (Properties[PropertyIndex].PropertyType = 0) Or
       (Properties[PropertyIndex].PropertyType = 1) Or
       (Properties[PropertyIndex].PropertyType = 2) Then Begin
-
     If Properties[PropertyIndex].Owner = 0 Then Begin
-     { Propri√©t√© libre }
+     { PropriÇtÇ libre }
      If Players[PlayerIndex].IsHuman Then Begin
       { Demander au joueur humain s'il veut acheter }
       If Players[PlayerIndex].Money >= Properties[PropertyIndex].Price Then Begin
@@ -926,24 +874,24 @@ Begin
       If Players[PlayerIndex].Money >= Properties[PropertyIndex].Price Then Begin
        Players[PlayerIndex].Money := Players[PlayerIndex].Money - Properties[PropertyIndex].Price;
        Properties[PropertyIndex].Owner := PlayerIndex;
-       ActionMsg := Players[PlayerIndex].Name + ' ach√®te ' + Properties[PropertyIndex].Name;
+       ActionMsg := Players[PlayerIndex].Name + ' achäte ' + Properties[PropertyIndex].Name;
       End Else Begin
        ActionMsg := Players[PlayerIndex].Name + ' ne peut pas acheter ' + Properties[PropertyIndex].Name;
       End;
      End;
-    End Else If Properties[PropertyIndex].Owner <> PlayerIndex Then Begin
-     { Propri√©t√© appartient √† un autre joueur - payer loyer }
+    End
+     Else
+    If Properties[PropertyIndex].Owner <> PlayerIndex Then Begin
+     { PropriÇtÇ appartient Ö un autre joueur - payer loyer }
      RentAmount := Properties[PropertyIndex].Rent;
-
-     { Calcul du loyer avec maisons/h√¥tels }
+     { Calcul du loyer avec maisons/hìtels }
      If Properties[PropertyIndex].PropertyType = 0 Then Begin
       If Properties[PropertyIndex].HasHotel Then
        RentAmount := RentAmount * 5
       Else If Properties[PropertyIndex].Houses > 0 Then
        RentAmount := RentAmount * (Properties[PropertyIndex].Houses + 1);
      End;
-
-     { V√©rifier si le joueur peut payer le loyer }
+     { VÇrifier si le joueur peut payer le loyer }
      If HandleDebt(PlayerIndex, RentAmount) Then Begin
       Players[PlayerIndex].Money := Players[PlayerIndex].Money - RentAmount;
       Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money + RentAmount;
@@ -954,11 +902,10 @@ Begin
       EliminatePlayer(PlayerIndex);
       Players[Properties[PropertyIndex].Owner].Money := Players[Properties[PropertyIndex].Owner].Money +
                                                         Players[PlayerIndex].Money;
-      ActionMsg := Players[PlayerIndex].Name + ' fait faillite! Biens transf√©r√©s.';
+      ActionMsg := Players[PlayerIndex].Name + ' fait faillite! Biens transfÇrÇs.';
      End;
     End Else Begin
-     ActionMsg := Players[PlayerIndex].Name + ' sur sa propri√©t√©';
-
+     ActionMsg := Players[PlayerIndex].Name + ' sur sa propriÇtÇ';
      { Proposer la construction pour le joueur humain }
      If Players[PlayerIndex].IsHuman And (Properties[PropertyIndex].PropertyType = 0) Then Begin
       If CanBuildHouses(PlayerIndex, PropertyIndex) Or CanBuildHotel(PlayerIndex, PropertyIndex) Then Begin
@@ -970,16 +917,14 @@ Begin
    End;
   End;
  End;
-
  ProcessPlayerAction := ActionMsg;
 End;
 
-Procedure HandlePurchase(Accept: Boolean);
-Begin
+Procedure HandlePurchase(Accept: Boolean);Begin
  If Accept And (Players[CurrentPlayer].Money >= Properties[PropertyToBuy].Price) Then Begin
   Players[CurrentPlayer].Money := Players[CurrentPlayer].Money - Properties[PropertyToBuy].Price;
   Properties[PropertyToBuy].Owner := CurrentPlayer;
-  ActionMessage := Players[CurrentPlayer].Name + ' ach√®te ' + Properties[PropertyToBuy].Name;
+  ActionMessage := Players[CurrentPlayer].Name + ' achäte ' + Properties[PropertyToBuy].Name;
  End Else Begin
   ActionMessage := Players[CurrentPlayer].Name + ' refuse d''acheter ' + Properties[PropertyToBuy].Name;
  End;
@@ -1013,12 +958,11 @@ Begin
     Properties[PropertyIndex].Houses := 0;
     Properties[PropertyIndex].HasHotel := True;
     Str(Properties[PropertyIndex].HousePrice, PriceStr);
-    ActionMessage := Players[CurrentPlayer].Name + ' construit un h√¥tel: -' + PriceStr + '$';
+    ActionMessage := Players[CurrentPlayer].Name + ' construit un hìtel: -' + PriceStr + '$';
    End Else Begin
-    ActionMessage := 'Impossible de construire un h√¥tel';
+    ActionMessage := 'Impossible de construire un hìtel';
    End;
   End;
-
   'Q', 'q': Begin { Quitter }
    ActionMessage := Players[CurrentPlayer].Name + ' termine la construction';
   End;
@@ -1038,16 +982,14 @@ Begin
  { Dessiner chaque joueur sur sa position actuelle }
  For I := 1 to 4 Do Begin
   GetCellPosition(Players[I].Position, X, Y);
-
-  { Calculer l'offset pour √©viter la superposition des joueurs }
+   { Calculer l'offset pour √©viter la superposition des joueurs }
   Case I of
    1: Begin OffsetX := 2; OffsetY := 2; End;    { Joueur 1 - coin haut-gauche }
    2: Begin OffsetX := 22; OffsetY := 2; End;   { Joueur 2 - coin haut-droit }
    3: Begin OffsetX := 2; OffsetY := 22; End;   { Joueur 3 - coin bas-gauche }
    4: Begin OffsetX := 22; OffsetY := 22; End;  { Joueur 4 - coin bas-droit }
   End;
-
-  { Dessiner l'ic√¥ne du joueur √† sa position }
+   { Dessiner l'icìne du joueur Ö sa position }
   DrawPlayerIcon(X + OffsetX, Y + OffsetY, Players[I].Icon);
  End;
 End;
@@ -1057,30 +999,27 @@ Var
  X, Y, I: Integer;
 Begin
  If Properties[Index].PropertyType <> 0 Then Exit;
-
  GetCellPosition(Index, X, Y);
-
  { Dessiner les maisons }
  SetColor(Green);
  SetFillStyle(SolidFill, Green);
-
  For I := 1 to Properties[Index].Houses Do Begin
   If Index <= 10 Then Begin
-   { C√¥t√© bas }
+   { CìtÇ bas }
    Bar(X + 15 + (I - 1) * 5, Y + 15, X + 18 + (I - 1) * 5, Y + 20);
   End Else If Index <= 20 Then Begin
-   { C√¥t√© gauche }
+   { CìtÇ gauche }
    Bar(X + 15, Y + 15 + (I - 1) * 5, X + 20, Y + 18 + (I - 1) * 5);
   End Else If Index <= 30 Then Begin
-   { C√¥t√© haut }
+   { CìtÇ haut }
    Bar(X + 15 + (I - 1) * 5, Y + 15, X + 18 + (I - 1) * 5, Y + 20);
   End Else Begin
-   { C√¥t√© droit }
+   { CìtÇ droit }
    Bar(X + 15, Y + 15 + (I - 1) * 5, X + 20, Y + 18 + (I - 1) * 5);
   End;
  End;
 
- { Dessiner l'h√¥tel }
+ { Dessiner l'hìtel }
  If Properties[Index].HasHotel Then Begin
   SetColor(Red);
   SetFillStyle(SolidFill, Red);
@@ -1110,86 +1049,79 @@ Var
  PriceStr: String;
 Begin
  GetCellPosition(Index, X, Y);
-
  { Dessiner la cellule de base }
  SetColor(Black);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + CELL_SIZE, Y + CELL_SIZE);
  Rectangle(X, Y, X + CELL_SIZE, Y + CELL_SIZE);
-
- { Dessiner la bande de couleur pour les propri√©t√©s }
+ { Dessiner la bande de couleur pour les propriÇtÇs }
  If Properties[Index].PropertyType = 0 Then Begin
   SetFillStyle(SolidFill, Properties[Index].Color);
   If (Index <= 10) Or (Index > 30) Then Begin
-   { C√¥t√© bas et droit - bande en haut }
+   { CìtÇ bas et droit - bande en haut }
    Bar(X + 1, Y + 1, X + CELL_SIZE - 1, Y + PROPERTY_HEIGHT);
   End Else Begin
-   { C√¥t√© gauche et haut - bande √† gauche ou en bas }
+   { CìtÇ gauche et haut - bande Ö gauche ou en bas }
    If Index <= 20 Then
     Bar(X + 1, Y + 1, X + PROPERTY_HEIGHT, Y + CELL_SIZE - 1)
    Else
     Bar(X + 1, Y + CELL_SIZE - PROPERTY_HEIGHT, X + CELL_SIZE - 1, Y + CELL_SIZE - 1);
   End;
  End;
-
  { Dessiner le texte du nom }
  SetColor(Black);
-
  { Ajuster le texte selon la position }
  If Index <= 10 Then Begin
-  { C√¥t√© bas - texte horizontal }
+  { CìtÇ bas - texte horizontal }
   SetTextStyle(DefaultFont, HorizDir, 1);
   If Length(Properties[Index].Name) > 8 Then
    OutTextXY(X + 5, Y + 12, Copy(Properties[Index].Name, 1, 8))
   Else
    OutTextXY(X + 5, Y + 12, Properties[Index].Name);
  End Else If Index <= 20 Then Begin
-  { C√¥t√© gauche - texte vertical }
+  { CìtÇ gauche - texte vertical }
   SetTextStyle(DefaultFont, VertDir, 1);
   If Length(Properties[Index].Name) > 6 Then
    OutTextXY(X + 25, Y + 35, Copy(Properties[Index].Name, 1, 6))
   Else
    OutTextXY(X + 25, Y + 35, Properties[Index].Name);
  End Else If Index <= 30 Then Begin
-  { C√¥t√© haut - texte horizontal }
+  { CìtÇ haut - texte horizontal }
   SetTextStyle(DefaultFont, HorizDir, 1);
   If Length(Properties[Index].Name) > 8 Then
    OutTextXY(X + 5, Y + 15, Copy(Properties[Index].Name, 1, 8))
   Else
    OutTextXY(X + 5, Y + 25, Properties[Index].Name);
  End Else Begin
-  { C√¥t√© droit - texte vertical }
+  { CìtÇ droit - texte vertical }
   SetTextStyle(DefaultFont, VertDir, 1);
   If Length(Properties[Index].Name) > 6 Then
    OutTextXY(X + 15, Y + 5, Copy(Properties[Index].Name, 1, 6))
   Else
    OutTextXY(X + 15, Y + 5, Properties[Index].Name);
  End;
-
- { Afficher le prix pour les propri√©t√©s }
+ { Afficher le prix pour les propriÇtÇs }
  If Properties[Index].Price > 0 Then Begin
   Str(Properties[Index].Price, PriceStr);
   If (Index <= 10) Or ((Index > 20) And (Index <= 30)) Then Begin
-   { C√¥t√©s bas et haut - prix horizontal }
+   { CìtÇs bas et haut - prix horizontal }
    SetTextStyle(DefaultFont, HorizDir, 1);
    OutTextXY(X + 5, Y + 30, PriceStr + '$');
   End Else If Index <= 20 Then Begin
-   { C√¥t√© gauche - prix vertical }
+   { CìtÇ gauche - prix vertical }
    SetTextStyle(DefaultFont, VertDir, 1);
    OutTextXY(X + 15, Y + 35, PriceStr + '$');
   End Else Begin
-   { C√¥t√© droit - prix vertical (d√©cal√© de 10 pixels vers la droite) }
+   { CìtÇ droit - prix vertical (dÇcalÇ de 10 pixels vers la droite) }
    SetTextStyle(DefaultFont, VertDir, 1);
    OutTextXY(X + 25, Y + 5, PriceStr + '$');
   End;
  End;
-
- { Dessiner les maisons et h√¥tels }
+ { Dessiner les maisons et hìtels }
  DrawHousesAndHotels(Index);
 End;
 
-Procedure DrawCorners;
-Begin
+Procedure DrawCorners;Begin
  { Coin GO (0) }
  SetColor(Black);
  SetFillStyle(SolidFill, LightGreen);
@@ -1200,7 +1132,6 @@ Begin
  OutTextXY(370, 370, 'DEPART');
  OutTextXY(365, 385, 'Touchez');
  OutTextXY(368, 395, '200$');
-
  { Coin JAIL (10) }
  SetFillStyle(SolidFill, LightGray);
  Bar(0, 360, 40, 400);
@@ -1209,7 +1140,6 @@ Begin
  OutTextXY(8, 370, 'PRISON');
  OutTextXY(5, 385, 'Simple');
  OutTextXY(3, 395, 'Visite');
-
  { Coin FREE PARKING (20) }
  SetFillStyle(SolidFill, LightRed);
  Bar(0, 0, 40, 40);
@@ -1217,7 +1147,6 @@ Begin
  SetColor(Black);
  OutTextXY(5, 10, 'PARC');
  OutTextXY(3, 25, 'GRATUIT');
-
  { Coin GO TO JAIL (30) }
  SetFillStyle(SolidFill, LightGray);
  Bar(360, 0, 400, 40);
@@ -1229,89 +1158,72 @@ End;
 
 Procedure DrawBoard;
 Var
- I: Integer;
+ I:Integer;
 Begin
  { Fond noir }
  SetColor(Black);
  SetFillStyle(SolidFill, Black);
  Bar(0, 0, 640, 480);
-
  { Centre du plateau }
  SetFillStyle(SolidFill, Green);
  Bar(40, 40, 360, 360);
-
  { Titre au centre }
  SetColor(White);
  SetTextStyle(DefaultFont, HorizDir, 2);
  OutTextXY(150, 150, 'MONOPOLY');
-
  { Logo au centre }
  SetColor(Red);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(170, 180, 'Le Jeu de Plateau');
  OutTextXY(165, 195, 'des Affaires et');
- OutTextXY(175, 210, 'Propri√©t√©s');
-
- { Dessiner les coins sp√©ciaux }
+ OutTextXY(175, 210, 'PropriÇtÇs');
+ { Dessiner les coins spÇciaux }
  DrawCorners;
-
- { Dessiner toutes les propri√©t√©s }
+ { Dessiner toutes les propriÇtÇs }
  For I := 1 to 39 Do Begin
-  If (I <> 10) And (I <> 20) And (I <> 30) Then
-   DrawProperty(I);
+  If (I <> 10) And (I <> 20) And (I <> 30) Then DrawProperty(I);
  End;
-
- { Dessiner la zone des d√©s }
+ { Dessiner la zone des dÇs }
  DrawDiceArea;
-
  { Dessiner la zone d'action }
  DrawActionMessage;
-
  { Dessiner les informations des joueurs }
  DrawPlayersInfo;
-
  { Dessiner les joueurs sur le plateau }
  DrawPlayersOnBoard;
 End;
 
-Procedure DrawCardStack(X, Y: Integer);
-Begin
+Procedure DrawCardStack(X,Y:Integer);Begin
  { Dessiner une pile de 3 cartes avec effet de profondeur }
- { Carte du fond (la plus √©loign√©e) }
+ { Carte du fond (la plus ÇloignÇe) }
  SetColor(DarkGray);
  SetFillStyle(SolidFill, DarkGray);
  Bar(X + 4, Y + 4, X + 24, Y + 34);
  SetColor(Black);
  Rectangle(X + 4, Y + 4, X + 24, Y + 34);
-
  { Carte du milieu }
  SetColor(LightGray);
  SetFillStyle(SolidFill, LightGray);
  Bar(X + 2, Y + 2, X + 22, Y + 32);
  SetColor(Black);
  Rectangle(X + 2, Y + 2, X + 22, Y + 32);
-
  { Carte du dessus (la plus proche) }
  SetColor(White);
  SetFillStyle(SolidFill, White);
  Bar(X, Y, X + 20, Y + 30);
  SetColor(Black);
  Rectangle(X, Y, X + 20, Y + 30);
-
  { Ajouter un motif sur la carte du dessus }
  SetColor(Red);
  SetTextStyle(DefaultFont, HorizDir, 1);
  OutTextXY(X + 8, Y + 12, '?');
 End;
 
-Procedure DrawSpecialSymbols;
-Begin
- { Dessiner des symboles sp√©ciaux }
-
+Procedure DrawSpecialSymbols;Begin
+ { Dessiner des symboles spÇciaux }
  { Chance - pile de cartes }
  DrawCardStack(100, 100);
  DrawCardStack(250, 250);
-
  { Community Chest - coffre }
  SetColor(Yellow);
  Rectangle(80, 280, 110, 300);
@@ -1326,38 +1238,33 @@ Begin
  NextPlayer := (CurrentPlayerIndex Mod 4) + 1;
  StartPlayer := NextPlayer;
  CheckCount := 0;
-
  { Chercher le prochain joueur actif (non en faillite) }
  While (Players[NextPlayer].Money < 0) And (CheckCount < 5) Do Begin
   NextPlayer := (NextPlayer Mod 4) + 1;
   Inc(CheckCount);
   If NextPlayer = StartPlayer Then Break;
  End;
-
  { Si tous les joueurs sont en faillite, retourner le joueur actuel }
- If CheckCount >= 5 Then
-  GetNextActivePlayer := CurrentPlayerIndex
- Else
-  GetNextActivePlayer := NextPlayer;
+ If CheckCount >= 5 Then GetNextActivePlayer := CurrentPlayerIndex
+                    Else GetNextActivePlayer := NextPlayer;
 End;
 
-Function CountActivePlayers: Integer;
+Function CountActivePlayers:Integer;
 Var
- I, Count: Integer;
+ I,Count:Integer;
 Begin
- Count := 0;
+ Count:=0;
  For I := 1 to 4 Do Begin
-  If Players[I].Money >= 0 Then
-   Inc(Count);
+  If Players[I].Money >= 0 Then Inc(Count);
  End;
- CountActivePlayers := Count;
+ CountActivePlayers:=Count;
 End;
 
-Function GetWinner: Integer;
+Function GetWinner:Integer;
 Var
- I: Integer;
+ I:Integer;
 Begin
- GetWinner := 0;
+ GetWinner:=0;
  For I := 1 to 4 Do Begin
   If Players[I].Money >= 0 Then Begin
    GetWinner := I;
@@ -1366,68 +1273,73 @@ Begin
  End;
 End;
 
-Procedure PlayComputerTurn(PlayerIndex: Integer);
+Procedure PlayComputerTurn(PlayerIndex:Integer);
 Var
- I, J: Integer;
+ I,J,DelayCounter:Integer;
+ EscapePressed:Boolean;
 Begin
- { V√©rifier si le joueur est encore actif }
+ { VÇrifier si le joueur est encore actif }
  If Players[PlayerIndex].Money < 0 Then Exit;
-
- { Lancer les d√©s }
+ { Lancer les dÇs }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
-
- { D√©placer le joueur ordinateur }
+ { DÇplacer le joueur ordinateur }
  Players[PlayerIndex].Position := (Players[PlayerIndex].Position + Dice1 + Dice2) Mod 40;
-
  { Traiter l'action sur la case }
  ActionMessage := ProcessPlayerAction(PlayerIndex);
-
  { Redessiner le plateau }
  DrawBoard;
  DrawSpecialSymbols;
-
- { Attendre 2 secondes avec possibilit√© d'interruption }
- For I := 1 to 100 Do Begin
-  For J := 1 to 600 Do Begin
-   { V√©rifier interruption clavier pendant l'attente }
-   If KeyPressed Then Begin
-    If SafeReadKey = #27 Then Exit;
+ { Attendre avec vÇrification constante d'interruption }
+ DelayCounter := 0;
+ EscapePressed := False;
+ Repeat
+  { VÇrifier interruption clavier }
+  If KeyPressed Then Begin
+   If SafeReadKey = #27 Then Begin
+    EscapePressed := True;
+    Break;
    End;
   End;
- End;
+  { Petit dÇlai }
+  For I := 1 to 100 Do Begin
+   For J := 1 to 50 Do Begin
+    { Boucle vide pour crÇer le dÇlai }
+   End;
+  End;
+  Inc(DelayCounter);
+ Until (DelayCounter >= 40) Or EscapePressed;
+ { Forcer la sortie si Escape pressÇ }
+ If EscapePressed Then Exit;
 End;
 
 BEGIN
  Randomize;
-
- { Initialiser les d√©s }
+ { Initialiser les dÇs }
  Dice1 := Random(6) + 1;
  Dice2 := Random(6) + 1;
-
  { Initialiser le joueur actuel }
  CurrentPlayer := 1;
-
- { Initialiser les √©tats du jeu }
+ { Initialiser les Çtats du jeu }
  GameState := 0;
  PropertyToBuy := 0;
-
  { Initialiser les messages }
  ActionMessage := 'Appuyez ESPACE pour commencer';
- ContextualMessage := 'Appuyez ESPACE pour lancer les d√©s';
-
+ ContextualMessage := 'Appuyez ESPACE pour lancer les dÇs';
  InitScreen;
  InitProperties;
  InitPlayers;
  DrawBoard;
  DrawSpecialSymbols;
-
- { Boucle principale }
  Repeat
-  { V√©rifier s'il ne reste qu'un joueur (fin du jeu) }
+  { VÇrification immÇdiate d'interruption }
+  If KeyPressed Then Begin
+   If ReadKey = #27 Then Break;
+  End;
+  { VÇrifier s'il ne reste qu'un joueur (fin du jeu) }
   If CountActivePlayers <= 1 Then Begin
    If CountActivePlayers = 1 Then Begin
-    ActionMessage := Players[GetWinner].Name + ' a gagn√© la partie!';
+    ActionMessage := Players[GetWinner].Name + ' a gagnÇ la partie!';
     DrawBoard;
     DrawSpecialSymbols;
     ReadKey;
@@ -1439,47 +1351,46 @@ BEGIN
    End;
    Break;
   End;
-
-  { Passer les joueurs en faillite }
+  { Passer les joueurs en faillite avec sÇcuritÇ maximale }
   While (Players[CurrentPlayer].Money < 0) And (CountActivePlayers > 1) Do Begin
+   { VÇrifier interruption avant de changer de joueur }
+   If KeyPressed Then Begin
+    If ReadKey = #27 Then Break;
+   End;
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-   { S√©curit√© pour √©viter une boucle infinie }
+   { SÇcuritÇ pour Çviter une boucle infinie }
    If CountActivePlayers <= 1 Then Break;
   End;
-
   If Players[CurrentPlayer].IsHuman Then Begin
-   { Tour du joueur humain - attendre une entr√©e }
+   { Tour du joueur humain - attendre une entrÇe }
    Case ReadKey of
-    ' ': Begin
+    ' ':Begin
      If GameState = 0 Then Begin
-      { Lancer les d√©s }
+      { Lancer les dÇs }
       Dice1 := Random(6) + 1;
       Dice2 := Random(6) + 1;
-
-      { D√©placer le joueur humain }
+      { DÇplacer le joueur humain }
       Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
-
-      { G√©rer l'action du joueur sur la case }
+      { GÇrer l'action du joueur sur la case }
       ActionMessage := ProcessPlayerAction(CurrentPlayer);
-
       { Si pas de demande d'achat/construction, passer au joueur suivant }
       If GameState = 0 Then Begin
        CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
        ContextualMessage := 'Appuyez ESPACE pour continuer';
       End;
-
       { Redessiner le plateau complet }
       DrawBoard;
       DrawSpecialSymbols;
-     End Else Begin
-      { Continuer apr√®s achat/construction }
+     End
+      Else
+     Begin
+      { Continuer apräs achat/construction }
       CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-      ContextualMessage := 'Appuyez ESPACE pour lancer les d√©s';
+      ContextualMessage := 'Appuyez ESPACE pour lancer les dÇs';
       DrawBoard;
       DrawSpecialSymbols;
      End;
     End;
-
     'O', 'o': Begin
      If GameState = 1 Then Begin
       HandlePurchase(True);
@@ -1487,7 +1398,6 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-
     'N', 'n': Begin
      If GameState = 1 Then Begin
       HandlePurchase(False);
@@ -1495,7 +1405,6 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-
     'M', 'm': Begin
      If GameState = 2 Then Begin
       HandleConstruction('M');
@@ -1503,7 +1412,6 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-
     'H', 'h': Begin
      If GameState = 2 Then Begin
       HandleConstruction('H');
@@ -1511,7 +1419,6 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-
     'Q', 'q': Begin
      If GameState = 2 Then Begin
       HandleConstruction('Q');
@@ -1519,33 +1426,33 @@ BEGIN
       DrawSpecialSymbols;
      End;
     End;
-
     #27: Begin
      Break;
     End;
    End;
   End Else Begin
-   { Tour de l'ordinateur - jouer automatiquement }
+   { Tour de l'ordinateur - version ultra-simplifiÇe }
    If Players[CurrentPlayer].Money >= 0 Then Begin
-    PlayComputerTurn(CurrentPlayer);
-    
-    { V√©rifier s'il y a eu une interruption clavier }
-    If KeyPressed Then Begin
-     If SafeReadKey = #27 Then Begin { Escape }
-      Break;
-     End;
-    End;
+    { Lancer les dÇs }
+    Dice1 := Random(6) + 1;
+    Dice2 := Random(6) + 1;
+    { DÇplacer le joueur ordinateur }
+    Players[CurrentPlayer].Position := (Players[CurrentPlayer].Position + Dice1 + Dice2) Mod 40;
+    { Traiter l'action sur la case }
+    ActionMessage := ProcessPlayerAction(CurrentPlayer);
+    { Redessiner le plateau }
+    DrawBoard;
+    DrawSpecialSymbols;
+    { DÇlai simple sans boucle complexe }
+    Delay(2000);
    End;
-
    { Passer au joueur suivant automatiquement }
    CurrentPlayer := GetNextActivePlayer(CurrentPlayer);
-   ContextualMessage := 'Appuyez ESPACE pour lancer les d√©s';
-   
-   { Redessiner apr√®s changement de joueur }
+   ContextualMessage := 'Appuyez ESPACE pour lancer les dÇs';
+   { Redessiner apräs changement de joueur }
    DrawBoard;
    DrawSpecialSymbols;
   End;
  Until False;
-
  CloseGraph;
 END.
