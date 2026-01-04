@@ -251,6 +251,11 @@ Procedure _Halt;Begin
 End;
 
 BEGIN
+ {$IFDEF FPC}
+  {$IFDEF WINDOWS}
+   SetUseACP(False);
+  {$ENDIF}
+ {$ENDIF}
  TextMode(C80);
  ClrScr;
  Instruction;
