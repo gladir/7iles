@@ -28,7 +28,7 @@ Type
  End;
 
 Const
-  MAX_GAMES = 72;
+  MAX_GAMES = 73;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
@@ -81,6 +81,7 @@ Const
     (Title: 'Pango'; ProgramExec: 'PANGO.EXE'),
     (Title: 'Patience - Jeu de carte'; ProgramExec: 'PATIENCE.EXE'),
     (Title: 'Peg Leap - Jeu de jeton'; ProgramExec: 'PEGLEAP.EXE'),
+    (Title: 'Pipe Game - Jeu de deplacer les tuyaux'; ProgramExec: 'PIPE.EXE'),
     (Title: 'Poker - Jeu de carte'; ProgramExec: 'POKER.EXE'),
     (Title: 'Pong - Tennis electronique'; ProgramExec: 'PONG.EXE'),
     (Title: 'Puissance 4 - Alignement vertical'; ProgramExec: 'PUISS4.EXE'),

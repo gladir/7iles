@@ -6,7 +6,7 @@
 
 Program BOWLING;
 
-Uses Crt;
+Uses Crt,DOS;
 
 Var
  Screen:Array[0..25,0..40]of Char;
@@ -14,6 +14,28 @@ Var
  NA:Array[0..4]of String;
  A,B1,J,PS1,J1,Q,Score,T_,X1,X2,Z9:Integer;
  PS,Terminated:Boolean;
+
+{$IFNDEF FPC}
+ Procedure CursorOff;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AH:=1;
+  Regs.CH:=32;
+  Regs.CL:=0;
+  Intr($10,Regs);
+ End;
+
+ Procedure CursorOn;
+ Var
+  Regs:Registers;
+ Begin
+  Regs.AX:=$0100;
+  Regs.CX:=(7 shl 8)+9;
+  Intr($10,Regs);
+ End;
+{$ENDIF}
+
 
 Function Left(Const Str:String;Num:Byte):String;Begin
  Left:=Copy(Str,1,Num);
@@ -74,18 +96,18 @@ Begin
  GotoXY(10,1);
  Write('1  2  3  4  5  6  7  8  9  10');
  GotoxY(10,2);
- For J:=1 to 31 do Write({$IFDEF FPC}'-'{$ELSE}Chr(196){$ENDIF});
+ For J:=1 to 31 do Write(Chr(196));
  For I:=1 to A do Begin
   GotoXY(1,2*I+1);
   TextColor(I+1);
   Write(PadRight(NA[I-1],11));
   J:=12;
   While J<=36 do Begin
-   Write({$IFDEF FPC}'|'{$ELSE}Chr(179){$ENDIF},'  ');
+   Write(Chr(179),'  ');
    Inc(J,3);
   End;
   GotoXY(10,2*I+2);
-  For J:=1 to 31 do Write({$IFDEF FPC}'-'{$ELSE}Chr(196){$ENDIF});
+  For J:=1 to 31 do Write(Chr(196));
  End;
  GotoXY(1,12);
  For I:=0 to A-1 do Begin
@@ -94,9 +116,9 @@ Begin
   Write(NA[I],' :',' ':19-Length(NA[I]));
  End;
  GotoXY(1,15);
- For I:=1 to 39 do Write({$IFDEF FPC}'-'{$ELSE}Chr(196){$ENDIF});
+ For I:=1 to 39 do Write(Chr(196));
  GotoXY(1,25);
- For I:=1 to 39 do Write({$IFDEF FPC}'-'{$ELSE}Chr(196){$ENDIF});
+ For I:=1 to 39 do Write(Chr(196));
 End;
 
 Procedure InitScore;
@@ -324,10 +346,17 @@ Begin
 End;
 
 BEGIN
+ {$IFDEF FPC}
+  {$IFDEF WINDOWS}
+   SetUseACP(False);
+  {$ENDIF}
+ {$ENDIF}
  InitGame;
+ CursorOff;
  DrawGameScreen;
  InitScore;
  Repeat
   MainLoop;
  Until Terminated;
+ CursorOn;
 END.
