@@ -462,6 +462,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier contient le jeu Peg Leap, ressemblant au dames. Le but de jeu est d'enlever le plus de jetons possible du jeu en sautant par dessus chaque jeton avec un autre.</td>
      </tr>
     <tr>
+        <td><b>PIPE.PAS</b></td>
+        <td><b>Pipe Game</b></td>
+        <td>Ce fichier contient le jeu de déplacement de tuyau. Jeu d'un auteur voulant rester anonyme sous le nom de Goupil Brother.</td>
+    </tr>
+    <tr>
         <td><b>POKER.PAS</b></td>
         <td><b>Poker</b></td>
         <td>Ce fichier contient le jeu de carte Poker.</td>
