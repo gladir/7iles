@@ -28,7 +28,7 @@ Type
  End;
 
 Const
-  MAX_GAMES = 73;
+  MAX_GAMES = 74;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
@@ -43,6 +43,7 @@ Const
     (Title: 'Bingo - Jeu de hasard'; ProgramExec: 'BINGO.EXE'),
     (Title: 'Blackjack - Jeu de cartes'; ProgramExec: 'BLACJACK.EXE'),
     (Title: 'Blox - Puzzle de blocs'; ProgramExec: 'BLOX.EXE'),
+    (Title: 'Boston - Jeu de carte'; ProgramExec: 'BOSTON.EXE'),
     (Title: 'Bouncing Babies'; ProgramExec: 'BABY.EXE'),
     (Title: 'Bourr‚ - Jeu de carte'; ProgramExec: 'BOURRE.EXE'),
     (Title: 'Bowling'; ProgramExec: 'BOWLING.EXE'),
@@ -84,7 +85,7 @@ Const
     (Title: 'Pipe Game - Jeu de deplacer les tuyaux'; ProgramExec: 'PIPE.EXE'),
     (Title: 'Poker - Jeu de carte'; ProgramExec: 'POKER.EXE'),
     (Title: 'Pong - Tennis electronique'; ProgramExec: 'PONG.EXE'),
-    (Title: 'Puissance 4 - Alignement vertical'; ProgramExec: 'PUISS4.EXE'),
+    (Title: 'Puissance 4 - Alignement vertical'; ProgramExec: 'POWER4.EXE'),
     (Title: 'QBert - Jeu de saut'; ProgramExec: 'QBERT.EXE'),
     (Title: 'Renju - Gomoku avance'; ProgramExec: 'RENJU.EXE'),
     (Title: 'Reversi - Retournement de pions'; ProgramExec: 'REVERSI.EXE'),
