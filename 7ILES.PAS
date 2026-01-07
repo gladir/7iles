@@ -28,14 +28,16 @@ Type
  End;
 
 Const
-  MAX_GAMES = 74;
+  MAX_GAMES = 80;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
+    (Title: '421 - Jeu de d‚s'; ProgramExec: '421.EXE'),
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
     (Title: 'Anagram - Jeu de mots'; ProgramExec: 'ANAGRAM.EXE'),
     (Title: 'Asteroid - Jeu spatial'; ProgramExec: 'ASTEROID.EXE'),
     (Title: 'Baccarat - Jeu de carte'; ProgramExec: 'BACCARAT.EXE'),
     (Title: 'Backgammon - Jeu de strategie'; ProgramExec: 'BACKGAM.EXE'),
+    (Title: 'Badugi - Jeu de carte'; ProgramExec: 'BADUGI.EXE'),
     (Title: 'Barbu - Jeu de carte'; ProgramExec: 'BARBU.EXE'),
     (Title: 'Baseball - Jeu de sport'; ProgramExec: 'BASEBALL.EXE'),
     (Title: 'Berzerk - Labyrinthe action'; ProgramExec: 'BERZERK.EXE'),
@@ -53,7 +55,9 @@ Const
     (Title: 'Centipede - Arcade insecte'; ProgramExec: 'CENTIPED.EXE'),
     (Title: 'Checkers - Jeu de dames'; ProgramExec: 'CHECKERS.EXE'),
     (Title: 'Coco-Yathzee - Jeu de d‚s'; ProgramExec: 'CYATHZEE.EXE'),
+    (Title: 'Colonel - Jeu de carte'; ProgramExec: 'COLONEL.EXE'),
     (Title: 'Color Space Invaders'; ProgramExec: 'CSI.EXE'),
+    (Title: 'Craps - Jeu de d‚s'; ProgramExec: 'CRAPS.EXE'),
     (Title: 'Domino'; ProgramExec: 'DOMINO.EXE'),
     (Title: 'Dr Mario - Puzzle medical'; ProgramExec: 'DRMARIO.EXE'),
     (Title: 'FreeCell - Jeu de carte'; ProgramExec: 'FREECELL.EXE'),
@@ -74,6 +78,7 @@ Const
     (Title: 'MasterMind - Jeu de r‚flexion'; ProgramExec: 'MASTERMD.EXE'),
     (Title: 'Matching - Jeu d association'; ProgramExec: 'MATCHING.EXE'),
     (Title: 'Missile Command'; ProgramExec: 'MISSILE.EXE'),
+    (Title: 'Monopoly'; ProgramExec: 'MONOPOLY.EXE'),
     (Title: 'Mouse Trap'; ProgramExec: 'MOUSETRP.EXE'),
     (Title: 'Nibbles'; ProgramExec: 'NIBBLES.EXE'),
     (Title: 'O''Riley''s Mine'; ProgramExec: 'ORILEYS.EXE'),
@@ -83,6 +88,7 @@ Const
     (Title: 'Patience - Jeu de carte'; ProgramExec: 'PATIENCE.EXE'),
     (Title: 'Peg Leap - Jeu de jeton'; ProgramExec: 'PEGLEAP.EXE'),
     (Title: 'Pipe Game - Jeu de deplacer les tuyaux'; ProgramExec: 'PIPE.EXE'),
+    (Title: 'Pinball - Jeu de machine a boule'; ProgramExec: 'PINBALL.EXE'),
     (Title: 'Poker - Jeu de carte'; ProgramExec: 'POKER.EXE'),
     (Title: 'Pong - Tennis electronique'; ProgramExec: 'PONG.EXE'),
     (Title: 'Puissance 4 - Alignement vertical'; ProgramExec: 'POWER4.EXE'),
