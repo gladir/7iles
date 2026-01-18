@@ -28,7 +28,7 @@ Type
  End;
 
 Const
-  MAX_GAMES = 80;
+  MAX_GAMES = 81;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
     (Title: '421 - Jeu de d‚s'; ProgramExec: '421.EXE'),
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
@@ -62,6 +62,7 @@ Const
     (Title: 'Dr Mario - Puzzle medical'; ProgramExec: 'DRMARIO.EXE'),
     (Title: 'FreeCell - Jeu de carte'; ProgramExec: 'FREECELL.EXE'),
     (Title: 'Frogger - Traversee de route'; ProgramExec: 'FROGGER.EXE'),
+    (Title: 'Game of Life - Jeu de la Vie'; ProgramExec: 'LIFE.EXE'),
     (Title: 'Gin Rummmy - Jeu de carte'; ProgramExec: 'GINRUMMY.EXE'),
     (Title: 'Golf - Jeu de carte'; ProgramExec: 'GOLF.EXE'),
     (Title: 'Gomoku - Alignement 5 pions'; ProgramExec: 'GOMOKU.EXE'),
