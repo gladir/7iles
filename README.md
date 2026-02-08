@@ -566,3 +566,9 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td>Ce fichier de jeu permet de lancer le jeu de dés Yathzee.</td>
     </tr>
 </table>
+
+<h3>Remarque</h3>
+<ul>
+    <li>Le programme 7ILES n'est pas un jeu mais uniquement un menu centralisé permettant de lancer n'importe quel jeu.</li>
+    <li>A partir de la version 1.1 du jeu PIPE, il supporte les jeux générés de façon aléatoires en plus des niveaux statiques.</li>
+</ul>
