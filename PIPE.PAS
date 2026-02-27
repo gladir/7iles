@@ -1,15 +1,15 @@
 { @author: Sylvain Maltais (support@gladir.com)
   @website(https://www.gladir.com/7iles)
-  @version: 1.1
+  @version: 1.2
   @creation: 2026
-  @first version by: Goupil Brother
+  @author2: Goupil Brother
   @website(http://goupilbrother.free.fr)
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
 }
 
 Program PIPE;
 
-{$R-}
+{$R+}
 
 Uses {$IFDEF FPC}
       Crt,PtcCrt
@@ -18,127 +18,18 @@ Uses {$IFDEF FPC}
      {$ENDIF};
 
 
-Const MaxX=8;
-      MaxLevel=10;
-
- {0:Tuyau droit 1:Coude}
- Tab:Array[1..MaxLevel,0..MaxX] of String[MaxX+1]=((
-   { 001 }
-  '         ',
-  '         ',
-  '000000001',
-  '        0',
-  '        0',
-  '        0',
-  '        1',
-  '         ',
-  '         '
- ),
-   { 002 }
- ('         ',
-  '         ',
-  '00000001 ',
-  '       11',
-  '        0',
-  '        0',
-  '        1',
-  '         ',
-  '         '
- ),
-   { 003 }
- ('         ',
-  '         ',
-  '00001    ',
-  '    0    ',
-  '    0    ',
-  '   11    ',
-  '   100000',
-  '         ',
-  '         '
- ),
-   { 004 }
- ('         ',
-  '         ',
-  '00000001 ',
-  '    1001 ',
-  '    0    ',
-  '    0    ',
-  '    0   1',
-  '    10001',
-  '         '
- ),
-   { 005 }
- ('         ',
-  '         ',
-  '110001   ',
-  '11   1001',
-  '        0',
-  '        0',
-  '        1',
-  '         ',
-  '         '
- ),
-   { 006 }
- ('100000001',
-  '0       0',
-  '1  100001',
-  '   0     ',
-  '   0     ',
-  '   0     ',
-  '   100000',
-  '         ',
-  '         '
- ),
-   { 007 }
- ('         ',
-  '         ',
-  '1        ',
-  '0  100001',
-  '0  0    0',
-  '0  1001 0',
-  '0     0 1',
-  '0     0  ',
-  '1000001  '
- ),
-   { 008 }
- ('  101    ',
-  '  0 0    ',
-  '001 101  ',
-  '      0  ',
-  '      101',
-  '        0',
-  '        1',
-  '         ',
-  '         '
- ),
-   { 009 }
- ('100000001',
-  '0       0',
-  '1       0',
-  '0       0',
-  '0       0',
-  '0       0',
-  '0       1',
-  '0       0',
-  '100000001'
- ),
-   { 010 }
- ('   101   ',
-  '   0 0   ',
-  '1  0 0   ',
-  '0  0 0   ',
-  '0  0 0   ',
-  '0  0 0   ',
-  '1001 0 10',
-  '     0 0 ',
-  '     101 '
- ));
-
+Const {$IFDEF FPC}
+       V2:String[6]='∫ªº»…Õ';
+      {$ELSE}
+       V2:Array[0..5] Of Byte=(186,187,188,200,201,205);
+      {$ENDIF}
+      NextPipe:Array[0..5] Of Byte=(5,2,3,4,1,0);
 
 Var
- PipeValue:Array[0..MaxX,0..MaxX]of Byte;
- Won:Array[0..MaxX,0..MaxX]of Boolean;
- Level,XPipe,YPipe:Byte;
+ PipeValue:Array[0..39,0..24]of Byte;
+ Won:Array[0..39,0..24]of Boolean;
+ MaxSize,XPipe,YPipe:Byte;
+
 
 {$IFNDEF FPC}
  Procedure CursorOff;
@@ -163,38 +54,33 @@ Var
 
 Procedure ShowLevel(Win:Boolean);
 Var
- I,J:Byte;
+ I,J,V:Byte;
 Begin
-  TextColor(1);
-  TextBackground(0);
-  If Win Then TextBackground(2);
+
+  TextColor(DarkGray);
+  TextBackground(LightGray);
+  If Win Then TextBackground(Blue);
   GotoXY(1,5);
   Write({$IFDEF FPC}'Õ'{$ELSE}Chr(205){$ENDIF});
-  GotoXY(MaxX+3,MaxX+1);
+  GotoXY(MaxSize+3,MaxSize+1);
   Write({$IFDEF FPC}'Õ'{$ELSE}Chr(205){$ENDIF});
-  For I:=0 to MaxX do
-  Begin
-   For J:=0 to MaxX do
+
+  For I:=0 To MaxSize Do
+   For J:=0 To MaxSize Do
    Begin
-    TextColor(1);
-    TextBackground(0);
-    If (I=XPipe) and (J=YPipe) Then TextBackground(2);
+    TextColor(LightGray);
+    TextBackground(Black);
+    If (I=XPipe) and (J=YPipe) Then TextBackground(Green);
     If Win Then
      If Won[I,J] Then
-      TextBackground(2)
+      TextBackground(Blue)
      Else
-      TextBackground(0);
+      TextBackground(Black);
     GotoXY(I+2,J+3);
-    Case PipeValue[I,J] of
-    0:Write({$IFDEF FPC}'∫'{$ELSE}Chr(186){$ENDIF});
-    1:Write({$IFDEF FPC}'ª'{$ELSE}Chr(187){$ENDIF});
-    2:Write({$IFDEF FPC}'º'{$ELSE}Chr(188){$ENDIF});
-    3:Write({$IFDEF FPC}'»'{$ELSE}Chr(200){$ENDIF});
-    4:Write({$IFDEF FPC}'…'{$ELSE}Chr(201){$ENDIF});
-    5:Write({$IFDEF FPC}'Õ'{$ELSE}Chr(205){$ENDIF});
-    End;
+    V:=PipeValue[I,J];
+    Write({$IFDEF FPC}V2[v]{$ELSE}Chr(V2[v]){$ENDIF});
    End;
-  End;
+
 End;
 
 Function CheckWin:Boolean;
@@ -205,8 +91,8 @@ Var
  NextX,NextY,I,J:Integer;
 Begin
  CheckWin:=False;
- For I:=0 to MaxX Do
-  For J:=0 to MaxX Do
+ For I:=0 to MaxSize Do
+  For J:=0 to MaxSize Do
    Won[I,J]:=False;
  NextX:=-1;
  NextY:=2;
@@ -221,7 +107,7 @@ Begin
    2:Dec(NextX);
    3:Dec(NextY);
   End;
-  If (NextX<0) or (NextY<0) or (NextX>MaxX) or (NextY>MaxX) Then Good:=False;
+  If (NextX<0) or (NextY<0) or (NextX>MaxSize) or (NextY>MaxSize) Then Good:=False;
   If Good then
   Begin
    Won[NextX,NextY]:=True;
@@ -254,11 +140,90 @@ Begin
    End;
   End;
  End;
- If (NextX=MaxX+1) and (NextY=MaxX-2) Then CheckWin:=True;
+ If (NextX=MaxSize+1) and (NextY=MaxSize-2) Then CheckWin:=True;
 End;
 
+
+
+
+
+
+
 Function CheckWin_FreeDir:Boolean;
-var proofs:Array[0..MaxX,0..MaxX]of Byte;
+var proofs:Array[0..39,0..23]of Byte;
+    CheckWin_FreeDir2:boolean;
+
+
+ Procedure Next_FreeDir(X,Y,Direction:Integer);{0:Droite 1:Bas 2:Gauche 3:Haut}
+
+ var value:integer;
+     i,j:integer;
+ Begin
+
+  If CheckWin_FreeDir2 Then exit Else
+   If (x=MaxSize+1) and (y=MaxSize-2) Then
+    Begin
+     CheckWin_FreeDir2:=true;
+     exit;
+    End;
+
+  If Not ((x=-1) And (y=2)) Then
+   Begin
+    If (X<0) Or (Y<0) Or (X>MaxSize) Or (Y>MaxSize) Then Exit;
+    If proofs[x,y]=0 Then
+     proofs[x,y]:=1
+    Else exit;
+   End;
+
+    value:=5;
+    If not ((x=-1) and (y=2)) Then value:=pipevalue[x,y];
+
+    Case Direction of
+     0:case value of {droite}
+        0,5:Next_FreeDir(x+1,y,0);
+        Else Begin
+              Next_FreeDir(x,y-1,3);
+              Next_FreeDir(x,y+1,1);
+             End;
+       end;
+     1:case value of {bas}
+        0,5:Next_FreeDir(x,y+1,1);
+        Else Begin
+              Next_FreeDir(x-1,y,2);
+              Next_FreeDir(x+1,y,0);
+             End;
+       end;
+     2:case value of {gauche}
+        0,5:Next_FreeDir(x-1,y,2);
+        Else Begin
+              Next_FreeDir(x,y-1,3);
+              Next_FreeDir(x,y+1,1);
+             End;
+       end;
+     3:case value of {haut}
+        0,5:Next_FreeDir(x,y-1,3);
+        Else Begin
+              Next_FreeDir(x-1,y,2);
+              Next_FreeDir(x+1,y,0);
+             End;
+       End;
+    End;
+    If Not ((x=-1) And (y=2)) Then proofs[x,y]:=0;
+
+ End;
+
+Var i,j:integer;
+
+Begin
+ CheckWin_FreeDir2:=False;
+ For I:=0 To 39 Do For J:=0 To 23 Do proofs[I,J]:=0;
+ Next_FreeDir(-1,2,0);
+ CheckWin_FreeDir:=CheckWin_FreeDir2;
+end;
+
+(*
+Function CheckWin_FreeDir:Boolean;
+var proofs:Array[0..39,0..23]of Byte;
     CheckWin_FreeDir2:boolean;
 
 
@@ -269,7 +234,7 @@ var proofs:Array[0..MaxX,0..MaxX]of Byte;
  Begin
 
   If CheckWin_FreeDir2 Then exit Else
-   If (x=MaxX+1) and (y=MaxX-2) Then
+   If (x=MaxSize+1) and (y=MaxSize-2) Then
     Begin
      CheckWin_FreeDir2:=true;
      exit;
@@ -277,7 +242,7 @@ var proofs:Array[0..MaxX,0..MaxX]of Byte;
 
   If Not ((x=-1) And (y=2)) Then
    Begin
-    If (X<0) Or (Y<0) Or (X>MaxX) Or (Y>MaxX) Then exit;
+    If (X<0) Or (Y<0) Or (X>MaxSize) Or (Y>MaxSize) Then Exit;
     If proofs[x,y]=0 Then
      proofs[x,y]:=proof
     Else exit;
@@ -324,221 +289,128 @@ Var i,j:integer;
 
 Begin
  CheckWin_FreeDir2:=False;
- For I:=0 to MaxX Do
-  For J:=0 to MaxX Do
-   proofs[I,J]:=0;
+ For I:=0 To 39 Do For J:=0 To 23 Do proofs[I,J]:=0;
  Next_FreeDir(-1,2,0,0);
  CheckWin_FreeDir:=CheckWin_FreeDir2;
 end;
+*)
 
-Procedure Randomize_Game;
-Var
- I,J:Integer;
-Begin
- Repeat
-  For I:=0 to MaxX do
-   For J:=0 to MaxX do
-    Case Tab[Level,J][I+1] of
-     ' ':PipeValue[I,J]:=Random(6);
-     '0':PipeValue[I,J]:=Random(2)*5;
-     '1':PipeValue[I,J]:=Random(4)+1;
-    End;
- Until not CheckWin;
-End;
 
-Procedure Show_Head;
-Begin
- TextMode(CO40);
- ClrScr;
- CursorOff;
- GotoXY(8,1);
- Write('Jeu de tuyaux (Pipe Game)');
-End;
 
-Procedure Show_Head_Level;
-Begin
- GotoXY(10,2);
- Write('Niveau ',Level);
-End;
 
-Procedure Init_Game;
-Begin
- XPipe:=0;
- YPipe:=0;
- Level:=0;
- Randomize;
-End;
+
 
 Procedure Generate_FreeDir;
 Var
  I,J:Integer;
 Begin
+ Randomize;
  Repeat
-  For I:=0 to MaxX do
-   For J:=0 to MaxX do
-    PipeValue[I,J]:=Random(6);
+  For I:=0 to 39 do For J:=0 to 23 do PipeValue[I,J]:=Random(6);
  Until CheckWin_FreeDir;
 End;
 
-Procedure Show_Keys;
-Begin
-  TextBackground(White);
-  TextColor(Black);
-  GotoXY(24,9);
-  Write('Espace');
-  GotoXY(24,11);
-  Write('Echap');
-  GotoXY(24,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(24){$ENDIF});
-  GotoXY(26,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(25){$ENDIF});
-  GotoXY(28,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(26){$ENDIF});
-  GotoXY(30,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(27){$ENDIF});
-  TextBackground(Black);
-  TextColor(White);
-End;
 
 Procedure Play_Game;
 Var
  K,K2:Char;
  I:Integer;
- Temp_Level,Selection:Byte;
 Begin
 
+ XPipe:=0;
+ YPipe:=0;
+ MaxSize:=8;
 
- Clrscr;
+ { Menu }
 
- { Debut de: Menu }
+ Writeln;
+ TextBackground(Red);
+ TextColor(Black);
+ Write(
+  {$IFDEF FPC}'≤±∞ PIPE ∞±≤€'
+  {$ELSE}
+   Chr(178),Chr(177),Chr(176),' PIPE ',Chr(176),Chr(177),Chr(178),Chr(219)
+  {$ENDIF});
+ TextBackground(White);
+ Writeln(
+  {$IFDEF FPC}'€€€€ Space € Eskape '
+  {$ELSE}Chr(24),Chr(219),
+         Chr(25),Chr(219),
+         Chr(26),Chr(219),
+         Chr(27),Chr(219),
+         ' Space ',Chr(219),
+         ' Eskape '{$ENDIF});
+ TextBackground(Black);
+ TextColor(Black);
+ Writeln;
+ Write('Level? ');
+ TextBackground(White);
+ TextColor(Black);
+ Writeln(
+ {$IFDEF FPC}'1€2€3€4€5'
+ {$ELSE}'1',Chr(219),
+        '2',Chr(219),
+        '3',Chr(219),
+        '4',Chr(219),
+        '5',Chr(219){$ENDIF});
+ TextBackground(Black);
+ TextColor(Black);
 
  Repeat
+  Repeat Until Keypressed;
+  K:=ReadKey;
+  K2:=Char(0);
+  If K=#0 Then K2:=ReadKey;
+ Until (K=#27) or (K in ['1','2','3','4','5']);
 
-  Show_Head;
-  Init_Game;
-  Temp_Level:=1;
-  Selection:=0;
-  TextBackground(White);
-  TextColor(Black);
-  GotoXY(24,9);
-  Write('Espace');
-  GotoXY(24,11);
-  Write('Echap');
-  GotoXY(24,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(24){$ENDIF});
-  GotoXY(26,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(25){$ENDIF});
-  GotoXY(28,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(26){$ENDIF});
-  GotoXY(30,7);
-  Write({$IFDEF FPC}''{$ELSE}Chr(27){$ENDIF});
-  TextBackground(Black);
-  TextColor(White);
-  GotoXY(10,5);
-  Write('par niveau:1');
-  GotoXY(8,4+Selection);
-  Write({$IFDEF FPC}''{$ELSE}Chr(16){$ENDIF},' par hasard');
+ { Fin de Menu }
 
-  Repeat (* Menu de selection *)
-   Repeat Until Keypressed;
-   K:=ReadKey;
-   K2:=Char(0);
-   Case K of
-    #0:Begin
-        K2:=ReadKey;
-        Case K2 of
-         #72:Selection:=0;
-         #80:Selection:=1;
-         #75:If Selection=1 Then If Temp_Level>1 Then Dec(Temp_Level);
-         #77:If Selection=1 Then If Temp_Level<MaxLevel Then Inc(Temp_Level);
-        End;
-       End;
-   End;
-   GotoXY(8,4);
-   Write(' ');
-   GotoXY(8,5);
-   Write(' ');
-   GotoXY(8,4+Selection);
-   Write({$IFDEF FPC}''{$ELSE}Chr(16){$ENDIF});
-   GotoXY(21,5);
-   Write(Temp_Level,'   ');
-  Until (K=#27) or (K=' ');
+ If K=#27 Then Exit;
 
-  If (K=#27) Then (* Fin du jeu *)
-   Begin
-    Clrscr;
-    Exit;
-   End;
+ MaxSize:=8;
+ Case K Of
+ '2':MaxSize:=10;
+ '3':MaxSize:=12;
+ '4':MaxSize:=16;
+ '5':MaxSize:=18;
+ End;
 
-  Level:=Temp_Level;
-  If Selection=0 Then Level:=0;
-  If Level=0 Then Generate_FreeDir;
+ Generate_FreeDir;
 
-  { Debut de: Jeu }
+ TextMode(CO40);
+ CursorOff;
+ ClrScr;
 
-  Repeat
-   Show_Head;
-   If Level<>0 Then Show_Head_Level;
-   Randomize_Game;
-   ShowLevel(False);
-   Show_Keys;
-   Repeat
+ ShowLevel(False);
+ Repeat
     Repeat Until Keypressed;
     K:=ReadKey;
     K2:=Char(0);
     Case K of
-     ' ':Case PipeValue[XPipe,YPipe] of
-          0:PipeValue[XPipe,YPipe]:=5;
-          1:PipeValue[XPipe,YPipe]:=2;
-          2:PipeValue[XPipe,YPipe]:=3;
-          3:PipeValue[XPipe,YPipe]:=4;
-          4:PipeValue[XPipe,YPipe]:=1;
-          5:PipeValue[XPipe,YPipe]:=0;
-         End;
+     ' ':PipeValue[XPipe,YPipe]:=NextPipe[PipeValue[XPipe,YPipe]];
      #0:Begin
          K2:=ReadKey;
          Case K2 of
           #72:If YPipe>0 Then Dec(YPipe);
           #75:If XPipe>0 Then Dec(XPipe);
-          #77:If XPipe<MaxX Then Inc(XPipe);
-          #80:If YPipe<MaxX Then Inc(YPipe);
+          #77:If XPipe<MaxSize Then Inc(XPipe);
+          #80:If YPipe<MaxSize Then Inc(YPipe);
          End;
         End;
     End;
     ShowLevel(False);
-   Until (K=#27) or ((K=' ') and CheckWin);
+ Until (K=#27) or ((K=' ') and CheckWin);
 
-   If K<>#27 Then
+ If K<>#27 Then
     Begin
      ShowLevel(True);
-     TextColor(7);
-     TextBackground(0);
-     GotoXY(15,MaxX+5);
-     Write('Victoire');
-     GotoXY(15,MaxX+6);
-     Inc(Level);
-     If Level>MaxLevel Then
-      Writeln('FIN')
-     Else
-      If Level=1 Then
-       Level:=MaxLevel+1
-      Else
-       Write('Et Maintenant, Niveau ',Level);
-     Delay(3000);
+     Repeat Until Keypressed;
     End;
-
-  Until (K=#27) or (Level>MaxLevel) or (Level=0);
-
- { Fin de: Jeu }
-
-
- Until 0=1;
- { Fin de: Menu }
-
 
 End;
 
 
+Var OrigMode:Integer;
 
 BEGIN
  {$IFDEF FPC}
@@ -546,8 +418,10 @@ BEGIN
    SetUseACP(False);
   {$ENDIF}
  {$ENDIF}
- Init_Game;
+ OrigMode:=LastMode;
+ CursorOff;
  Play_Game;
- Clrscr;
+ TextMode(OrigMode);
  CursorOn;
+ Clrscr;
 END.
