@@ -45,7 +45,7 @@ Aperçu de Peg Leap (sous Turbo Pascal)
 
 Aperçu du jeu de tuyau (Pipe Game) de Goupil Brother (en Free Pascal)
 
-<img width="565" height="293" alt="image" src="https://github.com/user-attachments/assets/576ffbfd-0a1c-48b4-8d2d-37bfb23453f6" />
+<img width="424" height="502" alt="image" src="https://github.com/user-attachments/assets/94b56e2e-2394-4e26-b46f-587f037affe3" />
 
 Aperçu de Poker (sous Free Pascal)
 
