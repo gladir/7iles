@@ -1,10 +1,12 @@
-{ @author: Sylvain Maltais (support@gladir.com)
-  @website(https://www.gladir.com/7iles)
-  @version: 1.1
-  @creation: 2026
-  @author2: Goupil Brother
-  @website(http://goupilbrother.free.fr)
-  @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
+{ @author:      Sylvain Maltais (support@gladir.com)
+  @website:     https://www.gladir.com/7iles
+  @version:     1.3
+  @creation:    2026
+  @author:      Goupil Brother
+  @website:     http://goupilbrother.free.fr
+  @target:      Turbo Pascal 7, Free Pascal 3.2
+  @description: Remplissez toutes les cases vides.
+  @hint:        G pour generer un tableau puis S pour voir la solution
 }
 
 
@@ -21,78 +23,108 @@ Uses {$IFDEF FPC}
 
 
 
-Const Tab:Array[1..10,1..6] of String[10]=(
-   { 001 }
- ('      xxxx',
-  '    x xx a',
-  '    x x  x',
-  '   xx x  x',
-  ' x    xx  ',
-  '          '),
-   { 002 }
- ('ax        ',
-  ' x x   x  ',
-  ' x x x x  ',
-  ' x     x  ',
-  ' xxxx     ',
-  '          '),
-   { 003 }
- ('   x  a   ',
-  ' x    x   ',
-  '  x x xxx ',
-  '  x   xxx ',
-  ' x  xx  x ',
-  '          '),
-   { 004 }
- ('    xxxxxx',
-  ' xx   x   ',
-  '   xx   x ',
-  ' x        ',
-  '   xx     ',
-  '  axx     '),
-   { 005 }
- ('    x     ',
-  ' x  x xx  ',
-  ' x xx    x',
-  ' x   xx   ',
-  '  xx    xa',
-  'x      xxx'),
-   { 006 }
- ('         a',
-  ' xxxxxxxxx',
-  '          ',
-  '   xx   x ',
-  ' x xx     ',
-  '       xxx'),
-   { 007 }
- ('x         ',
-  'x      xx ',
-  'a      x  ',
-  'x     x  x',
-  '  x     x ',
-  '          '),
-   { 008 }
- ('x  axxx  x',
-  '  x   x   ',
-  ' xx     x ',
-  '   xx  x  ',
-  '    x  x x',
-  '  x      x'),
-   { 009 }
- ('x  xxax   ',
-  '    x     ',
-  ' xx    x  ',
-  '  xx      ',
-  'x  x  x x ',
-  'xx    x   '),
-   { 010 }
- ('x       x ',
-  'a x   x x ',
-  'xx  x     ',
-  '   xx  x  ',
-  ' xx     x ',
-  '    xxx   ')
-  );
+Const Tab:Array[0..100] of String[27]=(
+('            b  bgb      b'),
+('    b        bg bbbb     '),
+('bbb        b   bg   b    '),
+(' bg                 bb  b'),
+('b                b   bb g'),
+('  gb   b    b b          '),
+('b bbb   gb               '),
+('  bb           bgb  b   b'),
+('    b bbgb     bb        '),
+('b    bgbb   b        b   '),
+('   b    b           bb gb'),
+('    b    bb   bg   b     '),
+('     b  b bbgb    b      '),
+('bbb              b   gb b'),
+('       b    b   b b gb   '),
+('bbg         b          b '),
+('    bbgb  b  b          b'),
+('   bg     b     bb      b'),
+('      b        b   b  bgb'),
+('        b b    b   bbg   '),
+('b          b    g    b  b'),
+('b b    bg    b          b'),
+('        bb        b    bg'),
+('       b  b   bg   bb    '),
+('        b b    bgb       '),
+('        bg  bbb        b '),
+('       b    b    g  b b  '),
+(' b      b   b  g b  b    '),
+('     gb      b  b    b  b'),
+('          b b  bgb       '),
+('b   b  b b         g  b b'),
+('  b  b b  b    g        b'),
+('     bg   bb            b'),
+('      b    bbb    g   bb '),
+('    b  b      g b  b     '),
+('       bb bgb    b  b    '),
+('b b      g    b  b       '),
+('       b  bgb       b    '),
+(' b gb    b  b   b        '),
+('bbg               b    b '),
+(' bb   b            bbb  g'),
+('    bbg   bb             '),
+('    b  b        bg  bbb  '),
+('b b        b        bg   '),
+('       b  b g   bb      b'),
+('   gb b  b        b    bb'),
+('g         bb   bb   b    '),
+('b bbg      b    b        '),
+('   b  b    bb   bg       '),
+('      b   bg b          b'),
+('    b      bbb  g    bb  '),
+('           b  bbg   b    '),
+('     bb          b gb   b'),
+('    bb    b  b     g    b'),
+('             bbgb   b    '),
+('           bb    g  b b  '),
+('b          bg   bb    b  '),
+('    b   bb   gbb    b    '),
+('g  bb          b  b      '),
+('   bg   b b  b       b  b'),
+('b        b  bgb  b       '),
+('  bb   gb      b    b    '),
+('b bbb  g    b    b       '),
+('  bbb            bgbb    '),
+('b gb b          bbb      '),
+('g           bb       bb  '),
+('b   bb       b  b g    b '),
+('   b      b b  g b    b  '),
+('   b      b b  g b    b  '),
+('      b       g  b b  b  '),
+('  b         bb b  g b  b '),
+('b gb b                b  '),
+('    b    bbb gb   b      '),
+('  b  b g    bb  b        '),
+('        bb        b    bg'),
+('b           b    b b  g  '),
+('  b  b     gbb  b        '),
+('   gb    b  b  b      b  '),
+('       b    b g    bb    '),
+('  b g bb           b    b'),
+('           bb    g  b b  '),
+('   bb  gb   b            '),
+('  b b    b bb g          '),
+('              b    gbb bb'),
+('       bgb    b     b    '),
+('   g  b b bb             '),
+(' bg                 bb  b'),
+('  b    b         gb   b  '),
+('  bbbb    g  b  b        '),
+('        b b      bgb   bb'),
+('bb    b          b  bg  b'),
+('  b              bgbb    '),
+('b      b  bbg     b      '),
+('    b bb   b  b b  g     '),
+('       gb bbb        b   '),
+('      bbb  gb        b   '),
+('    b  bgbb  b    b      '),
+('      bbgb bb       b    '),
+('            b bbg  bbb   '),
+('     b gb   bb      b    '),
+('            bb  b g    b '));
 
 
 
@@ -122,9 +154,9 @@ Const Characters:String[12]='∫ªº»…Õ*€';
       Spriteref:Array[0..19] Of Integer=
        (5,5,7,13,8,10,9,10,8,13,5,13,6,5,9,10,6,13,7,10);
 
-Var AKey:Array[0..40*25] Of Integer;
+Var AKey,AKeysolution:Array[0..40*25] Of Integer;
     Bloxx,Bloxy:Array[0..40*25] Of Integer;
-    Xpos,Ypos,AKeys,Bloxs,XMax,YMax,Level:Integer;
+    Xpos,Ypos,AKeys,AKeyssolution,Bloxs,XMax,YMax,Level:Integer;
 
 Procedure Show_Level(Refresh_screen:Boolean);
 var Xpos2,Ypos2,Value,Old,I:Integer;
@@ -229,18 +261,18 @@ var i,j:Integer;
 Begin
  Bloxs:=0;
 
- Xmax:=9;Ymax:=5;
- For I:=1 To 10 Do
-  For J:=1 To 6 Do
+ Xmax:=4;Ymax:=4;
+ For I:=0 To 4 Do
+  For J:=0 To 4 Do
    Begin
-    Case Tab[Level,J][I] Of
-     'x':Begin
-          Bloxx[Bloxs]:=I-1;
-          Bloxy[Bloxs]:=J-1;
+    Case Tab[Level][I+j*5+1] Of
+     'b':Begin
+          Bloxx[Bloxs]:=I;
+          Bloxy[Bloxs]:=J;
           Inc(Bloxs);
          End;
-     'a':Begin
-          Xpos:=I-1;Ypos:=J-1;
+     'g':Begin
+          Xpos:=I;Ypos:=J;
          End;
     End;
    End;
@@ -254,9 +286,17 @@ End;
 Procedure Cadre;
 Var I:Integer;
 Begin
+ GotoXY(14,1);
+ TextBackground(Red);
+ TextColor(Black);
+ Write('≤±∞ FlOOD ∞±≤');
+ GotoXY(18,2);
  TextBackground(Black);
  TextColor(DarkGray);
- GotoXY(16,1);
+ Write('    Spc Esk G S');
+ TextBackground(Black);
+ TextColor(DarkGray);
+ GotoXY(5,2);
  If Level<>0 Then Write('Level ',Level);
  TextColor(Black);
  TextBackground(Red);
@@ -353,6 +393,10 @@ Begin
             Inc(Bloxs);
            End;
 
+        For I:=0 To Akeys-1 Do
+         Akeysolution[I]:=Akey[I];
+        AKeyssolution:=AKeys;
+
         AKeys:=0; (*!*)
 
         TextColor(Black);
@@ -365,10 +409,12 @@ End;
 
 
 
+(*********************************************)
+
 Procedure Play_Game;
 Var
  K,K2:Char;
- I:Integer;
+ I,code:Integer;
 Label GotoLevel;
 
 Begin
@@ -378,36 +424,51 @@ Begin
 
 
  CursorOff;
- Writeln;
- TextBackground(Red);
- TextColor(Black);
- Write('≤±∞ FlOOD ∞±≤€€€€€€€€€');
- TextBackground(Black);
- TextColor(DarkGray);
- Write('    Spc Esk G');
 
  TextBackground(Black);
  TextColor(White);
+
  Writeln;
- Write('Level? 0,1-9');
+ Write('Enter Level (1-99)? ');
 
  Repeat
   Repeat Until Keypressed;
   K:=ReadKey;
   K2:=Char(0);
   If K=#0 Then K2:=ReadKey;
- Until (K=#27) or (K in ['0','1','2','3','4','5','6','7','8','9']);
+ Until (K=#27) or (K in ['1','2','3','4','5','6','7','8','9']);
 
  If K=#27 Then Exit;
 
+ Write(K);Val(K,Level,code);
+
+ Repeat
+  Repeat Until Keypressed;
+  K:=ReadKey;
+  K2:=Char(0);
+  If K=#0 Then K2:=ReadKey;
+ Until (K=#27) or (K=#13) or (K in ['0','1','2','3','4','5','6','7','8','9']);
+
+ If K=#27 Then Exit;
+
+ If K<>#13 Then
+  Begin
+   Write(K);
+   Val(K,i,code);
+   Level:=i+Level*10;
+   Repeat
+    Repeat Until Keypressed;
+    K:=ReadKey;
+    K2:=Char(0);
+    If K=#0 Then K2:=ReadKey;
+   Until (K=#27) or (K=#13);
+  End;
+
+
  TextMode(CO40);
+ Clrscr;
  CursorOff;
 
- Case K Of
-  '0':Level:=0;
-  '1':Level:=1;'2':Level:=2;'3':Level:=3;'4':Level:=4;'5':Level:=5;
-  '6':Level:=6;'7':Level:=7;'8':Level:=8;'9':Level:=9;
- End;
 
 
 GotoLevel:
@@ -439,12 +500,26 @@ GotoLevel:
        Show_Level(False);
       End;
    ' ':Begin Show_Level(True);If AKeys>0 Then Dec(AKeys);Show_Level(False);End;
-   'g','G':Begin Level:=0;Goto GotoLevel;End;
 
+   'g','G': (* generate level *)
+     Begin Level:=0;Goto GotoLevel;End;
+
+   's','S': (* show solution (generated level only) *)
+    If Level=0 Then
+     Begin
+        AKeys:=AKeyssolution;
+        For I:=0 To Akeys-1 Do
+         Akey[I]:=Akeysolution[I];
+        TextColor(Black);
+        TextBackground(Black);
+        clrscr;
+        Cadre;
+        Show_Level(False);
+     End;
 
   End;
 
-  If K<>#27 Then
+  If K<>#27 Then If Not (K In ['s','S']) Then
    If Akeys+Bloxs+1=(XMax+1)*(YMax+1) Then
     Begin
      AKeys:=0;
@@ -452,10 +527,14 @@ GotoLevel:
      TextBackground(Black);
      TextColor(Red);
      Write('Victory ');
-     If Level<>0 Then Write(Level,'/10');
-     Delay(3000);
+     If Level<>0 Then Write(Level,'/100');
+     Repeat
+      Repeat Until Keypressed;
+      K:=ReadKey;
+      If K=#0 Then K2:=ReadKey;
+     Until (K=#27) Or (K=#13) Or (K=' ');
      If Level<>0 Then Inc(Level);
-     If Level=11 then Exit;
+     If (Level=101) Or (K=#27) then Exit;
      Goto GotoLevel;
     End;
 
@@ -465,6 +544,7 @@ End;
 
 
 
+(*********************************************)
 
 Var OrigMode:Integer;
 

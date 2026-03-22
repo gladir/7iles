@@ -1,15 +1,18 @@
-{ @author: Sylvain Maltais (support@gladir.com)
-  @website(https://www.gladir.com/7iles)
-  @version: 1.2
-  @creation: 2026
-  @author2: Goupil Brother
-  @website(http://goupilbrother.free.fr)
-  @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
+{ @author:      Sylvain Maltais (support@gladir.com)
+  @website:     https://www.gladir.com/7iles
+  @version:     1.1bis
+  @creation:    2026
+  @author:      Goupil Brother
+  @website:     http://goupilbrother.free.fr
+  @target:      Turbo Pascal 7, Free Pascal 3.2
+  @description: Creez un chemin entre les deux extremites.
 }
 
-Program PIPE;
+
 
 {$R+}
+
+Program PIPE;
 
 Uses {$IFDEF FPC}
       Crt,PtcCrt
@@ -18,18 +21,569 @@ Uses {$IFDEF FPC}
      {$ENDIF};
 
 
-Const {$IFDEF FPC}
-       V2:String[6]='∫ªº»…Õ';
-      {$ELSE}
-       V2:Array[0..5] Of Byte=(186,187,188,200,201,205);
-      {$ENDIF}
-      NextPipe:Array[0..5] Of Byte=(5,2,3,4,1,0);
+Const MaxX=8;
+      MaxLevel=50;
+
+ {0:Tuyau droit 1:Coude}
+ Tab:Array[1..MaxLevel,0..MaxX] of String[MaxX+1]=((
+   { 001 }
+  '         ',
+  '         ',
+  '000000001',
+  '        0',
+  '        0',
+  '        0',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 002 }
+ ('         ',
+  '         ',
+  '00000001 ',
+  '       11',
+  '        0',
+  '        0',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 003 }
+ ('         ',
+  '         ',
+  '00001    ',
+  '    0    ',
+  '    0    ',
+  '   11    ',
+  '   100000',
+  '         ',
+  '         '
+ ),
+   { 004 }
+ ('         ',
+  '         ',
+  '00000001 ',
+  '    1001 ',
+  '    0    ',
+  '    0    ',
+  '    0   1',
+  '    10001',
+  '         '
+ ),
+   { 005 }
+ ('         ',
+  '         ',
+  '110001   ',
+  '11   1001',
+  '        0',
+  '        0',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 006 }
+ ('100000001',
+  '0       0',
+  '1  100001',
+  '   0     ',
+  '   0     ',
+  '   0     ',
+  '   100000',
+  '         ',
+  '         '
+ ),
+   { 007 }
+ ('         ',
+  '         ',
+  '1        ',
+  '0  100001',
+  '0  0    0',
+  '0  1001 0',
+  '0     0 1',
+  '0     0  ',
+  '1000001  '
+ ),
+   { 008 }
+ ('  101    ',
+  '  0 0    ',
+  '001 101  ',
+  '      0  ',
+  '      101',
+  '        0',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 009 }
+ ('100000001',
+  '0       0',
+  '1       0',
+  '0       0',
+  '0       0',
+  '0       0',
+  '0       1',
+  '0       0',
+  '100000001'
+ ),
+   { 010 }
+ ('   101   ',
+  '   0 0   ',
+  '1  0 0   ',
+  '0  0 0   ',
+  '0  0 0   ',
+  '0  0 0   ',
+  '1001 0 10',
+  '     0 0 ',
+  '     101 '
+ ),
+   { 011 }
+ ('11       ',
+  '001000001',
+  '100     0',
+  ' 0101   0',
+  ' 0  0   0',
+  ' 1001   0',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 012 }
+ ('         ',
+  '         ',
+  '1  100001',
+  '0  100010',
+  '0      00',
+  '0      00',
+  '0      01',
+  '0      0 ',
+  '10000001 '
+ ),
+   { 013 }
+ ('   1001  ',
+  '   0  0  ',
+  '0001  0  ',
+  '    101  ',
+  '10001    ',
+  '100000001',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 014 }
+ (' 1000001 ',
+  ' 0     0 ',
+  '01     0 ',
+  '       11',
+  '       11',
+  '       0 ',
+  '       10',
+  '         ',
+  '         '
+ ),
+   { 015 }
+ ('         ',
+  '         ',
+  '0001     ',
+  '   0     ',
+  '1001     ',
+  '100001   ',
+  '     1001',
+  '         ',
+  '         '
+ ),
+   { 016 }
+ (' 100001  ',
+  ' 0    0  ',
+  '10    0  ',
+  '011   0  ',
+  '0 0   0  ',
+  '101   0  ',
+  '      0 1',
+  '      0 0',
+  '      101'
+ ),
+   { 017 }
+ ('   10001 ',
+  '   0   0 ',
+  '1  10010 ',
+  '0     00 ',
+  '0     00 ',
+  '0     00 ',
+  '0     010',
+  '0     0  ',
+  '1000001  '
+ ),
+   { 018 }
+ ('         ',
+  '         ',
+  '1        ',
+  '0        ',
+  '100000001',
+  '100000001',
+  '100000000',
+  '         ',
+  '         '
+ ),
+   { 019 }
+ ('100001   ',
+  '1001 0   ',
+  '0001 0   ',
+  '     0   ',
+  '     0   ',
+  '     0   ',
+  '     0  1',
+  '     0  0',
+  '     1001'
+ ),
+   { 020 }
+ ('         ',
+  '         ',
+  '000000001',
+  '        0',
+  '   100001',
+  '   11    ',
+  '    11  1',
+  '     0  0',
+  '     1001'
+ ),
+   { 021 }
+ ('         ',
+  '         ',
+  '1 101    ',
+  '0 0 0    ',
+  '0 011    ',
+  '0 0101   ',
+  '0 0  1000',
+  '101      ',
+  '         '
+ ),
+   { 022 }
+ ('         ',
+  '         ',
+  '01       ',
+  ' 11      ',
+  ' 11      ',
+  ' 11      ',
+  ' 11     1',
+  ' 10000001',
+  '         '
+ ),
+   { 023 }
+ ('  10001  ',
+  '  0   0  ',
+  '1 10010  ',
+  '0    00  ',
+  '0    00  ',
+  '0    00  ',
+  '0    0100',
+  '0    0   ',
+  '100001   '
+ ),
+   { 024 }
+ ('101      ',
+  '110      ',
+  '010      ',
+  '  0 10001',
+  '  0 101 0',
+  '  0   0 0',
+  '  0   0 1',
+  '  0   0  ',
+  '  10001  '
+ ),
+   { 025 }
+ ('         ',
+  '         ',
+  '001      ',
+  '  0 10001',
+  '101 10010',
+  '100000010',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 026 }
+ ('  101    ',
+  '  0 0    ',
+  '1 0 0    ',
+  '0 0 0    ',
+  '101 0    ',
+  '    0    ',
+  ' 10011000',
+  ' 0   0   ',
+  ' 10001   '
+ ),
+   { 027 }
+ ('         ',
+  '         ',
+  '00001    ',
+  ' 1001101 ',
+  '11   0 0 ',
+  '100001 0 ',
+  '       10',
+  '         ',
+  '         '
+ ),
+   { 028 }
+ ('1001     ',
+  '0  0     ',
+  '1  0     ',
+  '   0     ',
+  '   0     ',
+  '1001     ',
+  '0   10000',
+  '0   0    ',
+  '10001    '
+ ),
+   { 029 }
+ ('      101',
+  '     11 0',
+  '01   0  0',
+  '11   0 11',
+  '100001 0 ',
+  '       0 ',
+  '       01',
+  '       00',
+  '       11'
+ ),
+   { 030 }
+ ('100000001',
+  '0       0',
+  '1       0',
+  '  1000001',
+  '  0      ',
+  '  0      ',
+  '  0     1',
+  '  0     0',
+  '  1000001'
+ ),
+   { 031 }
+ ('         ',
+  '         ',
+  '00000001 ',
+  ' 11    0 ',
+  ' 0100001 ',
+  ' 1001    ',
+  '    0   1',
+  '    0   0',
+  '    10001'
+ ),
+   { 032 }
+ ('         ',
+  '         ',
+  '1        ',
+  '0        ',
+  '0        ',
+  '0        ',
+  '11      1',
+  ' 0      0',
+  ' 10000001'
+ ),
+   { 033 }
+ ('101    11',
+  '011    00',
+  '10     00',
+  ' 0     00',
+  ' 0     00',
+  ' 0 100010',
+  ' 0 101  1',
+  ' 0   0   ',
+  ' 10001   '
+ ),
+   { 034 }
+ ('100000001',
+  '10001   0',
+  '00001   0',
+  '        0',
+  '       11',
+  '       0 ',
+  '       10',
+  '         ',
+  '         '
+ ),
+   { 035 }
+ ('         ',
+  '         ',
+  '01       ',
+  '11       ',
+  '0    1001',
+  '0    0101',
+  '0    0010',
+  '0    0011',
+  '100001101'
+ ),
+   { 036 }
+ (' 11      ',
+  ' 00      ',
+  '011001   ',
+  ' 0   0   ',
+  ' 0   1001',
+  ' 0      0',
+  ' 0      1',
+  ' 0      0',
+  ' 10000001'
+ ),
+   { 037 }
+ ('         ',
+  '         ',
+  '1        ',
+  '11   0   ',
+  ' 0   0   ',
+  ' 0   0   ',
+  ' 0   1000',
+  ' 0   0   ',
+  ' 10001   '
+ ),
+   { 038 }
+ ('         ',
+  '         ',
+  '0001     ',
+  '  111    ',
+  '  0 0    ',
+  '  0 0  11',
+  '  0 10011',
+  '  0      ',
+  '  1000001'
+ ),
+   { 039 }
+ ('         ',
+  '         ',
+  '000000001',
+  '        0',
+  '100000001',
+  '0        ',
+  '100000000',
+  '         ',
+  '         '
+ ),
+   { 040 }
+ ('     1001',
+  '  1111  0',
+  '00111   0',
+  '        0',
+  '        0',
+  '        0',
+  '        1',
+  '         ',
+  '         '
+ ),
+   { 041 }
+ ('100001   ',
+  '0    0   ',
+  '1    0   ',
+  '11   0   ',
+  '11   0   ',
+  '0    0   ',
+  '0    1001',
+  '0    0   ',
+  '100001   '
+ ),
+   { 042 }
+ ('         ',
+  '         ',
+  '0001     ',
+  '   10001 ',
+  '     101 ',
+  '     0   ',
+  '     0  1',
+  '     1010',
+  '       11'
+ ),
+   { 043 }
+ ('         ',
+  '         ',
+  '1        ',
+  '0        ',
+  '0        ',
+  '0        ',
+  '1001  100',
+  '   0  0  ',
+  '   1001  '
+ ),
+   { 044 }
+ ('101      ',
+  '0 0  1001',
+  '1 0  0101',
+  '  0  00  ',
+  '  0  00  ',
+  '  0  00  ',
+  '  0  0101',
+  '  0  0   ',
+  '  1001   '
+ ),
+   { 045 }
+ ('101      ',
+  '0 0100001',
+  '1 00    0',
+  '  00    0',
+  '  0010001',
+  '10100    ',
+  '101010000',
+  '1010     ',
+  '1001     '
+ ),
+   { 046 }
+ ('100000001',
+  '0   11110',
+  '1   00000',
+  '  1010000',
+  '  0  0011',
+  '  0  11  ',
+  '  0     1',
+  '  0     0',
+  '  1000001'
+ ),
+   { 047 }
+ ('    1 101',
+  '    0 0 0',
+  '00001 0 0',
+  '    0 0 0',
+  '    0 0 0',
+  '    0 0 0',
+  '10001 0 1',
+  '1000001  ',
+  '         '
+ ),
+   { 048 }
+ ('  10001  ',
+  '  10010  ',
+  '1100010  ',
+  '11    0  ',
+  '      0  ',
+  '     11  ',
+  '     1000',
+  '         ',
+  '         '
+ ),
+   { 049 }
+ ('         ',
+  '         ',
+  '1        ',
+  '1001  101',
+  '   0  0 0',
+  '   0  0 0',
+  '   1001 1',
+  '         ',
+  '         '
+ ),
+   { 050 }
+ ('10001    ',
+  '0   0    ',
+  '1   0    ',
+  '    0    ',
+  '    0    ',
+  '    0    ',
+  '10001 100',
+  '0     101',
+  '100000001'
+ )
+
+ );
+
 
 Var
- PipeValue:Array[0..39,0..24]of Byte;
- Won:Array[0..39,0..24]of Boolean;
- MaxSize,XPipe,YPipe:Byte;
-
+ PipeValue:Array[0..MaxX,0..MaxX]of Byte;
+ Won,WonFD:Array[0..MaxX,0..MaxX]of Boolean;
+ Level,XPipe,YPipe:Byte;
 
 {$IFNDEF FPC}
  Procedure CursorOff;
@@ -54,33 +608,39 @@ Var
 
 Procedure ShowLevel(Win:Boolean);
 Var
- I,J,V:Byte;
+ I,J:Byte;
 Begin
-
-  TextColor(DarkGray);
-  TextBackground(LightGray);
-  If Win Then TextBackground(Blue);
-  GotoXY(1,5);
+  TextColor(1);
+  TextBackground(0);
+  If Win Then TextBackground(2);
+  GotoXY(1+18-Maxx div 2,5+10-Maxx div 2);
   Write({$IFDEF FPC}'Õ'{$ELSE}Chr(205){$ENDIF});
-  GotoXY(MaxSize+3,MaxSize+1);
+  GotoXY(MaxX+3+18-Maxx div 2,MaxX+1+10-Maxx div 2);
   Write({$IFDEF FPC}'Õ'{$ELSE}Chr(205){$ENDIF});
-
-  For I:=0 To MaxSize Do
-   For J:=0 To MaxSize Do
+  For I:=0 to MaxX do
+  Begin
+   For J:=0 to MaxX do
    Begin
-    TextColor(LightGray);
-    TextBackground(Black);
-    If (I=XPipe) and (J=YPipe) Then TextBackground(Green);
+    TextColor(1);
+    TextBackground(0);
+    If (I=XPipe) and (J=YPipe) Then TextBackground(2);
     If Win Then
      If Won[I,J] Then
-      TextBackground(Blue)
+      TextBackground(2)
      Else
-      TextBackground(Black);
-    GotoXY(I+2,J+3);
-    V:=PipeValue[I,J];
-    Write({$IFDEF FPC}V2[v]{$ELSE}Chr(V2[v]){$ENDIF});
+      TextBackground(0);
+    GotoXY(I+2+18-Maxx div 2,J+3+10-Maxx div 2);
+    Case PipeValue[I,J] of
+    0:Write({$IFDEF FPC}'∫'{$ELSE}Chr(186){$ENDIF});
+    1:Write({$IFDEF FPC}'ª'{$ELSE}Chr(187){$ENDIF});
+    2:Write({$IFDEF FPC}'º'{$ELSE}Chr(188){$ENDIF});
+    3:Write({$IFDEF FPC}'»'{$ELSE}Chr(200){$ENDIF});
+    4:Write({$IFDEF FPC}'…'{$ELSE}Chr(201){$ENDIF});
+    5:Write({$IFDEF FPC}'Õ'{$ELSE}Chr(205){$ENDIF});
+    6:Write(' ');
+    End;
    End;
-
+  End;
 End;
 
 Function CheckWin:Boolean;
@@ -91,8 +651,8 @@ Var
  NextX,NextY,I,J:Integer;
 Begin
  CheckWin:=False;
- For I:=0 to MaxSize Do
-  For J:=0 to MaxSize Do
+ For I:=0 to MaxX Do
+  For J:=0 to MaxX Do
    Won[I,J]:=False;
  NextX:=-1;
  NextY:=2;
@@ -107,7 +667,7 @@ Begin
    2:Dec(NextX);
    3:Dec(NextY);
   End;
-  If (NextX<0) or (NextY<0) or (NextX>MaxSize) or (NextY>MaxSize) Then Good:=False;
+  If (NextX<0) or (NextY<0) or (NextX>MaxX) or (NextY>MaxX) Then Good:=False;
   If Good then
   Begin
    Won[NextX,NextY]:=True;
@@ -140,90 +700,15 @@ Begin
    End;
   End;
  End;
- If (NextX=MaxSize+1) and (NextY=MaxSize-2) Then CheckWin:=True;
+ If (NextX=MaxX+1) and (NextY=MaxX-2) Then CheckWin:=True;
 End;
 
 
 
 
 
-
-
 Function CheckWin_FreeDir:Boolean;
-var proofs:Array[0..39,0..23]of Byte;
-    CheckWin_FreeDir2:boolean;
-
-
- Procedure Next_FreeDir(X,Y,Direction:Integer);{0:Droite 1:Bas 2:Gauche 3:Haut}
-
- var value:integer;
-     i,j:integer;
- Begin
-
-  If CheckWin_FreeDir2 Then exit Else
-   If (x=MaxSize+1) and (y=MaxSize-2) Then
-    Begin
-     CheckWin_FreeDir2:=true;
-     exit;
-    End;
-
-  If Not ((x=-1) And (y=2)) Then
-   Begin
-    If (X<0) Or (Y<0) Or (X>MaxSize) Or (Y>MaxSize) Then Exit;
-    If proofs[x,y]=0 Then
-     proofs[x,y]:=1
-    Else exit;
-   End;
-
-    value:=5;
-    If not ((x=-1) and (y=2)) Then value:=pipevalue[x,y];
-
-    Case Direction of
-     0:case value of {droite}
-        0,5:Next_FreeDir(x+1,y,0);
-        Else Begin
-              Next_FreeDir(x,y-1,3);
-              Next_FreeDir(x,y+1,1);
-             End;
-       end;
-     1:case value of {bas}
-        0,5:Next_FreeDir(x,y+1,1);
-        Else Begin
-              Next_FreeDir(x-1,y,2);
-              Next_FreeDir(x+1,y,0);
-             End;
-       end;
-     2:case value of {gauche}
-        0,5:Next_FreeDir(x-1,y,2);
-        Else Begin
-              Next_FreeDir(x,y-1,3);
-              Next_FreeDir(x,y+1,1);
-             End;
-       end;
-     3:case value of {haut}
-        0,5:Next_FreeDir(x,y-1,3);
-        Else Begin
-              Next_FreeDir(x-1,y,2);
-              Next_FreeDir(x+1,y,0);
-             End;
-       End;
-    End;
-    If Not ((x=-1) And (y=2)) Then proofs[x,y]:=0;
-
- End;
-
-Var i,j:integer;
-
-Begin
- CheckWin_FreeDir2:=False;
- For I:=0 To 39 Do For J:=0 To 23 Do proofs[I,J]:=0;
- Next_FreeDir(-1,2,0);
- CheckWin_FreeDir:=CheckWin_FreeDir2;
-end;
-
-(*
-Function CheckWin_FreeDir:Boolean;
-var proofs:Array[0..39,0..23]of Byte;
+var proofs:Array[0..MaxX,0..MaxX]of Byte;
     CheckWin_FreeDir2:boolean;
 
 
@@ -234,7 +719,7 @@ var proofs:Array[0..39,0..23]of Byte;
  Begin
 
   If CheckWin_FreeDir2 Then exit Else
-   If (x=MaxSize+1) and (y=MaxSize-2) Then
+   If (x=MaxX+1) and (y=MaxX-2) Then
     Begin
      CheckWin_FreeDir2:=true;
      exit;
@@ -242,7 +727,7 @@ var proofs:Array[0..39,0..23]of Byte;
 
   If Not ((x=-1) And (y=2)) Then
    Begin
-    If (X<0) Or (Y<0) Or (X>MaxSize) Or (Y>MaxSize) Then Exit;
+    If (X<0) Or (Y<0) Or (X>MaxX) Or (Y>MaxX) Then exit;
     If proofs[x,y]=0 Then
      proofs[x,y]:=proof
     Else exit;
@@ -250,6 +735,7 @@ var proofs:Array[0..39,0..23]of Byte;
 
     value:=5;
     If not ((x=-1) and (y=2)) Then value:=pipevalue[x,y];
+    If value=6 Then Exit;
 
     Case Direction of
      0:case value of {droite}
@@ -289,128 +775,205 @@ Var i,j:integer;
 
 Begin
  CheckWin_FreeDir2:=False;
- For I:=0 To 39 Do For J:=0 To 23 Do proofs[I,J]:=0;
+ For I:=0 to MaxX Do
+  For J:=0 to MaxX Do
+   proofs[I,J]:=0;
  Next_FreeDir(-1,2,0,0);
  CheckWin_FreeDir:=CheckWin_FreeDir2;
 end;
-*)
-
-
-
-
 
 
 Procedure Generate_FreeDir;
 Var
- I,J:Integer;
+ I,J,K:Integer;
 Begin
- Randomize;
  Repeat
-  For I:=0 to 39 do For J:=0 to 23 do PipeValue[I,J]:=Random(6);
+  For I:=0 to MaxX do
+   For J:=0 to MaxX do
+    Begin
+     K:=Random(7);
+     If K>6 Then K:=6;
+     PipeValue[I,J]:=K;
+    End;
  Until CheckWin_FreeDir;
 End;
 
 
-Procedure Play_Game;
+
+
+Procedure Randomize_Game;
 Var
- K,K2:Char;
- I:Integer;
+ I,J:Integer;
 Begin
 
- XPipe:=0;
- YPipe:=0;
- MaxSize:=8;
+ If Level<>0 Then
+  Repeat
+   For I:=0 to MaxX do
+    For J:=0 to MaxX do
+     Case Tab[Level,J][I+1] of
+      ' ':PipeValue[I,J]:=Random(7);
+      '0':PipeValue[I,J]:=Random(2)*5;
+      '1':PipeValue[I,J]:=Random(4)+1;
+     End;
+  Until not CheckWin;
 
- { Menu }
+End;
 
- Writeln;
+Procedure Cadre;
+Var I,J:Integer;
+Begin
+ TextMode(CO40);
+ ClrScr;
+ CursorOff;
+ GotoXY(14,1);
  TextBackground(Red);
  TextColor(Black);
- Write(
-  {$IFDEF FPC}'≤±∞ PIPE ∞±≤€'
-  {$ELSE}
-   Chr(178),Chr(177),Chr(176),' PIPE ',Chr(176),Chr(177),Chr(178),Chr(219)
-  {$ENDIF});
- TextBackground(White);
- Writeln(
-  {$IFDEF FPC}'€€€€ Space € Eskape '
-  {$ELSE}Chr(24),Chr(219),
-         Chr(25),Chr(219),
-         Chr(26),Chr(219),
-         Chr(27),Chr(219),
-         ' Space ',Chr(219),
-         ' Eskape '{$ENDIF});
+ Write('≤±∞ PIPE ∞±≤');
+ GotoXY(18,2);
  TextBackground(Black);
+ TextColor(DarkGray);
+ Write('    Spc Esk G');
+ TextBackground(Black);
+ TextColor(DarkGray);
+ GotoXY(5,2);
+ If Level<>0 Then Write('Level ',Level);
+
  TextColor(Black);
+ TextBackground(Red);
+ For I:=-1 To MaxX+1 Do
+  For J:=-1 To MaxX+1 Do
+  Begin
+   Gotoxy(I+2+18-MaxX div 2,J+1+12-MaxX div 2);
+   Write(' ');
+  End;
+End;
+
+
+
+Procedure Init_Game;
+Begin
+ XPipe:=0;
+ YPipe:=0;
+ Level:=0;
+ Randomize;
+End;
+
+
+Procedure Play_Game;
+Label GotoLevel;
+Var
+ K,K2:Char;
+ I,code:Integer;
+Begin
+
+
+ Level:=1;
+
+
+ CursorOff;
+
+ TextBackground(Black);
+ TextColor(White);
+
  Writeln;
- Write('Level? ');
- TextBackground(White);
- TextColor(Black);
- Writeln(
- {$IFDEF FPC}'1€2€3€4€5'
- {$ELSE}'1',Chr(219),
-        '2',Chr(219),
-        '3',Chr(219),
-        '4',Chr(219),
-        '5',Chr(219){$ENDIF});
- TextBackground(Black);
- TextColor(Black);
+ Write('Enter Level (1-50)? ');
 
  Repeat
   Repeat Until Keypressed;
   K:=ReadKey;
   K2:=Char(0);
   If K=#0 Then K2:=ReadKey;
- Until (K=#27) or (K in ['1','2','3','4','5']);
-
- { Fin de Menu }
+ Until (K=#27) or (K in ['1','2','3','4','5','6','7','8','9']);
 
  If K=#27 Then Exit;
 
- MaxSize:=8;
- Case K Of
- '2':MaxSize:=10;
- '3':MaxSize:=12;
- '4':MaxSize:=16;
- '5':MaxSize:=18;
- End;
+ Write(K);Val(K,Level,code);
 
- Generate_FreeDir;
+ Repeat
+  Repeat Until Keypressed;
+  K:=ReadKey;
+  K2:=Char(0);
+  If K=#0 Then K2:=ReadKey;
+ Until (K=#27) or (K=#13) or (K in ['0','1','2','3','4','5','6','7','8','9']);
+
+ If K=#27 Then Exit;
+
+ If K<>#13 Then
+  Begin
+   Write(K);
+   Val(K,i,code);
+   Level:=i+Level*10;
+   Repeat
+    Repeat Until Keypressed;
+    K:=ReadKey;
+    K2:=Char(0);
+    If K=#0 Then K2:=ReadKey;
+   Until (K=#27) or (K=#13);
+  End;
+
+ If Level>50 Then Level:=50;
 
  TextMode(CO40);
+GotoLevel:
+ Clrscr;
  CursorOff;
- ClrScr;
 
- ShowLevel(False);
- Repeat
+
+  If Level=0 Then Generate_FreeDir;
+
+  Repeat
+   Cadre;
+   Randomize_Game;
+   ShowLevel(False);
+   Repeat
     Repeat Until Keypressed;
     K:=ReadKey;
     K2:=Char(0);
     Case K of
-     ' ':PipeValue[XPipe,YPipe]:=NextPipe[PipeValue[XPipe,YPipe]];
+     ' ':Case PipeValue[XPipe,YPipe] of
+          0:PipeValue[XPipe,YPipe]:=5;
+          1:PipeValue[XPipe,YPipe]:=2;
+          2:PipeValue[XPipe,YPipe]:=3;
+          3:PipeValue[XPipe,YPipe]:=4;
+          4:PipeValue[XPipe,YPipe]:=1;
+          5:PipeValue[XPipe,YPipe]:=0;
+         End;
+     'g','G': (* generate level *)
+             Begin Level:=0;Goto GotoLevel;End;
      #0:Begin
          K2:=ReadKey;
          Case K2 of
           #72:If YPipe>0 Then Dec(YPipe);
           #75:If XPipe>0 Then Dec(XPipe);
-          #77:If XPipe<MaxSize Then Inc(XPipe);
-          #80:If YPipe<MaxSize Then Inc(YPipe);
+          #77:If XPipe<MaxX Then Inc(XPipe);
+          #80:If YPipe<MaxX Then Inc(YPipe);
          End;
         End;
     End;
     ShowLevel(False);
- Until (K=#27) or ((K=' ') and CheckWin);
+   Until (K=#27) or ((K=' ') and CheckWin);
 
- If K<>#27 Then
+   If K<>#27 Then
     Begin
      ShowLevel(True);
-     Repeat Until Keypressed;
+     GotoXY(16,25);
+     TextBackground(Black);
+     TextColor(Red);
+     Write('Victory ');
+     If Level<>0 Then Write(Level,'/',MaxLevel);
+     Repeat
+      Repeat Until Keypressed;
+      K:=ReadKey;
+      If K=#0 Then K2:=ReadKey;
+     Until (K=#27) Or (K=#13) Or (K=' ');
+     If Level<>0 Then Inc(Level);
+     If (Level=MaxLevel+1) Or (K=#27) then Exit;
+     Goto GotoLevel;
     End;
 
+  Until K=#27;
+
 End;
-
-
-Var OrigMode:Integer;
 
 BEGIN
  {$IFDEF FPC}
@@ -418,10 +981,8 @@ BEGIN
    SetUseACP(False);
   {$ENDIF}
  {$ENDIF}
- OrigMode:=LastMode;
- CursorOff;
+ Init_Game;
  Play_Game;
- TextMode(OrigMode);
- CursorOn;
  Clrscr;
+ CursorOn;
 END.
