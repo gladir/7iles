@@ -2302,14 +2302,27 @@ Const
  KbDn    = #80;
  KbCtrlL = #12;
 
+Const
+ { Bloc POW (coordonnees monde 320x200) }
+ POW_X1  = 148;
+ POW_X2  = 172;
+ POW_TOP = 143;
+ POW_BOT = 159;
+ POW_MAX = 3;
+ STUN_FRAMES = 80;
+ STUN_FRAMES_FLOOR = 750; { ~30 sec a 25 fps - flip par coup de tete }
+
 Type
  TPlatform = Record X1,X2,Y:Integer; End;
  TSprite   = Record
-  Active : Boolean;
-  Kind   : Byte;
-  X,Y    : Integer;
-  DX,DY  : Integer;
-  Anim   : Integer;
+  Active  : Boolean;
+  Kind    : Byte;
+  X,Y     : Integer;
+  DX,DY   : Integer;
+  Anim    : Integer;
+  Stunned : Boolean;
+  StunCnt : Integer;
+  SaveDX  : Integer;
  End;
 
 Const
@@ -2334,6 +2347,8 @@ Var
  GameLevel: Byte;
  Frame    : Word;
  Score    : LongInt;
+ PowHits  : Byte;
+ PowFlash : Integer;
 
 { ---------------------------------------------------------- }
 { Construit la table 256 codes-palette -> 16 couleurs EGA.    }
@@ -2411,7 +2426,59 @@ Begin
 End;
 
 { ---------------------------------------------------------- }
-{ Decor du niveau : plateformes + tuyaux + POW + sol.         }
+{ Bloc POW : 3 utilisations puis disparait. Quand Mario le    }
+{ frappe par dessous, tous les ennemis se retournent (DX=-DX) }
+{ et deviennent etourdis pendant STUN_FRAMES.                 }
+{ ---------------------------------------------------------- }
+Procedure DrawPow;
+Var BgC:Word;
+Begin
+ If PowHits<=0 Then Begin
+  SetFillStyle(SolidFill, Black);
+  Bar(POW_X1*SCALE-2, POW_TOP*SCALE-2,
+      POW_X2*SCALE+2, POW_BOT*SCALE+2);
+  Exit;
+ End;
+ If PowFlash>0 Then BgC:=LightRed Else BgC:=Blue;
+ SetFillStyle(SolidFill, BgC);
+ Bar(POW_X1*SCALE, POW_TOP*SCALE, POW_X2*SCALE, POW_BOT*SCALE);
+ SetColor(Yellow);
+ Rectangle(POW_X1*SCALE, POW_TOP*SCALE, POW_X2*SCALE, POW_BOT*SCALE);
+ SetColor(White);
+ OutTextXY(POW_X1*SCALE+8, POW_TOP*SCALE+6, 'POW');
+End;
+
+{ Retourne tous les ennemis qui sont poses sur la plateforme }
+{ d'altitude PlatY (coup de tete par dessous).                }
+Procedure FlipEnemiesOnPlatform(PlatY:Integer);
+Var I:Integer;
+Begin
+ For I:=1 to NumSpr-1 do
+  With Sprites[I] do
+   If Active And(Not Stunned)And(Y=PlatY)And(DY=0)Then Begin
+    DX:=-DX;
+    Stunned:=True;
+    StunCnt:=STUN_FRAMES_FLOOR;
+   End;
+End;
+
+Procedure TriggerPow;
+Var I:Integer;
+Begin
+ If PowHits<=0 Then Exit;
+ Dec(PowHits);
+ PowFlash:=6;
+ For I:=1 to NumSpr-1 do
+  With Sprites[I] do
+   If Active Then Begin
+    DX:=-DX;
+    Stunned:=True;
+    StunCnt:=STUN_FRAMES;
+   End;
+ { Invalider les sauvegardes de fond : le decor (POW) a change }
+ For I:=0 to MAX_SPR-1 do BgValid[I]:=False;
+End;
+
 { ---------------------------------------------------------- }
 Procedure DrawLevel;
 Var I:Integer;
@@ -2447,12 +2514,7 @@ Begin
  Bar(300*SCALE,  170*SCALE, SCR_W-1,    189*SCALE);
 
  { POW block au centre }
- SetFillStyle(SolidFill, LightCyan);
- Bar(148*SCALE, 143*SCALE, 172*SCALE, 159*SCALE);
- SetColor(Blue);
- Rectangle(148*SCALE, 143*SCALE, 172*SCALE, 159*SCALE);
- SetColor(White);
- OutTextXY(152*SCALE, 148*SCALE, 'POW');
+ DrawPow;
 
  { Sol rouge avec hachures }
  SetFillStyle(SolidFill, LightRed);
@@ -2571,6 +2633,8 @@ Begin
   Kind  :=K;
   Anim  :=0;
   Y     :=22;
+  Stunned:=False;
+  StunCnt:=0;
   If SideRight Then Begin X:=250; DX:=-1; End
                Else Begin X:=50;  DX:=1;  End;
   DY:=2; { tombe vers la 1ere plateforme }
@@ -2596,18 +2660,62 @@ End;
 { Mise-a-jour physique de tous les sprites.                   }
 { ---------------------------------------------------------- }
 Procedure UpdateSprites;
-Var I,FY:Integer;
+Var I,FY,MCX,HeadY,HitIdx:Integer;
 Begin
+ If PowFlash>0 Then Begin
+  Dec(PowFlash);
+  If PowFlash=0 Then DrawPow;
+ End;
+
+ { --- Mario : collision avec POW par dessous --- }
+ With Sprites[0] do
+  If Active And(DY<0)And(PowHits>0)Then Begin
+   MCX:=X+10;
+   HeadY:=Y-16;
+   If(MCX>=POW_X1-2)And(MCX<=POW_X2+2)And
+     (HeadY<=POW_BOT)And(HeadY>=POW_TOP-2)Then Begin
+    DY:=2; { rebond vers le bas }
+    TriggerPow;
+    DrawPow;
+   End;
+  End;
+
  For I:=0 to NumSpr-1 do
   With Sprites[I] do
    If Active Then Begin
-    Inc(X, DX);
-    If X<0   Then X:=W_W-1;
+    { Etourdissement : ennemi immobile en X, mais subit gravite }
+    If Stunned Then Begin
+     Dec(StunCnt);
+     If StunCnt<=0 Then Begin
+      Stunned:=False;
+      If DX=0 Then DX:=1;
+     End;
+    End Else
+     Inc(X, DX);
+
+    If X<0    Then X:=W_W-1;
     If X>=W_W Then X:=0;
 
     If DY<>0 Then Begin
      Inc(Y, DY);
      If DY<0 Then Begin { saut }
+      { Coup de tete : si Mario (I=0) heurte le dessous d'une plateforme }
+      { (Y-16 = head, plateforme epaisse de 5px de Plat.Y a Plat.Y+4),  }
+      { retourner les ennemis qui se trouvent sur cette plateforme.     }
+      If I=0 Then Begin
+       FY:=999;
+       MCX:=X+10;
+       HeadY:=Y-16;
+       For HitIdx:=0 to NPLATS-1 do
+        If(MCX>=Platforms[HitIdx].X1)And(MCX<Platforms[HitIdx].X2)And
+          (HeadY>=Platforms[HitIdx].Y)And(HeadY<=Platforms[HitIdx].Y+5)Then
+         FY:=Platforms[HitIdx].Y;
+       If FY<999 Then Begin
+        FlipEnemiesOnPlatform(FY);
+        DY:=2; { rebond }
+        Y:=FY+20+1; { repositionne sous la plateforme }
+       End;
+      End;
       If Y<22 Then Begin Y:=22; DY:=2; End
               Else
       If StandsOn(X+10,Y)Then DY:=0;
@@ -2620,12 +2728,9 @@ Begin
      If Not StandsOn(X+10,Y)Then DY:=2;
     End;
 
-    If(I>0)And(DX<>0)And(DY=0)Then Anim:=(Anim+1)And 7;
+    If(I>0)And(Not Stunned)And(DX<>0)And(DY=0)Then Anim:=(Anim+1)And 7;
     If I=0 Then
      If(DX<>0)And(DY=0)Then Anim:=(Anim+1)And 7;
-
-    { Mario "ecrase" un ennemi qui touche la plateforme par-dessous : }
-    { non implemente dans cette version simplifiee.                  }
 
     { Despawn ennemi qui sort par les tuyaux du bas }
     If(I>0)And(Y>170)Then
@@ -2634,6 +2739,18 @@ Begin
       Inc(Score, 100);
      End;
    End;
+
+ { --- Collision Mario - ennemis : seuls les etourdis sont tues --- }
+ With Sprites[0] do
+  If Active Then
+   For I:=1 to NumSpr-1 do
+    If Sprites[I].Active And
+      (Abs(Sprites[I].X-X)<16)And
+      (Abs(Sprites[I].Y-Y)<16)Then
+     If Sprites[I].Stunned Then Begin
+      Sprites[I].Active:=False;
+      Inc(Score, 800);
+     End;
 End;
 
 { ---------------------------------------------------------- }
@@ -2673,7 +2790,10 @@ Begin
   Active:=True;
   Kind  :=iMario;
   X:=160; Y:=189; DX:=0; DY:=0; Anim:=0;
+  Stunned:=False; StunCnt:=0;
  End;
+ PowHits:=POW_MAX;
+ PowFlash:=0;
 
  DrawLevel;
  DrawHUD;
@@ -2722,6 +2842,7 @@ Begin
        If GameLevel>5 Then GameLevel:=0;
        For I:=0 to NumSpr-1 do
         If I<>0 Then Sprites[I].Active:=False;
+       PowHits:=POW_MAX; PowFlash:=0;
        DrawLevel; DrawHUD;
       End;
     End;
