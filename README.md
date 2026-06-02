@@ -6,6 +6,10 @@ Aperçu de Tetris (sous Free Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/132130638-57b5e8d3-50df-4696-834e-1790eb6e7645.png)
 
+Aperçu du jeu 1942 (sous Free Pascal)
+
+<img width="639" height="476" alt="image" src="https://github.com/user-attachments/assets/7e91a5ab-13a2-4008-96df-c1dc34492f33" />
+
 Aperçu de Tours d'Hanois (sous Free Pascal)
 
 ![image](https://user-images.githubusercontent.com/11842176/132130773-31b4704d-974c-48d3-a9d9-49b31ae1698d.png)
@@ -182,6 +186,11 @@ Voici la liste des différents fichiers de jeux proposés dans 7iles :
         <td><b>649.PAS</b></td>
         <td><b>6/49</b></td>
         <td>Ce fichier contient un jeu de Lotto 6/49.</td>
+    </tr>
+    <tr>
+        <td><b>1942.PAS</b></td>
+        <td><b>1942</b></td>
+        <td>Ce fichier contient le jeu 1942, le jeu de tir d'avion a defilement vertical.</td>
     </tr>
     <tr>
         <td><b>2048.PAS</b></td>
