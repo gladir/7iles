@@ -4,7 +4,7 @@
   @abstract(Target: Turbo Pascal 7, Free Pascal 3.2)
   @description: Clone du jeu d'arcade 1942 (Capcom, 1984). Le joueur pilote un
                 P-38 Lightning au-dessus du Pacifique et abat des avions ennemis
-                qui descendent l'ecran. 
+                qui descendent l'ecran.
   Touches :
    - Fleches gauche/droite/haut/bas : deplacement
    - Espace : tir
@@ -12,7 +12,7 @@
    - Echap : quitter
 }
 
-Program Game1942;
+Program _1942;
 
 {$R-}
 
@@ -80,6 +80,7 @@ Var
  Frame:LongInt;
  SpawnTimer:Integer;
  ScreenW,ScreenH:Integer;
+ WaveScroll:Integer;
 
 Function IntToStr(V:LongInt):String;
 Var S:String[12];
@@ -350,6 +351,7 @@ Begin
  ExpT:=0;
  Frame:=0;
  SpawnTimer:=0;
+ WaveScroll:=0;
  For I:=1 to MAX_PSHOTS do PShots[I].Active:=False;
  For I:=1 to MAX_ESHOTS do EShots[I].Active:=False;
  For I:=1 to MAX_ENEMIES do Enemies[I].Active:=False;
@@ -449,11 +451,51 @@ Begin
    End;
 End;
 
-Procedure DrawScene;
-Var I:Integer;Blink:Boolean;
+Procedure DrawOcean;
+Var
+ Col,Row,X,Y,H:Integer;
+ Cell:Word;
 Begin
  SetFillStyle(SolidFill,Blue);
  Bar(0,0,ScreenW,ScreenH);
+ { Vagues : petits traits clairs sur une grille pseudo-aléatoire }
+ { défilant vers le bas pour donner l'illusion de mouvement.    }
+ For Row:=-1 to (ScreenH Div 16)+1 do
+  For Col:=0 to (ScreenW Div 24) do Begin
+   { Hash déterministe (Col,Row) pour position stable. }
+   Cell:=Word((Col*73+(Row+WaveScroll Div 4)*131+(Col And Row)*17) And $FFFF);
+   X:=Col*24+(Cell And 15);
+   Y:=Row*16+WaveScroll Mod 16+((Cell Shr 4) And 7);
+   H:=(Cell Shr 7) And 3;
+   Case H of
+    0:Begin
+     SetColor(LightBlue);
+     Line(X,Y,X+4,Y);
+    End;
+    1:Begin
+     SetColor(LightBlue);
+     Line(X,Y,X+2,Y);
+     Line(X+4,Y+1,X+6,Y+1);
+    End;
+    2:Begin
+     SetColor(White);
+     PutPixel(X,Y,White);
+     PutPixel(X+1,Y,White);
+     PutPixel(X+2,Y+1,LightBlue);
+    End;
+    3:Begin
+     SetColor(LightBlue);
+     Line(X+1,Y,X+3,Y);
+     PutPixel(X+5,Y+1,LightBlue);
+    End;
+   End;
+  End;
+End;
+
+Procedure DrawScene;
+Var I:Integer;Blink:Boolean;
+Begin
+ DrawOcean;
  DrawClouds;
  For I:=1 to MAX_PSHOTS do
   If PShots[I].Active Then DrawPShot(PShots[I].X,PShots[I].Y);
@@ -508,14 +550,13 @@ Begin
  OutTextXY(ScreenW Div 2-80,80,'1942');
  SetTextStyle(DefaultFont,HorizDir,1);
  SetColor(White);
- OutTextXY(ScreenW Div 2-130,180,'Clone Turbo Pascal du jeu Capcom');
+ OutTextXY(ScreenW Div 2-130,180,'Clone du jeu 1942 du jeu Capcom');
  OutTextXY(ScreenW Div 2-100,220,'Fleches  : Deplacer');
  OutTextXY(ScreenW Div 2-100,235,'Espace   : Tir');
  OutTextXY(ScreenW Div 2-100,250,'L        : Looping (esquive)');
  OutTextXY(ScreenW Div 2-100,265,'Echap    : Quitter');
  SetColor(LightGreen);
  OutTextXY(ScreenW Div 2-110,330,'Appuyez sur une touche...');
- OutTextXY(ScreenW Div 2-130,360,'(c) 2026 Sylvain Maltais');
  ClrKbd;
  Ch:=ReadKey;
  If Ch=#0 Then Ch:=ReadKey;
@@ -554,6 +595,7 @@ BEGIN
   InitGame;
   Repeat
    Inc(Frame);
+   Inc(WaveScroll);
    HandleInput;
    If Quit Then Break;
    UpdateClouds;

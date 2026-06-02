@@ -28,10 +28,11 @@ Type
  End;
 
 Const
-  MAX_GAMES = 81;
+  MAX_GAMES = 82;
   Games: Array[1..MAX_GAMES] of TGameInfo = (
     (Title: '421 - Jeu de d‚s'; ProgramExec: '421.EXE'),
     (Title: '649 - Lotto 6/49'; ProgramExec: '649.EXE'),
+    (Title: '1942 - Jeu d''avion'; ProgramExec: '1942.EXE'),
     (Title: '2048 - Puzzle de nombres'; ProgramExec: '2048.EXE'),
     (Title: 'Anagram - Jeu de mots'; ProgramExec: 'ANAGRAM.EXE'),
     (Title: 'Asteroid - Jeu spatial'; ProgramExec: 'ASTEROID.EXE'),
